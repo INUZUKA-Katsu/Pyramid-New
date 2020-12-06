@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -Ku
+#!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
 #// 横浜市の人口ピラミッド ver2.10 2017.1.14  INUZUKA Katsu
@@ -10,7 +10,7 @@ require "net/https"
 require 'open-uri'
 require 'openssl'
 
-$KCODE = "utf-8"
+#$KCODE = "utf-8"
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 #Encoding.default_external = "utf-8" if RUBY_VERSION[0]=="2"
 
@@ -25,10 +25,12 @@ KuOptionFile       = "/nenreibetsu/ku-option.txt"
 ChoOptionFile      = "/nenreibetsu/cho-option.txt"
 AyumiOptionFile    = "/ayumi/ayumi-option.txt"
 SyoraiOptionFile   = "/syoraisuikei/syorai-option.txt"
-Location0          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/new/age-j.html"
+#Location0          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/new/age-j.html"
+Location0          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/juki/"
 Location1          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/<nengetsu>/<ku>-j.html"
 Location2          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/<nengetsu>/csv/<ku><nengetsu>.csv"
-Location3          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/mokuji/tsurumi.html"
+#Location3          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/mokuji/tsurumi.html"
+Location3          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/"
 #町丁別年齢別人口のインデックスのページ
 Location4          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/index.html"
 #町丁別年齢別人口のcsvファイルのurl
@@ -36,13 +38,13 @@ Location5          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/toke
 Location6          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/opendata/suikei03.files/e3yokohama<nengetsu>.zip"
 
 def alert(s)
-    print "Content-Type: text/html\n\n"
+    str = "Content-Type: text/html\n\n"
     #print s.gsub(/Shift_JIS|shift_jis/u,"UTF-8")
-    print '<html>'
-    print '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>'
-    print s
-    print "</html>"
-    exit
+    str << '<html>'
+    str << '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>'
+    str << s
+    str << "</html>"
+    ["text/html",str]
 end
 
 class String
@@ -328,10 +330,9 @@ class GetDATA
   def get_and_save_all_options()
     def ku_option()
       html  = get_network_file(Location0)
-      ary   = html.scan(/value="\/ex\/stat\/jinko\/age\/\d\d"/).map{|l| l.match(/\d\d/)[0].to_s+"01"}
+      ary   = html.scan(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/nenrei\/juki\/\w\d\d?nen\.html">.*?年\(\d\d(\d\d)\).*?<\/a>/).flatten.map{|yy| yy+"01"}
       ary.map!{|nengetsu| "#{" "*18}<option value=\"#{nengetsu}\">#{kijunbi(nengetsu)}</option>"}
       ary.shift  #2019.3.14 付け焼き刃の応急措置
-      ary.unshift("#{" "*18}<option value=\"1901\">平成31年1月1日現在</option>")
       ary.unshift("#{" "*18}<option value=\"new\" selected>　　 最新</option>").join("\n")
     end
     def syorai_option(ku_str)
@@ -356,12 +357,15 @@ class GetDATA
     end
     def cho_option()
       html  = get_network_file(Location3)
-      ary   = html.scan(/<option.*?\d\d.*?>.{3,10}年/).map{|l| l.match(/\d\d/)[0]+"09"}
-      ary.shift unless url_exist?(web_location(:csv,ary[0]))
+      ary   = html.scan(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/chocho\/nenrei\/\w\d\d?cho-nen\.html">.*?年[\s|　]?\(\d\d(\d\d)\).*?<\/a>
+/).flatten
+      ary.map!{|yy| yy+"09"}
       ary.map!{|nengetsu| "<option value=\"#{nengetsu}\">#{kijunbi(nengetsu)}</option>"}
-      #リニューアルサイトからの取得がなぜか作動しないので緊急避難
-      ary.unshift('<option value="1809">平成30年9月30日現在</option>')
-      ary.unshift('<option value="1909">令和元年9月30日現在</option>')
+      newest = html.match(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/chocho\/nenrei\/(\w\d\d?cho-nen\.html)">.*?<\/a>/)[1]
+      html2  = get_network_file(Location3+newest)
+      unless html2.match(/<a.*?href="\w\d\d?cho-nen\.files\/tsurumi\d\d09\.csv">/)
+        ary.shift
+      end
       "#{" "*18}"+ary.join("\n#{" "*18}")
     end
 
@@ -628,7 +632,7 @@ class GetDATA
     #response['last-modified']
     #alert(uri.to_s)
     #uri.open().last_modified
-    open(location).last_modified
+    URI.open(location).last_modified
   end
 
   def get_network_file(location, limit = 10)
@@ -738,7 +742,6 @@ def main(param)
   else
     cho    = nil
   end
-
   case level
   when :shiku_json
     if nengetsu.match(/年$/)
@@ -770,6 +773,6 @@ def main(param)
       ["text/plain", obj.html_str]
     end
   rescue => e
-      ["text/html", alert(e.message + "<br>\n" + e.backtrace.join("<br>\n"))]
+      alert(e.message + "<br>\n" + e.backtrace.join("<br>\n"))
   end
 end
