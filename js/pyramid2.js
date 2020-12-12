@@ -14,7 +14,7 @@ function on_page_load(){
   modify_screen_shot_button();
   //************初期設定1ここまで**********
   
-  redisplay_pyramid();
+  //redisplay_pyramid();
   
   //************初期設定2****************
   //端末へのデータ保存のチェックボックス表示を各人の既定値にする.
@@ -22,7 +22,7 @@ function on_page_load(){
     localStorage_defautSetting();
   }
   //市区・町丁の年月日セレクトボックスをローカルに保存し、HTMLも更新する.
-  all_option_renew();
+  //all_option_renew();
   //市区の年月日セレクトボックスを更新する.
   //shiku_option();
   //町丁の年月日セレクトボックスを更新する.
@@ -326,7 +326,7 @@ function ajax(mode,nengetsu,i,unit_size){
      }
   }
   var SendData = get_SendData(mode,nengetsu);
-  xmlHttp.open("POST" , "./PyramidAjax2.cgi" , true);
+  xmlHttp.open("POST" , "./PyramidAjax.cgi" , true);
   xmlHttp.setRequestHeader("content-type",
       "application/x-www-form-urlencoded");
   encodeURIComponent(SendData).replace(/%20/g,'+');
@@ -338,14 +338,13 @@ function ajax(mode,nengetsu,i,unit_size){
 //ローカルまたはサーバから取得したデータを元にHTML変更処理を振り分ける.
 function modify_html(response,mode,nengetsu,unit_size){
 //s=mode+"の戻り値\n"+nengetsu+"\n"+response;
-//alert(mode);
+//alert(s);
   switch (mode){
     case "shiku_json":
     case "cho_json":
       try{
         //alert(response);
         var pyramidData = JSON.parse(response);
-        //var pyramidData = (new Function("return " + response))(); //セキュアブラウザ対応
         change_pyramid(pyramidData,unit_size);
       }catch(e){
         //サーバ側のrubyのJSON作成処理で文字コードに起因するエラーが発生した場合、
@@ -359,9 +358,7 @@ function modify_html(response,mode,nengetsu,unit_size){
       }
       break;
     case "cho_csv":
-      //alert(response)
       var pyramidData = makePyramidData(response);
-      //alert(pyramidData);
       change_pyramid(pyramidData,unit_size);
       break;
     case "cho_list":
@@ -374,6 +371,7 @@ function modify_html(response,mode,nengetsu,unit_size){
       change_cho_option(response);
       break;
     case "all_options":
+    //alert(response);
       var options = JSON.parse(response);
       //var options = (new Function("return " + response))();
       var shiku   = get_selected_shiku();
@@ -428,8 +426,7 @@ console.log(pyramidData["kakusai_betsu"][0]);
   }
   var time_series = [[],[],[]];
   kakusaiData.forEach(function(val){
-    //alert(val);
-    if(val[0]=="総数"){return;}
+    if(val[0]=="総数" || val[0]=="年齢不詳"){return;}
     var nenrei= val[0];
     var m_nin = val[2];
     var f_nin = val[3];
@@ -445,12 +442,12 @@ console.log(pyramidData["kakusai_betsu"][0]);
     time_series[2].push(parseInt(f_len));
     $KakusaiData[nenrei]={male:m_nin.replace(',', ''),female:f_nin.replace(',', '')};
   });
+
   adjust_size(time_series);
   var nengetsu=get_selected_nengetsu();
   if(nengetsu=="9501"&&(shiku=="港北区"||shiku=="緑区"||shiku=="都筑区"||shiku=="青葉区")){
     shiku="港北・緑・青葉・都筑４区";
   }
-
   var h2 = shiku.replace('将来推計人口','<span class="small">将来推計人口</span>')+'<span class="inline-block">('+kijunbi+')</span>';
   if(not_exist!=undefined && not_exist!=""){
     if(not_exist=="青葉区" || not_exist=="都筑区"){
@@ -462,7 +459,7 @@ console.log(pyramidData["kakusai_betsu"][0]);
   }
 
    //h2(タイトル)を西暦主体に書き直す.
-  h2=change_seireki_main(h2);
+   h2=change_seireki_main(h2);
 
   document.getElementById("h2").innerHTML     = h2;
   document.getElementById("sosu").innerHTML   = plus_comma(sosu);
@@ -474,7 +471,7 @@ console.log(pyramidData["kakusai_betsu"][0]);
   basic_data_position();
   //現在のピラミッドを次回ロード時に再現するための情報を保存する.
   save_last_pyramid();
-
+  
   function source_str(shiku,source){
     var str="データの出典： 横浜市統計ポータルサイト ";
     var nengetsu=get_selected_nengetsu();
@@ -613,21 +610,21 @@ function adjust_title_size(title){
 function basic_data_position(){
   var nengetsu = get_selected_nengetsu(get_pyramid_mode());
   var obj = document.getElementById("basic_data")
-	var btn=document.getElementById("kubun_button");
+  var btn=document.getElementById("kubun_button");
   if(nengetsu.match(/昭和|大正/)){
     if(btn.style.display=="none"){
-		  obj.style.bottom = "400px";
-		}else{
-			obj.style.bottom = "300px";
-		}
+      obj.style.bottom = "400px";
+    }else{
+      obj.style.bottom = "300px";
+    }
   }else{
     if(btn.style.display=="none"){
       obj.style.bottom = "66pt";
       obj.style.right = "5pt";
-		}else{
-			obj.style.bottom = "66pt";
+    }else{
+      obj.style.bottom = "66pt";
       obj.style.right = "10pt";
-		}
+    }
   }
 }
 //市区の選択が横浜市か区かを判別して、町丁一覧の表示・非表示を切り替える処理.
@@ -691,6 +688,7 @@ function change_shiku_option(str){
 }
 //町丁ピラミッド用の年月日セレクトボックスの選択肢を更新する.
 function change_cho_option(str){
+  //alert(str);
   var nengetsu=get_selected_nengetsu("cho");
   document.getElementById("cho_year").innerHTML = str;
   select_nengetsu(nengetsu,"cho");
@@ -1343,11 +1341,11 @@ function dateTime(arg="-sec"){
 function plus_comma(su,unit){
   if(unit=='%'){return su;}
   if(typeof su=='string'){
-		if(su.match(/^\d+$/)){
+    if(su.match(/^\d+$/)){
       num=Number(su);
-		}else{
-			return su;
-		}
+    }else{
+      return su;
+    }
   }else{
     num=su;
   }
@@ -1360,33 +1358,26 @@ function plus_comma(su,unit){
 }
 
 function change_seireki_main(hi){
-  //alert(hi);
   var a=hi.match(/(大正|昭和|平成|令和)(\d+|元).*年\)?/);
-  if(a==null){alert("pyramid.jsが新元号に対応していません。");}
+  if(a[2]=="元"){a[2]="1"}
   var org=a[0];
   var gen=a[1];
-  if(a[2]=="元"){
-    var nen=1
-  }else{
-    var nen=Number(a[2]);
-  }
-  if(gen=="平成" && nen>31){
-    gen="令和";
-    nen=nen-30;
-  }
-  if     (gen=="大正"){var seireki=1911+nen}
+  var nen=Number(a[2]);
+  if        (gen=="大正"){var seireki=1911+nen}
   else if(gen=="昭和"){var seireki=1925+nen}
   else if(gen=="平成"){var seireki=1988+nen}
-  else if(gen=="令和"){var seireki=2018+nen}
-  var alt=seireki+"年("+gen+nen+"年)";
-  //alert(hi.replace(org,alt));
-  hi=hi.replace(org,alt).replace("(","&nbsp;")
-  if(!hi.match(/将来推計人口/)){hi=hi.replace(/\)</,"<")};
+  else if(gen=="令和"){var seireki=2018+nen}    
+  if(hi.match(/1月|3月|9月/)){
+    var alt=seireki+"年("+gen+nen+"年)";
+  }else{
+    var alt=seireki+"年)";
+  }
+  hi=hi.replace(org,alt).replace("(","&nbsp;").replace(/\)</,"<");
   //alert(hi);
   return hi;
 }
 
-//年齢区分別人口の処理
+//年齢区分別人口の処理区分
 function kubunDisplay(){
   var opt=document.getElementById("kubun_unit");
   var val=opt.value;
@@ -1398,7 +1389,7 @@ function kubunDisplay(){
     disp.style.display="inline-block";
     btn.style.display ="none";
     info.style.display="inline";
-	}else if(val=="人口"){
+  }else if(val=="人口"){
     var ratio=false;
     disp.style.display="inline-block";
     btn.style.display ="none";
@@ -1410,7 +1401,7 @@ function kubunDisplay(){
     info.style.display="none";
   }
   basic_data_position();
-	kubunChange(ratio);
+  kubunChange(ratio);
 }
 
 function kubunSelectDisp(){
@@ -1426,10 +1417,19 @@ function kubunSelectDisp(){
   basic_data_position();
 }
 
+function current_kubun(){
+  var opt=document.getElementById("kubun_unit");
+  var num=opt.options.selectedIndex;
+  var kubun=opt.options[num].value;
+  return kubun;
+}
+
 //年齢区分を変更したとき、表側の高年齢区分と低年齢区分を連動させる。
 //引数：true(デフォルト) ⇒ 構成比、false ⇒ 人数
 function kubunChange(ratio){
-  if(ratio==undefined){
+  if(current_kubun()=="人口"){
+    ratio=false;
+  }else{
     ratio=true;
   }
   var smid=document.getElementById('smiddle');
