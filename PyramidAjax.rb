@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #// 横浜市の人口ピラミッド ver2.10 2017.1.14  INUZUKA Katsu
+require "json"
 require "time"
 require "cgi"
 require "kconv"
@@ -25,6 +26,8 @@ KuOptionFile       = "/nenreibetsu/ku-option.txt"
 ChoOptionFile      = "/nenreibetsu/cho-option.txt"
 AyumiOptionFile    = "/ayumi/ayumi-option.txt"
 SyoraiOptionFile   = "/syoraisuikei/syorai-option.txt"
+LocalDirShikuJson  = 'nenreibetsu/'
+
 #Location0          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/new/age-j.html"
 Location0          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/juki/"
 Location1          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/<nengetsu>/<ku>-j.html"
@@ -53,31 +56,6 @@ class String
       self
     else
       self.force_encoding("utf-8")
-    end
-  end
-end
-
-module JSON
-#配列限定、年齢別人口統計限定の簡易処理
-  def self.generate(arg)
-    if arg.class==Array
-      j="[" + arg.map{|item| self.quote(item)}.join(",") + "]"
-    elsif arg.class==Hash
-      j="{" + arg.keys.map{|k| self.quote(k)+":"+self.quote(arg[k])}.join(",") + "}"
-    end
-    j
-  end
-  def self.load(json)
-    eval(json.gsub(/":"/,'"=>"'))
-  end
-  def self.quote(item)
-    case
-    when item.class==String
-      "\"#{item.gsub(/\//,'\/').gsub(/"/,'\"').gsub(/\n/,'\\n')}\""
-    when item.class==Fixnum
-      "#{item}"
-    when item.class==Array, item.class==Hash
-      "#{generate(item)}"
     end
   end
 end
@@ -114,7 +92,13 @@ class GetDATA
     @ku            = ku
     @nengetsu      = nengetsu
     if nengetsu=="new" and level==:shiku_json
-      @nengetsu    = "2001"   #暫定的処置
+      ary = []
+      Dir.glob(LocalDirShikuJson+"tsurumi*.txt").each do |f|
+        if ans=f.match(/\d{4}/)
+          ary << ans[0]
+        end
+      end
+      @nengetsu = ary.select{|nengetsu| nengetsu.to_i<9001}.max
     else
       @nengetsu    = nengetsu
     end
@@ -154,7 +138,7 @@ class GetDATA
     when :cho_option
       @html_str    = get_cho_option()
     when :all_options
-      @json        = get_and_save_all_options()
+      @json        = get_all_options()
     end
   end
 
@@ -224,73 +208,12 @@ class GetDATA
   end
 
   def get_shiku_data()
-    ku_not_exist = json_of_not_exist_ku()
-    return ku_not_exist if ku_not_exist
-
+    if ku_not_exist = json_of_not_exist_ku()
+      return ku_not_exist
+    end
     json_file  = local_file(:json)
     json       = get_local(json_file)
-
-    location   = web_location(:html)
-    location2  = web_location(:shiku_zip) #オープンデータのzipファイル
-
-    @time = ""
-    if @nengetsu<="1901" or @nengetsu>"7501"
-      @time = last_modified(location)      
-    else
-      @time = last_modified(location2)
-    end
-    #alert time.class.to_s
-    #alert (Time.parse(last_modified_of_json(json)).strftime("%Y-%m-%d, %H:%M") == time.strftime("%Y-%m-%d, %H:%M")).to_s
-    #alert (Time.parse(last_modified_of_json(json)) == time).to_s
-    #alert (last_modified_of_json(json).class and Time.parse(last_modified_of_json(json)) == time).to_s
-    #alert (json != nil and last_modified_of_json(json)==@time).to_s
-    if json != nil and last_modified_of_json(json) == @time
-      #alert("Here 1")
-      return json
-    elsif @nengetsu<="1901" or @nengetsu>"7501"
-      #alert("Here 2")
-      html     = get_network_file(location, limit = 10)
-      html2    = to_han(html).sub("100歳以上","100").gsub(/総(¥s|　)*数/,"総数").gsub(/<\/?strong>/,"").gsub(/<\/?b>/,"")
-      data     = Hash.new
-      data["last_modified"] = @time.to_s
-      data["shiku"]         = to_kanji(@ku)
-      data["kijunbi"]       = get_kijunbi(html2)
-      data["source_url"]    = data_source(:html)
-      data["kakusai_betsu"] = kakusai_betsu(html2)
-      json                  = JSON.generate(data)
-      begin
-        save_local(json_file,json)
-      ensure
-        return json
-      end
-    else
-      #alert("Here 3")
-      csv_file = local_file(:shiku_csv)
-      csv      = get_local(csv_file)
-      ary      = csv.split("\n").map!{|l| l.strip.split(",")}
-      ary.shift
-      shiku   = ary[1][2]
-      d       = ary[1][0].split("-")
-      kijunbi = "令和#{(d[0].to_i-2018)}年#{d[1].to_i}月#{d[2].to_i}日現在"
-      kakusai = ary.map{|i| [i[3],i[4],i[5],i[6]]}
-
-      location = web_location(:shiku_zip) 
-      @time     = last_modified(location).getlocal
-      source   = location + "(" + local_file(:shiku_csv).sub(/.*\//,"") + ")"
-
-      data = Hash.new
-      data["last_modified"] = @time.to_s
-      data["shiku"]         = shiku
-      data["kijunbi"]       = kijunbi
-      data["source_url"]    = source
-      data["kakusai_betsu"] = kakusai
-      json                  = JSON.generate(data)
-      begin
-        save_local(json_file,json)
-      ensure
-        return json
-      end
-    end
+    json
   end
 
   def modify_src(json)
@@ -302,7 +225,7 @@ class GetDATA
     json_file  = local_file(:json_syorai)
     json       = get_local(json_file)
     json       = modify_src(json)
-    return json
+    json
   end
 
   def get_syorai_ku_data(ku)
@@ -326,56 +249,10 @@ class GetDATA
     end
   end
 
-  #年月日コンボボックスのoption(選択肢)を作成しサーバに保存する.
-  def get_and_save_all_options()
-    def ku_option()
-      html  = get_network_file(Location0)
-      ary   = html.scan(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/nenrei\/juki\/\w\d\d?nen\.html">.*?年\(\d\d(\d\d)\).*?<\/a>/).flatten.map{|yy| yy+"01"}
-      ary.map!{|nengetsu| "#{" "*18}<option value=\"#{nengetsu}\">#{kijunbi(nengetsu)}</option>"}
-      ary.shift  #2019.3.14 付け焼き刃の応急措置
-      ary.unshift("#{" "*18}<option value=\"new\" selected>　　 最新</option>").join("\n")
-    end
-    def syorai_option(ku_str)
-      newest_year = (ku_str.scan(/\d{2}01/).select{|y| y.match(/[^9]\d01/)}.max[0,2].to_i+2001)
-      data        = get_local(local_file(:syorai_option)).to_utf8
-      data.split("\n").map{|l| " "*18+l}.select{|l| y=l.match(/\d{4}/) and y[0].to_i>newest_year}.join("\n")
-    end
-    def ayumi_option()
-      file  = local_file(:ayumi_option)
-      get_local(file).to_utf8
-    end
-    def cho_option_new()
-      if 1==1 #緊急避難 
-        get_cho_option()
-      else
-        html  = get_network_file(Location4)
-        ary   = html.scan(/\w\d\dcho-nen\.html.*?>.*?町丁別年齢別人口/).map{|l| l.match(/\d{4}/)[0][2,2]+"09"}
-        ary.shift unless url_exist?(web_location(:csv,ary[0]))
-        ary.map!{|nengetsu| "<option value=\"#{nengetsu}\">#{kijunbi(nengetsu)}</option>"}
-        "#{" "*18}"+ary.join("\n#{" "*18}")
-      end
-    end
-    def cho_option()
-      html  = get_network_file(Location3)
-      ary   = html.scan(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/chocho\/nenrei\/\w\d\d?cho-nen\.html">.*?年[\s|　]?\(\d\d(\d\d)\).*?<\/a>
-/).flatten
-      ary.map!{|yy| yy+"09"}
-      ary.map!{|nengetsu| "<option value=\"#{nengetsu}\">#{kijunbi(nengetsu)}</option>"}
-      newest = html.match(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/chocho\/nenrei\/(\w\d\d?cho-nen\.html)">.*?<\/a>/)[1]
-      html2  = get_network_file(Location3+newest)
-      unless html2.match(/<a.*?href="\w\d\d?cho-nen\.files\/tsurumi\d\d09\.csv">/)
-        ary.shift
-      end
-      "#{" "*18}"+ary.join("\n#{" "*18}")
-    end
-
-    base    = ku_option()                        #以下3行 2018.4.7
-    ku_str  = syorai_option(base) + "\n" + base
-    shi_str = ku_str + "\n" + ayumi_option()
-    cho_str = cho_option()
-    save_local( local_file(:ku_option), ku_str  )
-    save_local( local_file(:shi_option),shi_str )
-    save_local( local_file(:cho_option),cho_str )
+  def get_all_options()
+    ku_str  = get_ku_option()
+    shi_str = get_shi_option()
+    cho_str = get_cho_option()
     JSON.generate( {"ku_option"=>ku_str,"shi_option"=>shi_str,"cho_option"=>cho_str} )
   end
 
@@ -600,102 +477,8 @@ class GetDATA
     web_location(syubetsu)
   end
 
-  def last_modified_of_json(json)
-    if json.match(/last_modified/)
-      Time.parse(json.match(/last_modified":"(.*?)"/)[1])
-    else
-      Time.parse(json.match(/\["(.*?)"/)[1])
-    end
-    #begin
-    #  data = JSON.load(json)
-    #  if data.class==Hash
-    #    if data.keys[0].class==Symbol
-    #      data[:last_modified]
-    #    else
-    #      data["last_modified"]
-    #    end
-    #  else
-    #    data[0]
-    #  end
-    #rescue => e
-    #  alert e.message
-    #end
-  end
-
-  def last_modified(location)
-    #戻り値はTimeクラス
-    #uri=URI.parse(location)
-    #response = nil
-    #Net::HTTP.start(uri.host, 80) {|http|
-    #  response = http.head(uri.request_uri)
-    #}
-    #response['last-modified']
-    #alert(uri.to_s)
-    #uri.open().last_modified
-    URI.open(location).last_modified
-  end
-
-  def get_network_file(location, limit = 10)
-  # *****  httpsに対応 *****
-    raise ArgumentError, 'too many HTTP redirects' if limit == 0
-    if location[0,6]=="https:"
-      https = true
-    end
-    uri = URI.parse(location)
-    begin
-      http = Net::HTTP.new(uri.host,uri.port)
-      if location[0,6]=="https:"
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-      http.start do
-        response = http.get(uri.request_uri)
-        case response
-        when Net::HTTPSuccess
-          if https ==true  and location[-3,3] != "csv"  #リニューアルサイトの文字コードはCSVファイルを除きUTF8になった.
-            return response.body.force_encoding("utf-8")
-          else
-            return response.body.kconv(Kconv::UTF8,Kconv::SJIS)
-          end
-          #return Uconv.sjistou8(response.body)
-        when Net::HTTPRedirection
-          location = response['location']
-          warn "redirected to #{location}"
-          get_network_file(location, limit - 1)
-        else
-          puts [uri.to_s, response.value].join(" : ")
-          nil
-        end
-      end
-    rescue => e
-      puts [uri.to_s, e.class, e].join(" : ")
-      nil
-    end
-  end
-
-  def url_exist?(url, limit = 10)
-    if limit == 0
-      return false
-    end
-    begin
-      response = Net::HTTP.get_response(URI.parse(url))
-    rescue
-      return false
-    else
-      case response
-      when Net::HTTPSuccess
-        return true
-      when Net::HTTPRedirection
-        url_request(response['location'], limit - 1)
-      else
-        return false
-      end
-    end
-  end
-
   def to_han(str)
-      h ={ "０"=>"0", "１"=>"1", "２"=>"2", "３"=>"3", "４"=>"4", "５"=>"5", "６"=>"6", "７"=>"7", "８"=>"8", "９"=>"9" }
-      str.gsub(/[０-９]/){h[$&]}
+    str.tr('０-９','0-9')
   end
 
   def to_kanji(kumei)
