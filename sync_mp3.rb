@@ -1,5 +1,8 @@
 # coding: utf-8
 
+#Dropboxのmp3フォルダをHerokuのtmpフォルダにコピーする。
+#HerokuのDyno起動時に実行する。
+
 require 'dropbox_api'
 require 'fileutils'
 
@@ -13,9 +16,11 @@ def get_files_path_list(folder,files,kakuchoshi)
   list.entries.each do |path|
     f = path.path_display
     if f[-5,5].match(/\./)
-      files << f if not kakuchoshi or File.extname(f)==kakuchoshi
+      if not kakuchoshi or kakuchoshi.include? File.extname(f)
+        files << f
+        p f
+      end
     else
-      p f
       adds << f
     end
   end
@@ -32,6 +37,7 @@ def get_from_dropbox(src_path,dest_path)
       contents << chunk
     end
     File.open(dest_path,"wb") do |f|
+      p dest_path
       f.write contents
     end  
   rescue
@@ -42,12 +48,18 @@ end
 if ARGV[0]
   kakuchoshi = ARGV[0]
 else
-  kakuchoshi = nil
+  kakuchoshi = %W|.mp3 .m4a|
 end
-list = get_files_path_list("/mp3",[],kakuchoshi)
+#Dropboxの'/アプリ/mcc-choir/mp3'以下のファイルのpathをリストアップする。
+#外からは、mcc-choirフォルダが'/'になる。
+folder     = '/mp3'
+files     = []
+list = get_files_path_list(folder,files,kakuchoshi)
 puts
+#Dropboxのファイルを読み出し、Herokuの一時保存フォルダに保存する。
+#保存先は、'/tmp/mcc/mp3'とする。
 list.each do |path|
-  p path
-  FileUtils.mkdir_p(File.dirname('./mcc'+path),:mode => 666)
-  get_from_dropbox(path,'./mcc'+path)
+  #p '/tmp/mcc'+path
+  FileUtils.mkdir_p(File.dirname('./tmp/mcc'+path),:mode => 666)
+  get_from_dropbox(path,'./tmp/mcc'+path)
 end
