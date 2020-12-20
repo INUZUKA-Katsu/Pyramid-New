@@ -59,6 +59,8 @@ puts
 #Dropboxのファイルを読み出し、Herokuの一時保存フォルダに保存する。
 #保存先は、'/tmp/mcc/mp3'とする。
 list.each do |path|
-  p '/tmp/mcc'+path
-  get_from_dropbox(path,'./tmp/mcc'+path)
+  #p '/tmp/mcc'+path
+  src_path  = path
+  dest_path = '$HOME/tmp/mcc'+path
+  get_from_dropbox(src_path,dest_path)
 end
