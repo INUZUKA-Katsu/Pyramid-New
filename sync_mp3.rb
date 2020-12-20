@@ -7,7 +7,7 @@ require 'dropbox_api'
 require 'fileutils'
 
 Dir.chdir(__dir__)
-p Dir.pwd
+#p Dir.pwd
 
 $access_token = "yqqyQxpAqngAAAAAAAAAAdYt0WfwqexuF4ahEUugRoOFxetIGwz1qVH09zlvfYBm"
 $client = DropboxApi::Client.new($access_token)
@@ -65,4 +65,5 @@ list.each do |path|
   src_path  = path
   dest_path = './tmp/mcc'+path
   get_from_dropbox(src_path,dest_path)
+  File.chmod(666,dest_path)
 end
