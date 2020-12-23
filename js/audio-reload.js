@@ -3,15 +3,11 @@ var i=0;
 window.onload=function(){
   var elms = document.getElementsByTagName('audio');
   var elm  = elms[elms.length-2]
-  id=setInterval(function(){reload(elm)},1500)
+  setTimeout(function(){reload(elm)},1500);
 }
-function reload(elm){
-  Location.reload;
-  window.location.href = window.location.href;
-  console.log(i);
-  i++
-  console.log('readyState => ' + elm.readyState);
-  if(elm.readyState>0){
-    clearInterval(id);
+function reload(elm){  
+  if(elm.readyState==0){
+    window.location.href = window.location.href;
   }
 }
+
