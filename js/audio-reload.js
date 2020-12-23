@@ -7,6 +7,7 @@ window.onload=function(){
 }
 function reload(elm){
   Location.reload;
+  window.location.href = window.location.href;
   console.log(i);
   i++
   console.log('readyState => ' + elm.readyState);
