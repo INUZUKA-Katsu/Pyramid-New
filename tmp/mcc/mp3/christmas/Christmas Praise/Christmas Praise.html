@@ -11,6 +11,20 @@
       audio    {height:24px;}
       div.link {margin-left:2em;margin-top:2em;}
 		</style>
+    <script type="text/javascript">
+      window.onload=function(){
+        var elms = document.getElementsByTagName('audio');
+        var reload = function(){
+          Location.reload;
+          console.log('reloaded');
+          if(elms[3].readyState>0){
+            //alert("ready!");
+            clearInterval(id);
+          }
+        }
+        var id=setInterval(reload,1500)
+      }
+    </script>
 		<title>'Christmas Praise'パート別練習用音源</title>
 	</head>
 	<body>
@@ -22,28 +36,28 @@
   <ul>
     <li>
       <div>ソプラノ</div>
-      <audio src='/tmp/mcc/mp3/christmas/Christmas Praise/01 Christmas Praise (soprano).mp3' controls preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Christmas Praise/01 Christmas Praise (soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <audio src='./01 Christmas Praise (soprano).mp3' controls preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='./01 Christmas Praise (soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
     <li>
       <div>アルト</div>
-      <audio src='/tmp/mcc/mp3/christmas/Christmas Praise/02 Christmas Praise (alto).mp3' controls preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Christmas Praise/02 Christmas Praise (alto).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <audio src='./02 Christmas Praise (alto).mp3' controls preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='./02 Christmas Praise (alto).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
     <li>
       <div>テノール</div>
-      <audio src='/tmp/mcc/mp3/christmas/Christmas Praise/03 Christmas Praise (tenor).mp3' controls preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Christmas Praise/03 Christmas Praise (tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <audio src='./03 Christmas Praise (tenor).mp3' controls preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='./03 Christmas Praise (tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
     <li>
       <div>バス</div>
-      <audio src='/tmp/mcc/mp3/christmas/Christmas Praise/04 Christmas Praise (bass).mp3' controls preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Christmas Praise/04 Christmas Praise (bass).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <audio src='./04 Christmas Praise (bass).mp3' controls preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='./04 Christmas Praise (bass).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
     <li>
       <div>コーラス</div>
-      <audio src='/tmp/mcc/mp3/christmas/Christmas Praise.mp3' controls preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Christmas Praise.mp3' download><img src='/mcc/img/download-m.png'></a>
+      <audio src='../Christmas Praise.mp3' controls preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='../Christmas Praise.mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
   </ul>
 </div>
