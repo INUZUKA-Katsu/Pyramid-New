@@ -273,6 +273,8 @@ class GetDATA
   end
 
   def get_local(file)
+    p 'local_file => ' + file
+    p File.exist?(file)
     return nil if not File.exist?(file)
     begin
       return File.read(file)
