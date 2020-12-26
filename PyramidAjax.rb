@@ -336,6 +336,7 @@ class GetDATA
     https.use_ssl     = true
     https.verify_mode = OpenSSL::SSL::VERIFY_NONE
     response = https.get(uri.request_uri)
+p response
     response.body
   end
 
