@@ -13,7 +13,7 @@ require 'openssl'
 
 #$KCODE = "utf-8"
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-#Encoding.default_external = "utf-8" if RUBY_VERSION[0]=="2"
+Encoding.default_external = "utf-8" if RUBY_VERSION[0]=="2"
 
 JSONFile           = "/nenreibetsu/<ku><nengetsu>-j.txt"
 JSONFile_SYORAI    = "/syoraisuikei/<nen>-suikei.txt"
@@ -115,9 +115,9 @@ class GetDATA
     when :syorai_ku_json
       @json        = get_syorai_ku_data(@ku)
     when :cho_csv,:cho_csv_for_save
-      @csv         = get_csv_of_cho()
+      @csv         = get_csv_of_cho(@ku,@nengetsu)
     when :cho_json
-      @csv         = get_csv_of_cho()
+      @csv         = get_csv_of_cho(@ku,@nengetsu)
       @kijunbi     = kijunbi(nengetsu)
       begin
         @json      = make_json_from_csv(@csv,@kijunbi,@cho)
@@ -130,7 +130,7 @@ class GetDATA
       @kijunbi     = ayumi_kijunbi(nengetsu)
       @json        = make_json_from_ayumi_csv(@csv,@kijunbi,@nengetsu)
     when :cho_list
-      @html_str    = get_newest_cho_list()
+      @html_str    = get_newest_cho_list(@ku)
     when :shi_option
       @html_str    = get_shi_option()
     when :ku_option
@@ -298,14 +298,26 @@ class GetDATA
       ary.select{|r| r[0].match(/^\d{1,3}$|総数|100歳以上/u)}
   end
 
-  def get_csv_of_cho()
+  def get_csv_of_cho(ku,nengetsu)
+    def gen(nengetsu)
+      yy = nengetsu[0,2].to_i
+      case yy
+      when 0..19  ; "h"+(yy+12).to_s
+      when 20..59 ; "r"+(yy-18).to_s
+      when 60..88 ; "s"+(yy-25).to_s 
+      when 89..99 ; "h"+(yy-88).to_s
+      end
+    end
     file = local_file(:csv)
-    csv = get_local(file) #存在しないときの戻り値は"nil".
-    if csv and csv.match(/(,\d+){102}/) and 1==0
+    csv = get_local(file)  #存在しないときの戻り値は"nil".
+    csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
+    if csv and csv.match(/(,\d+){102}/)
       csv
     else
-      location = web_location(:csv)
-      csv = get_network_file(location, limit = 10)
+      cho_nen_top = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
+      csv_url     = "#{gen(nengetsu)}cho-nen.files/#{ku+nengetsu}.csv"
+      csv = get_https_body(cho_nen_top+csv_url)
+      csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
       save_local(file,csv)
       csv
     end
@@ -317,31 +329,32 @@ class GetDATA
     csv
   end
 
-  #最新の年月とcsvファイルを取得する.戻り値は町名リストのhtml文字列
-  def get_newest_cho_list()
-    day = Time.now
-    y   = day.year-2000
-    m   = day.month
-    ary=["#{y}09", "#{y}03", "#{y-1}09", "#{y-1}03"]
+  def get_https_body(url)
+    host = 'https://www.city.yokohama.lg.jp'
+    uri   = URI.parse( host+url )
+    https = Net::HTTP.new(uri.host,uri.port)
+    https.use_ssl     = true
+    https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    response = https.get(uri.request_uri)
+    response.body
+  end
 
-    response = nil
-    ary.each do |nengetsu|
-      uri=URI.parse(web_location(:csv,nengetsu))
-      https = Net::HTTP.new(uri.host,uri.port)
-      https.use_ssl = true
-      https.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      begin
-        https.start{
-          response = https.get(uri.request_uri)
-          csv = response.body.kconv(Kconv::UTF8,Kconv::SJIS)
-          if csv.match(/100歳以上/m)
-            return ChoMeiList.new(csv).html
-            break
-          end
-        }
-      rescue
-      end
-    end
+  #最新の年月とcsvファイルを取得する.戻り値は町名リストのhtml文字列
+  def get_newest_cho_list(ku)
+    cho_nen_top = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
+
+    top_page_html = get_https_body(cho_nen_top)
+    
+    #最新年の町丁別年齢別csvファイルが掲載されているページのhtmlを取得する.
+    pattern = %r!<a href=.(/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/..cho-nen\.html).>!
+    href    = top_page_html.match(/#{pattern}/)[1]
+    newest_nen_page = get_https_body(href)
+    
+    #目当ての区のcsvファイルのurlを取得する.
+    pattern1 = %r!href="(\w\d+cho-nen.files/#{ku}\d{4}.csv)"!
+    href1    = newest_nen_page.match(/#{pattern1}/)[1]
+    csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
+    return ChoMeiList.new(csv).html
   end
 
   def make_json_from_csv(csv,kijunbi,cho)
