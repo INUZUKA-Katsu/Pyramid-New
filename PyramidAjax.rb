@@ -355,6 +355,7 @@ p response
     pattern1 = %r!href="(\w\d+cho-nen.files/#{ku}\d{4}.csv)"!
     href1    = newest_nen_page.match(/#{pattern1}/)[1]
     csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
+puts csv
     return ChoMeiList.new(csv).html
   end
 
