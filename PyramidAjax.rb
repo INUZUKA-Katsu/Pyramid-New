@@ -82,6 +82,7 @@ class ChoMeiList
     }
     html_a << "</div>"
     @html    = html_a.join
+puts @html
   end
 end
 
