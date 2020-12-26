@@ -86,7 +86,7 @@ class ChoMeiList
 end
 
 class GetDATA
-  attr_reader :json, :html_str, :csv, :shiku, :nenreibetsu
+  attr_reader :json, :html_str, :csv, :shiku, :nenreibetsu, :json_error
 
   def initialize(ku,nengetsu,level,cho=nil)
     @ku            = ku
@@ -103,6 +103,7 @@ class GetDATA
       @nengetsu    = nengetsu
     end
     @cho           = cho
+    @json_error    = nil
     case level
     when :shiku_json
       begin
@@ -123,7 +124,7 @@ class GetDATA
         @json      = make_json_from_csv(@csv,@kijunbi,@cho)
       rescue
       #文字コードエラーでJSONへの変換ができなかったときはCSVを返す.
-        @json      = @csv
+        @json_error= true
       end
     when :ayumi_json
       @csv         = get_csv_of_ayumi()
@@ -310,6 +311,7 @@ class GetDATA
     end
     file = local_file(:csv)
     csv = get_local(file)  #存在しないときの戻り値は"nil".
+    #p file + " => " + csv[0,200] if csv
     csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
     if csv and csv.match(/(,\d+){102}/)
       csv
@@ -336,7 +338,7 @@ class GetDATA
     https.use_ssl     = true
     https.verify_mode = OpenSSL::SSL::VERIFY_NONE
     response = https.get(uri.request_uri)
-p response
+    #p response
     response.body
   end
 
@@ -355,7 +357,7 @@ p response
     pattern1 = %r!href="(\w\d+cho-nen.files/#{ku}\d{4}.csv)"!
     href1    = newest_nen_page.match(/#{pattern1}/)[1]
     csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
-puts csv
+    #puts csv
     return ChoMeiList.new(csv).html
   end
 
@@ -564,11 +566,15 @@ def main(param)
     obj = GetDATA.new(shiku,nengetsu,level,cho)
     case level
     when :shiku_json,:cho_json,:ayumi_json,:syorai_json,:syorai_ku_json,:all_options
-      ["text/json", obj.json]
+      if obj.json_error
+        ["text/plain;charset=utf-8", obj.csv]
+      else
+        ["text/json;charset=utf-8", obj.json]
+      end
     when :cho_csv,:cho_csv_for_save
-      ["text/plain", obj.csv]
+      ["text/plain;charset=utf-8", obj.csv]
     when :ku_option,:shi_option,:cho_option,:cho_list
-      ["text/html", obj.html_str]
+      ["text/html;charset=utf-8", obj.html_str]
     end
   rescue => e
       alert(e.message + "<br>\n" + e.backtrace.join("<br>\n"))
