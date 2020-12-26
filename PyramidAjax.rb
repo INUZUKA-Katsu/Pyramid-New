@@ -568,7 +568,7 @@ def main(param)
     when :cho_csv,:cho_csv_for_save
       ["text/plain", obj.csv]
     when :ku_option,:shi_option,:cho_option,:cho_list
-      ["text/plain", obj.html_str]
+      ["text/html", obj.html_str]
     end
   rescue => e
       alert(e.message + "<br>\n" + e.backtrace.join("<br>\n"))
