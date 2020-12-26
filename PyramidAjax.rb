@@ -275,10 +275,7 @@ class GetDATA
   def get_local(file)
     return nil if not File.exist?(file)
     begin
-      f   = open(file,"r")
-      str = f.read
-      f.close
-      return str
+      return File.read(file)
     rescue
       return nil
     end
@@ -311,7 +308,7 @@ class GetDATA
     end
     file = local_file(:csv)
     csv = get_local(file)  #存在しないときの戻り値は"nil".
-    #p file + " => " + csv[0,200] if csv
+    p file + " => " + csv[0,200] if csv
     csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
     if csv and csv.match(/(,\d+){102}/)
       csv
