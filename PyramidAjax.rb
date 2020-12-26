@@ -82,6 +82,7 @@ class ChoMeiList
     }
     html_a << "</div>"
     @html    = html_a.join
+puts "@html => " + @html[0,100]
   end
 end
 
@@ -356,7 +357,7 @@ puts "newest_nen_page => " + newest_nen_page[0,100]
     pattern1 = %r!href="(\w\d+cho-nen.files/#{ku}\d{4}.csv)"!
     href1    = newest_nen_page.match(/#{pattern1}/)[1]
     csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
-puts "csv => " + csv
+puts "csv => " + csv[0,100]
     return ChoMeiList.new(csv).html
   end
 
@@ -573,6 +574,7 @@ def main(param)
     when :cho_csv,:cho_csv_for_save
       ["text/plain;charset=utf-8", obj.csv]
     when :ku_option,:shi_option,:cho_option,:cho_list
+      puts "obj.html_str => " + obj.html_str[0,100]
       ["text/html;charset=utf-8", obj.html_str]
     end
   rescue => e
