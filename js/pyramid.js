@@ -2144,6 +2144,14 @@ function time_stamp() {
   var ss = now.getSeconds();
   console.log(hh + ":" + mm + ":" + ss);
 }
+function time_stamp(){
+  var now  = new Date();
+  var hh = now.getHours();
+  var mm  = now.getMinutes();
+  var ss  = now.getSeconds();
+  console.log(hh+':'+mm+':'+ss)
+}
+
 
 //***************************************/
 //***** スクリーンショット用の補助関数. *****          
