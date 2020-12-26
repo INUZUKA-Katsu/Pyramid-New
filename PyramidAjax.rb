@@ -346,17 +346,17 @@ class GetDATA
     cho_nen_top = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
 
     top_page_html = get_https_body(cho_nen_top)
-    
+puts "top_page_html => "+top_page_html[0,100]
     #最新年の町丁別年齢別csvファイルが掲載されているページのhtmlを取得する.
     pattern = %r!<a href=.(/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/..cho-nen\.html).>!
     href    = top_page_html.match(/#{pattern}/)[1]
     newest_nen_page = get_https_body(href)
-    
+puts "newest_nen_page => " + newest_nen_page[0,100]
     #目当ての区のcsvファイルのurlを取得する.
     pattern1 = %r!href="(\w\d+cho-nen.files/#{ku}\d{4}.csv)"!
     href1    = newest_nen_page.match(/#{pattern1}/)[1]
     csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
-    #puts csv
+puts "csv => " + csv
     return ChoMeiList.new(csv).html
   end
 
