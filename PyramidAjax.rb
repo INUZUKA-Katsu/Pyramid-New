@@ -109,6 +109,7 @@ class GetDATA
     when :shiku_json
       begin
       @json        = get_shiku_data()
+      #p :step7
       rescue => e
         alert(e.message)
       end
@@ -176,48 +177,68 @@ class GetDATA
   end
 
   def local_file(syubetsu,nengetsu=@nengetsu)
+    root_dir = File.dirname(File.expand_path(__FILE__))
     case syubetsu
       when :json
-
-        File.expand_path(__dir__) + JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
+        #p :root2
+        begin
+          #p "@ku => " + @ku
+          #p "nengetsu => " + nengetsu
+          #p "root_dir => " + root_dir
+          #p 'JSONFile.sub("<ku>",@ku) => '+JSONFile.sub("<ku>",@ku)
+          #p 'JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)'+JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
+        rescue
+          #p :error
+        end
+        root_dir + JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
       when :json_syorai
         nen = nengetsu[0,4]
-        File.expand_path(__dir__) + JSONFile_SYORAI.sub("<nen>",nen)
+        root_dir + JSONFile_SYORAI.sub("<nen>",nen)
       when :json_ku_syorai
         nen = nengetsu[0,4]
-        File.expand_path(__dir__) + JSONFile_KU_SYORAI.sub("<ku>",@ku).sub("<nen>",nen)
+        root_dir + JSONFile_KU_SYORAI.sub("<ku>",@ku).sub("<nen>",nen)
       when :csv
-        File.expand_path(__dir__) + CSVFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
+        root_dir + CSVFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
       when :shiku_csv
         if @ku=="age"
           shiku = 'yokohama'
         else
           shiku = @ku
         end
-        File.expand_path(__dir__) + ShikuCSVFile.sub("<ku>",shiku).gsub("<nengetsu>",nengetsu)
+        root_dir + ShikuCSVFile.sub("<ku>",shiku).gsub("<nengetsu>",nengetsu)
       when :ayumi_csv
-        File.expand_path(__dir__) + AyumiCSVFile
+        root_dir + AyumiCSVFile
       when :shi_option
-        File.expand_path(__dir__) + ShiOptionFile
+        root_dir + ShiOptionFile
       when :ku_option
-        File.expand_path(__dir__) + KuOptionFile
+        root_dir + KuOptionFile
       when :cho_option
-        File.expand_path(__dir__) + ChoOptionFile
+        root_dir + ChoOptionFile
       when :ayumi_option
-        File.expand_path(__dir__) + AyumiOptionFile
+        root_dir + AyumiOptionFile
       when :syorai_option
-        File.expand_path(__dir__) + SyoraiOptionFile
+        root_dir + SyoraiOptionFile
     end
   end
 
   def get_shiku_data()
+    #p :step1
     if ku_not_exist = json_of_not_exist_ku()
       return ku_not_exist
     end
-    nengetsu = post_3month(@nengetsu) if @nengetsu[2,2]=="09"
+    #p :step2
+    if @nengetsu[2,2]=="09"
+      nengetsu = post_3month(@nengetsu)
+    else
+      nengetsu = @nengetsu
+    end
+    #p :step3
     json_file  = local_file(:json,nengetsu)
+    #p :step4
     unless json = get_local(json_file)
+      #p :step5
       json_file = pre_nen(json_file)
+      #p :step6
       json = get_local(json_file)
     end
     json
@@ -604,8 +625,10 @@ def main(param)
     case level
     when :shiku_json,:cho_json,:ayumi_json,:syorai_json,:syorai_ku_json,:all_options
       if obj.json_error
+        #p :step8
         ["text/plain;charset=utf-8", obj.csv]
       else
+        #p :step9
         ["text/json;charset=utf-8", obj.json]
       end
     when :cho_csv,:cho_csv_for_save
