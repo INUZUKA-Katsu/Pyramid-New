@@ -82,7 +82,7 @@ class ChoMeiList
     }
     html_a << "</div>"
     @html    = html_a.join
-puts "@html => " + @html[0,100]
+    #puts "@html => " + @html[0,100]
   end
 end
 
@@ -274,18 +274,28 @@ class GetDATA
   end
 
   def get_local(file)
-    p 'local_file => ' + file
-    p File.exist?(file)
-    return nil if not File.exist?(file)
+    #p 'local_file => ' + file
+    #p File.exist?(file)
+    tmp_file = "#{__dir__}/tmp+file"
     begin
-      return File.read(file)
+      if File.exist?(file)
+        File.read(file)
+      elsif File.exist?(tmp_file)
+        File.read(tmp_file)
+      else
+        nil
+      end
     rescue
-      return nil
+      nil
     end
   end
 
   def save_local(file,str)
-    File.open(file,"w") do |f|
+    tmp_file = "#{__dir__}/tmp+file"
+    unless Dir.exist? File.dirname(tmp_file)
+      FileUtils.mkdir_p File.dirname(tmp_file)
+    end
+    File.open(tmp_file,"w") do |f|
       f.print str
     end
   end
@@ -311,7 +321,7 @@ class GetDATA
     end
     file = local_file(:csv)
     csv = get_local(file)  #存在しないときの戻り値は"nil".
-    p file + " => " + csv[0,200] if csv
+    #p file + " => " + csv[0,200] if csv
     csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
     if csv and csv.match(/(,\d+){102}/)
       csv
@@ -345,19 +355,28 @@ class GetDATA
   #最新の年月とcsvファイルを取得する.戻り値は町名リストのhtml文字列
   def get_newest_cho_list(ku)
     cho_nen_top = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
-
     top_page_html = get_https_body(cho_nen_top)
-puts "top_page_html => "+top_page_html[0,100]
+    #puts "top_page_html => "+top_page_html[0,100]
     #最新年の町丁別年齢別csvファイルが掲載されているページのhtmlを取得する.
     pattern = %r!<a href=.(/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/..cho-nen\.html).>!
     href    = top_page_html.match(/#{pattern}/)[1]
     newest_nen_page = get_https_body(href)
-puts "newest_nen_page => " + newest_nen_page[0,100]
+    #puts "newest_nen_page => " + newest_nen_page[0,100]
     #目当ての区のcsvファイルのurlを取得する.
-    pattern1 = %r!href="(\w\d+cho-nen.files/#{ku}\d{4}.csv)"!
-    href1    = newest_nen_page.match(/#{pattern1}/)[1]
-    csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
-puts "csv => " + csv[0,100]
+    pattern1 = %r!href="(r\d\d?cho-nen.files/#{ku}(\d\d)(\d\d).csv)"!
+    ans      = newest_nen_page.match(/#{pattern1}/)
+    href1    = ans[1]
+    nengetsu = ans[2]+ans[3]
+    if ans[3] == '03'
+      nengetsu = "#{(ans[2].to_i - 1).to_s}09"
+      href1    = href1.sub(/\d\d?/, (ans[2].to_i - 19).to_s ).sub(/\d{4}/,nengetsu)
+    end
+    file = local_file(:csv,nengetsu)
+    unless csv = get_local(file)
+      csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
+      save_local(file,csv)
+      #puts "csv => " + csv[0,100]
+    end
     return ChoMeiList.new(csv).html
   end
 
@@ -574,7 +593,7 @@ def main(param)
     when :cho_csv,:cho_csv_for_save
       ["text/plain;charset=utf-8", obj.csv]
     when :ku_option,:shi_option,:cho_option,:cho_list
-      puts "obj.html_str => " + obj.html_str[0,100]
+      #puts "obj.html_str => " + obj.html_str[0,100]
       ["text/html;charset=utf-8", obj.html_str]
     end
   rescue => e
