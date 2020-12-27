@@ -178,34 +178,35 @@ class GetDATA
   def local_file(syubetsu,nengetsu=@nengetsu)
     case syubetsu
       when :json
-        File.dirname(File.expand_path(__FILE__)) + JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
+
+        File.expand_path(__dir__) + JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
       when :json_syorai
         nen = nengetsu[0,4]
-        File.dirname(File.expand_path(__FILE__)) + JSONFile_SYORAI.sub("<nen>",nen)
+        File.expand_path(__dir__) + JSONFile_SYORAI.sub("<nen>",nen)
       when :json_ku_syorai
         nen = nengetsu[0,4]
-        File.dirname(File.expand_path(__FILE__)) + JSONFile_KU_SYORAI.sub("<ku>",@ku).sub("<nen>",nen)
+        File.expand_path(__dir__) + JSONFile_KU_SYORAI.sub("<ku>",@ku).sub("<nen>",nen)
       when :csv
-        File.dirname(File.expand_path(__FILE__)) + CSVFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
+        File.expand_path(__dir__) + CSVFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
       when :shiku_csv
         if @ku=="age"
           shiku = 'yokohama'
         else
           shiku = @ku
         end
-        File.dirname(File.expand_path(__FILE__)) + ShikuCSVFile.sub("<ku>",shiku).gsub("<nengetsu>",nengetsu)
+        File.expand_path(__dir__) + ShikuCSVFile.sub("<ku>",shiku).gsub("<nengetsu>",nengetsu)
       when :ayumi_csv
-        File.dirname(File.expand_path(__FILE__)) + AyumiCSVFile
+        File.expand_path(__dir__) + AyumiCSVFile
       when :shi_option
-        File.dirname(File.expand_path(__FILE__)) + ShiOptionFile
+        File.expand_path(__dir__) + ShiOptionFile
       when :ku_option
-        File.dirname(File.expand_path(__FILE__)) + KuOptionFile
+        File.expand_path(__dir__) + KuOptionFile
       when :cho_option
-        File.dirname(File.expand_path(__FILE__)) + ChoOptionFile
+        File.expand_path(__dir__) + ChoOptionFile
       when :ayumi_option
-        File.dirname(File.expand_path(__FILE__)) + AyumiOptionFile
+        File.expand_path(__dir__) + AyumiOptionFile
       when :syorai_option
-        File.dirname(File.expand_path(__FILE__)) + SyoraiOptionFile
+        File.expand_path(__dir__) + SyoraiOptionFile
     end
   end
 
@@ -213,8 +214,12 @@ class GetDATA
     if ku_not_exist = json_of_not_exist_ku()
       return ku_not_exist
     end
-    json_file  = local_file(:json)
-    json       = get_local(json_file)
+    nengetsu = post_3month(@nengetsu) if @nengetsu[2,2]=="09"
+    json_file  = local_file(:json,nengetsu)
+    unless json = get_local(json_file)
+      json_file = pre_nen(json_file)
+      json = get_local(json_file)
+    end
     json
   end
 
@@ -274,9 +279,10 @@ class GetDATA
   end
 
   def get_local(file)
-    #p 'local_file => ' + file
-    #p File.exist?(file)
-    tmp_file = "#{__dir__}/tmp+file"
+    p caller_locations(1,1)[0].label
+    p 'local_file => ' + file
+    p File.exist?(file)
+    tmp_file = file.sub( /#{__dir__}/, "#{__dir__}/tmp")
     begin
       if File.exist?(file)
         File.read(file)
@@ -291,7 +297,7 @@ class GetDATA
   end
 
   def save_local(file,str)
-    tmp_file = "#{__dir__}/tmp+file"
+    tmp_file = file.sub( /#{__dir__}/, "#{__dir__}/tmp")
     unless Dir.exist? File.dirname(tmp_file)
       FileUtils.mkdir_p File.dirname(tmp_file)
     end
@@ -527,6 +533,18 @@ class GetDATA
 
   def get_kijunbi(html)
     html.match(/<title>.*?(平成\d+年\d+月\d+日現在).*?<\/title>/u)[1]
+  end
+  def pre_nen(nengetsu)
+    "#{nengetsu[0,2].to_i-1}#{nengetsu[2,2]}"
+  end
+  def post_nen(nengetsu)
+    "#{nengetsu[0,2].to_i+1}#{nengetsu[2,2]}"
+  end
+  def pre_9month(nengetsu)
+    "#{nengetsu[0,2]}01"
+  end
+  def post_3month(nengetsu)
+    "#{nengetsu[0,2].to_i+1}01"
   end
 end
 
