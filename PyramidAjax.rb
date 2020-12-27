@@ -237,7 +237,7 @@ class GetDATA
     #p :step4
     unless json = get_local(json_file)
       #p :step5
-      json_file = pre_nen(json_file)
+      json_file = local_file(:json,pre_nen(nengetsu))
       #p :step6
       json = get_local(json_file)
     end
