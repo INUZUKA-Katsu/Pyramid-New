@@ -28,17 +28,14 @@ AyumiOptionFile    = "/ayumi/ayumi-option.txt"
 SyoraiOptionFile   = "/syoraisuikei/syorai-option.txt"
 LocalDirShikuJson  = 'nenreibetsu/'
 
-#Location0          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/new/age-j.html"
-Location0          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/juki/"
-Location1          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/<nengetsu>/<ku>-j.html"
-Location2          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/<nengetsu>/csv/<ku><nengetsu>.csv"
-#Location3          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/mokuji/tsurumi.html"
-Location3          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/"
-#町丁別年齢別人口のインデックスのページ
-Location4          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/index.html"
-#町丁別年齢別人口のcsvファイルのurl
-Location5          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/<gen>cho-nen.files/<ku><nengetsu>.csv" #<gen>:h31,r02,r03・・・
-Location6          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/opendata/suikei03.files/e3yokohama<nengetsu>.zip"
+#横浜市サイト
+ShiHost            = "https://www.city.yokohama.lg.jp"
+#統計ポータルサイト
+TokeiPortal        = "/city-info/yokohamashi/tokei-chosa/portal"
+#町丁別年齢別人口のトップページ
+ChoTop             = "/jinko/chocho/nenrei"
+#町丁別年齢別人口のcsvファイルのパス(統計ポータルサイト内)
+ChoCSV             = "/jinko/chocho/nenrei/<gen>cho-nen.files/<ku><nengetsu>.csv" #<gen>:h31,r02,r03
 
 def alert(s)
     str = "Content-Type: text/html\n\n"
@@ -145,34 +142,14 @@ class GetDATA
     end
   end
 
-  #年月（ex."1909"）から元号年(ex."r01")を取得する
-  def gennen(nengetsu)
-    nen = nengetsu[0,2].to_i
-    if nen<=19
-      "h" + (nen+12).to_s
-    elsif nen<=27
-      "r" + (nen-18).to_s
-    else
-      "r" + (nen-18).to_s
-    end
-  end
-
-  def web_location(syubetsu,nengetsu=@nengetsu)
-    if syubetsu==:html
-      Location1.gsub("<ku>",@ku).gsub("<nengetsu>",nengetsu)
-    elsif syubetsu==:shiku_zip
-      Location6.gsub("<nengetsu>",nengetsu)      
-    elsif syubetsu==:csv
-      if nengetsu >= "1809"
-        if @ku=="age"
-          shiku = 'yokohama'
-        else
-          shiku = @ku
-        end
-        Location5.gsub("<gen>",gennen(nengetsu)).gsub("<ku>",shiku).gsub("<nengetsu>",nengetsu)
-      else
-        Location2.gsub("<ku>",@ku).gsub("<nengetsu>",nengetsu)
-      end
+  #年月（ex."1909"）から元号年(ex."r1")を取得する
+  def gen(nengetsu)
+    yy = nengetsu[0,2].to_i
+    case yy
+      when 0..19  ; "h"+(yy+12).to_s
+      when 20..59 ; "r"+(yy-18).to_s
+      when 60..88 ; "s"+(yy-25).to_s 
+      when 89..99 ; "h"+(yy-88).to_s
     end
   end
 
@@ -337,15 +314,6 @@ class GetDATA
   end
 
   def get_csv_of_cho(ku,nengetsu)
-    def gen(nengetsu)
-      yy = nengetsu[0,2].to_i
-      case yy
-      when 0..19  ; "h"+(yy+12).to_s
-      when 20..59 ; "r"+(yy-18).to_s
-      when 60..88 ; "s"+(yy-25).to_s 
-      when 89..99 ; "h"+(yy-88).to_s
-      end
-    end
     file = local_file(:csv)
     csv = get_local(file)  #存在しないときの戻り値は"nil".
     #p file + " => " + csv[0,200] if csv
@@ -353,9 +321,8 @@ class GetDATA
     if csv and csv.match(/(,\d+){102}/)
       csv
     else
-      cho_nen_top = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
-      csv_url     = "#{gen(nengetsu)}cho-nen.files/#{ku+nengetsu}.csv"
-      csv = get_https_body(cho_nen_top+csv_url)
+      csv_url = csv_source(ku,nengetsu)
+      csv = get_https_body(csv_url)
       csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
       save_local(file,csv)
       csv
@@ -369,25 +336,24 @@ class GetDATA
   end
 
   def get_https_body(url)
-    host = 'https://www.city.yokohama.lg.jp'
-    uri   = URI.parse( host+url )
+    uri   = URI.parse( ShiHost+url )
     https = Net::HTTP.new(uri.host,uri.port)
     https.use_ssl     = true
     https.verify_mode = OpenSSL::SSL::VERIFY_NONE
     response = https.get(uri.request_uri)
-    #p response
     response.body
   end
 
   #最新の年月とcsvファイルを取得する.戻り値は町名リストのhtml文字列
   def get_newest_cho_list(ku)
-    cho_nen_top = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
+    cho_nen_top = TokeiPortal+ChoTop+'/'
+    cho_nen_top_old = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
     top_page_html = get_https_body(cho_nen_top)
     #puts "top_page_html => "+top_page_html[0,100]
     #最新年の町丁別年齢別csvファイルが掲載されているページのhtmlを取得する.
-    pattern = %r!<a href=.(/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/..cho-nen\.html).>!
+    pattern = %r!<a href=.*?(#{ChoTop}/..cho-nen\.html).>!
     href    = top_page_html.match(/#{pattern}/)[1]
-    newest_nen_page = get_https_body(href)
+    newest_nen_page = get_https_body(TokeiPortal+href)
     #puts "newest_nen_page => " + newest_nen_page[0,100]
     #目当ての区のcsvファイルのurlを取得する.
     pattern1 = %r!href="(r\d\d?cho-nen.files/#{ku}(\d\d)(\d\d).csv)"!
@@ -395,12 +361,14 @@ class GetDATA
     href1    = ans[1]
     nengetsu = ans[2]+ans[3]
     if ans[3] == '03'
+      #最新データが3月のときは前年の9月のデータのページのURLに差し替える.
       nengetsu = "#{(ans[2].to_i - 1).to_s}09"
       href1    = href1.sub(/\d\d?/, (ans[2].to_i - 19).to_s ).sub(/\d{4}/,nengetsu)
     end
     file = local_file(:csv,nengetsu)
     unless csv = get_local(file)
-      csv = get_https_body(cho_nen_top+href1).kconv(Kconv::UTF8,Kconv::SJIS)
+      url = cho_nen_top+href1
+      csv = get_https_body(url).kconv(Kconv::UTF8,Kconv::SJIS)
       save_local(file,csv)
       #puts "csv => " + csv[0,100]
     end
@@ -435,7 +403,7 @@ class GetDATA
     data                  = Hash.new
     data["shiku"]         = exist_cho.join(",")
     data["kijunbi"]       = kijunbi
-    data["source_url"]    = data_source(:csv)
+    data["source_url"]    = ShiHost+csv_source()
     data["kakusai_betsu"] = j_ary
 
     data["not_exist"]     = not_exist.size>0 ? not_exist.join(",") : ""
@@ -536,8 +504,11 @@ class GetDATA
     end
   end
 
-  def data_source(syubetsu)
-    web_location(syubetsu)
+  def csv_source(ku=@ku,nengetsu=@nengetsu)
+    TokeiPortal+
+    ChoCSV.gsub("<gen>",gen(nengetsu)).
+           gsub("<ku>" ,shiku).
+           gsub("<nengetsu>",nengetsu)
   end
 
   def to_han(str)
