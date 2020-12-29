@@ -44,7 +44,7 @@
                   <option value="2022ft">2022年(将来推計)</option>
                   <option value="2021ft">2021年(将来推計)</option>
                   <option value="new" selected>　　 最新</option>
-                  <option value="1901">令和元年1月1日現在</option>
+                  <option value="1901">平成31年1月1日現在</option>
                   <option value="1801">平成30年1月1日現在</option>
                   <option value="1701">平成29年1月1日現在</option>
                   <option value="1601">平成28年1月1日現在</option>
