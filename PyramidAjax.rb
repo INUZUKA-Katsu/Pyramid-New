@@ -383,12 +383,10 @@ class GetDATA
       ary << l if cho.include?(l[0]) or l[0]=="町名"
     end
     title     = ary[0].map{|c| c.match(/歳/) ? c.sub!(/歳.*/,"") : c }
-
     if ary.size > 1
       male      = ary_sum(ary.select{|l| l[2]=="男"})
       female    = ary_sum(ary.select{|l| l[2]=="女"})
       total     = ary_sum([male,female])
-
       exist_cho = ary.map{|l| l[0]}.uniq-["町名"]
       not_exist = cho - exist_cho
       j_ary=[]
@@ -405,7 +403,6 @@ class GetDATA
     data["kijunbi"]       = kijunbi
     data["source_url"]    = ShiHost+csv_source()
     data["kakusai_betsu"] = j_ary
-
     data["not_exist"]     = not_exist.size>0 ? not_exist.join(",") : ""
     JSON.generate(data)
   end
@@ -505,10 +502,10 @@ class GetDATA
   end
 
   def csv_source(ku=@ku,nengetsu=@nengetsu)
-    TokeiPortal+
-    ChoCSV.gsub("<gen>",gen(nengetsu)).
-           gsub("<ku>" ,shiku).
-           gsub("<nengetsu>",nengetsu)
+    TokeiPortal +
+    ChoCSV.sub("<gen>",gen(nengetsu)).
+           sub("<ku>" ,ku).
+           sub("<nengetsu>",nengetsu)
   end
 
   def to_han(str)
@@ -540,6 +537,7 @@ class GetDATA
   end
 end
 
+
 #***********************************
 #       ここから実行プロセス
 #***********************************
@@ -567,7 +565,7 @@ def main(param)
   nengetsu = param["Year"]
   level    = param["Level"].to_sym
   if level == :cho_json
-    cho    = param["Cho"]
+    cho    = JSON.parse(param["Cho"])
   else
     cho    = nil
   end
