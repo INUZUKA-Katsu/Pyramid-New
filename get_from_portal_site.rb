@@ -89,7 +89,7 @@ end
 #uriリストのファイルをローカルにダウンロードする(サーバーに保存する).
 def download_by_list(uri_list,dest_folder)
   uri_list.each do |uri|
-    p uri
+    p "download : " + uri.path
     download(uri,dest_folder)
   end
 end
@@ -141,7 +141,10 @@ def is_old_json_shiku()
       json1 = File.join( Local_json_shiku, json)
       json_modified << File.stat( json1 ).mtime if File.exist? json1
       json2 = File.join( Local_tmp_json_shiku, json)
-      json_modified << File.stat( json2 ).mtime if File.exist? json2      
+      json_modified << File.stat( json2 ).mtime if File.exist? json2    
+      p "json_modified => " + json_modified.to_s
+      p "excel_modified=> " + excel_modified.to_s
+      p json_modified.max < excel_modified.max
       if json_modified.max < excel_modified.max
         ary << [ku, yy+'_hyo22.xlsx', json]
       end
@@ -196,6 +199,7 @@ def save_json_from_excel_hyo22(ary, dest_folder)
   FileUtils.mkdir_p(dest_folder) unless Dir.exist?(dest_folder)
   full_path = File.join(dest_folder, json)
   File.write(full_path, JSON.generate(hs))
+  p "saved: " + full_path
 end
 #print get_array_from_excel_hyo22('hodogaya', '19_hyo22.xlsx','hodogaya1901-j.txt')
 
@@ -312,14 +316,14 @@ download_by_list( need_to_download_shiku_excel_file , Local_tmp_excel_shiku )
 # 4. ローカルのexcelとjsonを比較し、不足しているjsonを作成し、保存する。
 p "ローカルのexcelとjsonを比較し、不足しているjsonを作成し、保存する"
 list1 = not_made_json_shiku
-p list1
+#p list1
 list1.each do |ary|
   save_json_from_excel_hyo22( ary, Local_tmp_json_shiku )
 end
 # 5. ローカルのexcelとjsonを比較し、excelの方が新しいときjsonを作成し、上書き保存する。
 p "excelの方が新しいので、jsonを作成し、上書き保存する"
 list2 = is_old_json_shiku
-p list2
+#p list2
 list2.each do |ary|
   save_json_from_excel_hyo22( ary, Local_tmp_json_shiku )
 end
