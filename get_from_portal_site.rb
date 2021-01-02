@@ -11,7 +11,7 @@ require 'json'
 require 'net/ftp'
 require 'net/smtp'
 require 'mail'
-
+require 'logger'
 
 Dir.chdir(__dir__)
 
@@ -38,6 +38,7 @@ Local_tmp_excel_shiku = Root_dir+'/tmp/excel'
 Local_tmp_json_shiku  = Root_dir+'/tmp/nenreibetsu'
 Local_tmp_csv_cho     = Root_dir+'/tmp/nenreibetsu'
 
+$logger = Logger.new(STDOUT)
 
 class Integer
   def to_str_add_cumma
@@ -117,7 +118,6 @@ def not_made_json_shiku()
       end
     end
   end
-  p ary
   ary
 end
 #p not_made_json_shiku
@@ -253,7 +253,12 @@ def send_mail(subject_str,body_str)
   mail.delivery_method(:smtp,option)
   mail.charset = "UTF-8"
   mail.content_transfer_encoding = "8bit"
-  mail.deliver
+  begin
+    mail.deliver
+  rescue => e
+    $logger.error( e.message )
+    $logger.error( e.backtrace.join("\n") )
+  end
 end
 
 #***** FTP送信 *****
@@ -280,15 +285,18 @@ def ftp_soshin(files)
     if cnt_retry<=3
       retry
     else
+      $logger.error( '"ftp.put" got a timeout error' )
       title = "FTP送信エラー"
       body  = "LacoocanへのFTP送信に失敗しました。"
       send_mail(title,body)
     end
   rescue => e
-      title = "FTP送信エラー"
-      body  = "LacoocanへのFTP送信に失敗しました。"
-      body += e.message.force_encoding("Windows-31J")
-      send_mail(title,body)
+    $logger.error( e.message )
+    $logger.error( e.backtrace.join("\n") )
+    title = "FTP送信エラー"
+    body  = "LacoocanへのFTP送信に失敗しました。"
+    body += e.message.force_encoding("Windows-31J")
+    send_mail(title,body)
   end
 end
 
@@ -316,19 +324,29 @@ download_by_list( need_to_download_shiku_excel_file , Local_tmp_excel_shiku )
 # 4. ローカルのexcelとjsonを比較し、不足しているjsonを作成し、保存する。
 p "ローカルのexcelとjsonを比較し、不足しているjsonを作成し、保存する"
 list1 = not_made_json_shiku
-#p list1
-list1.each do |ary|
-  save_json_from_excel_hyo22( ary, Local_tmp_json_shiku )
+if list1.size>0
+  list1.each do |ary|
+    save_json_from_excel_hyo22( ary, Local_tmp_json_shiku )
+  end
+else
+  p "不足しているjsonはありませんでした."
 end
 # 5. ローカルのexcelとjsonを比較し、excelの方が新しいときjsonを作成し、上書き保存する。
-p "excelの方が新しいので、jsonを作成し、上書き保存する"
+p "excelとjsonのmtimeを比較し、excelの方が新しいとき、jsonを再作成し、上書き保存する"
 list2 = is_old_json_shiku
-#p list2
-list2.each do |ary|
-  save_json_from_excel_hyo22( ary, Local_tmp_json_shiku )
+if list2.size>0
+  list2.each do |ary|
+    save_json_from_excel_hyo22( ary, Local_tmp_json_shiku )
+  end
+else
+  p "excelよりmtimeの古いjsonはありませんでした。"
 end
 # 6. 今回保存したjsonファイルをLacoocanにも保存する。
 list = list1+list2
-new_files = list.map{|ary| File.join(Local_tmp_json_shiku,ary[2])}
-ftp_soshin(new_files)
+if list.size>0
+  p "FTP送信を開始します。"
+  new_files = list.map{|ary| File.join(Local_tmp_json_shiku,ary[2])}
+  ftp_soshin(new_files)
+end
+p "バッチ処理終了。"
 
