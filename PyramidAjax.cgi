@@ -25,10 +25,12 @@ KuOptionFile       = "/nenreibetsu/ku-option.txt"
 ChoOptionFile      = "/nenreibetsu/cho-option.txt"
 AyumiOptionFile    = "/ayumi/ayumi-option.txt"
 SyoraiOptionFile   = "/syoraisuikei/syorai-option.txt"
-Location0          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/new/age-j.html"
-Location1          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/<nengetsu>/<ku>-j.html"
-Location2          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/<nengetsu>/csv/<ku><nengetsu>.csv"
-Location3          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/mokuji/tsurumi.html"
+#Location0          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/age/new/age-j.html"
+Location0 = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/juki/"
+Location1 = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/suikei.html"
+Location2 = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/<nengetsu>/csv/<ku><nengetsu>.csv"
+#Location3          = "http://archive.city.yokohama.lg.jp/ex/stat/jinko/choage/mokuji/tsurumi.html"
+Location3          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/"
 #町丁別年齢別人口のインデックスのページ
 Location4          = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/index.html"
 #町丁別年齢別人口のcsvファイルのurl
@@ -233,7 +235,7 @@ class GetDATA
 
     @time = ""
     if @nengetsu<="1901" or @nengetsu>"7501"
-      @time = last_modified(location)      
+      @time = last_modified(location)
     else
       @time = last_modified(location2)
     end
@@ -328,10 +330,9 @@ class GetDATA
   def get_and_save_all_options()
     def ku_option()
       html  = get_network_file(Location0)
-      ary   = html.scan(/value="\/ex\/stat\/jinko\/age\/\d\d"/).map{|l| l.match(/\d\d/)[0].to_s+"01"}
+      ary   = html.scan(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/nenrei\/juki\/\w\d\d?nen\.html">.*?年\(\d\d(\d\d)\).*?<\/a>/).flatten.map{|yy| yy+"01"}
       ary.map!{|nengetsu| "#{" "*18}<option value=\"#{nengetsu}\">#{kijunbi(nengetsu)}</option>"}
       ary.shift  #2019.3.14 付け焼き刃の応急措置
-      ary.unshift("#{" "*18}<option value=\"1901\">平成31年1月1日現在</option>")
       ary.unshift("#{" "*18}<option value=\"new\" selected>　　 最新</option>").join("\n")
     end
     def syorai_option(ku_str)
@@ -356,12 +357,15 @@ class GetDATA
     end
     def cho_option()
       html  = get_network_file(Location3)
-      ary   = html.scan(/<option.*?\d\d.*?>.{3,10}年/).map{|l| l.match(/\d\d/)[0]+"09"}
-      ary.shift unless url_exist?(web_location(:csv,ary[0]))
+      ary   = html.scan(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/chocho\/nenrei\/\w\d\d?cho-nen\.html">.*?年[\s|　]?\(\d\d(\d\d)\).*?<\/a>
+/).flatten
+      ary.map!{|yy| yy+"09"}
       ary.map!{|nengetsu| "<option value=\"#{nengetsu}\">#{kijunbi(nengetsu)}</option>"}
-      #リニューアルサイトからの取得がなぜか作動しないので緊急避難
-      ary.unshift('<option value="1809">平成30年9月30日現在</option>')
-      ary.unshift('<option value="1909">令和元年9月30日現在</option>')
+      newest = html.match(/<a href="\/city-info\/yokohamashi\/tokei-chosa\/portal\/jinko\/chocho\/nenrei\/(\w\d\d?cho-nen\.html)">.*?<\/a>/)[1]
+      html2  = get_network_file(Location3+newest)
+      unless html2.match(/<a.*?href="\w\d\d?cho-nen\.files\/tsurumi\d\d09\.csv">/)
+        ary.shift
+      end
       "#{" "*18}"+ary.join("\n#{" "*18}")
     end
 
@@ -715,18 +719,24 @@ end
 mode = :test
 
 if defined?(mode) and mode == :test
-  #shiku    = "tsurumi"
-  #nengetsu = "1901"
-  level = :all_options
+  shiku    = "tsurumi"
+  nengetsu = "1801"
+  #level = :all_options
   #level    = :cho_list
   #level    = :all_options
-  #cho      = [] #["相生町","赤門町","曙町","万代町","弁天通","千鳥町","千歳町","千代崎町","富士見町","福富町仲通","福富町西通","福富町東通","不老町","羽衣町","英町","花咲町","初音町","本郷町"]
+  level = :cho_csv
+  cho      = ["馬場一丁目","馬場二丁目"]
 else
   #postデータを受け取って引き数をcgiオブジェクトに格納する。
   cgi      = CGI.new
   shiku    = cgi.params['ShikuName'][0]
   nengetsu = cgi.params['Year'][0]
   level    = cgi.params['Level'][0].to_sym
+  if level == :cho_json
+    cho = eval(cgi.params['Cho'][0])
+  else
+    cho= nil
+  end
 end
 
 case level
@@ -747,12 +757,6 @@ when :shiku_option
   end
 when :all_options
   shiku = "tsurumi" unless shiku
-end
-
-if level == :cho_json
-  cho = eval(cgi.params['Cho'][0])
-else
-  cho= nil
 end
 
 begin
