@@ -5,15 +5,12 @@
 var $KakusaiObject = {}; //グローバル変数 {100:{male:xx,female:xx},99:{male:xx,female:xx}・・・
 var $nengetsu = 0;
 var $hitoku = false;
-<<<<<<< HEAD
 var $optionsCache = {
   shiku: null,
   cho: null,
   lastUpdate: null,
   cacheExpiry: 5 * 60 * 1000, // 5分間のキャッシュ
 };
-=======
->>>>>>> 63d8667 (1.Fixed the problem that the number of people in each age group and the numbers of the three age groups are displayed as "NaN" when there is HITOKU SYORI a secret process in the data by town and village, and displayed the fact that there is a secret data.)
 
 //最初にページを読み込んだときの処理
 function on_page_load() {
@@ -465,7 +462,6 @@ function modify_html(response, mode, nengetsu) {
 
 //#######  ピラミッドを描画するコアプログラム  ##########
 
-<<<<<<< HEAD
 //ピラミッド描画エンジン(引数isAnm: アニメーション中かどうかのフラグ, isInterpolation: 補間アニメーション中かどうかのフラグ)
 function change_pyramid(objectData, animeMode) {
   console.log("change_pyramid開始");
@@ -481,31 +477,6 @@ function change_pyramid(objectData, animeMode) {
   } else {
     isAnm = false;
     isInterpolation =false ;
-=======
-//ピラミッド描画エンジン
-function change_pyramid(pyramidData,unit_size){
-//alert(pyramidData["shiku"]);
-  if(pyramidData instanceof Array){
-    var shiku     = pyramidData[1];
-    var kijunbi   = pyramidData[2];
-    var source    = pyramidData[3];
-    var sosu      = pyramidData[4][1];
-    var male      = pyramidData[4][2];
-    var female    = pyramidData[4][3];
-    pyramidData.splice(0,5);
-    var kakusaiData   = pyramidData;
-  }else{
-    var shiku     = pyramidData["shiku"];
-    var not_exist = pyramidData["not_exist"];
-    var kijunbi   = pyramidData["kijunbi"];
-    var source    = pyramidData["source_url"];
-    var sosu      = pyramidData["kakusai_betsu"][0][1];
-    var male      = pyramidData["kakusai_betsu"][0][2];
-    var female    = pyramidData["kakusai_betsu"][0][3];
-    var kakusaiData   = pyramidData["kakusai_betsu"]
-    displey_hitoku_comment(pyramidData["hitoku"])
-    //kakusaiData.splice(0,1);
->>>>>>> 63d8667 (1.Fixed the problem that the number of people in each age group and the numbers of the three age groups are displayed as "NaN" when there is HITOKU SYORI a secret process in the data by town and village, and displayed the fact that there is a secret data.)
   }
   console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
   console.warn("1 get_selected_nengetsu()",get_selected_nengetsu());
@@ -579,7 +550,6 @@ function change_pyramid(pyramidData,unit_size){
       female: f_nin.replace(",", ""),
     };
   });
-<<<<<<< HEAD
 
 
   if (!isAnm){
@@ -649,40 +619,6 @@ function change_pyramid(pyramidData,unit_size){
     if (nengetsu == undefined || nengetsu == null) {
       nengetsu = "";
     }
-=======
-  adjust_size(time_series);
-  var nengetsu=get_selected_nengetsu();
-  if(nengetsu==undefined){nengetsu=$nengetsu}
-  if(nengetsu=="9501"&&(shiku=="港北区"||shiku=="緑区"||shiku=="都筑区"||shiku=="青葉区")){
-    shiku="港北・緑・青葉・都筑４区";
-  }
-  var h2 = shiku.replace('将来推計人口','<span class="small">将来推計人口</span>')+'<span class="inline-block">('+kijunbi+')</span>';
-  if(not_exist!=undefined && not_exist!=""){
-    if(not_exist=="青葉区" || not_exist=="都筑区"){
-      comment = "はこのころまだありませんでした.";
-    }else{
-      comment = "のデータはありません.住居表示等で新しい町名ができる前と思われます.";
-    }
-    h2=h2+"<br><span id='red'>("+not_exist+comment+")</span>";
-  }
-  //console.log("change_pyramid-3");
-  
-  //h2(タイトル)を西暦主体に書き直す.
-  h2=change_seireki_main(h2);
-  document.getElementById("h2").innerHTML     = h2;
-  document.getElementById("sosu").innerHTML   = plus_comma(sosu);
-  document.getElementById("male").innerHTML   = plus_comma(male);
-  document.getElementById("female").innerHTML = plus_comma(female);
-  document.getElementById("source").innerHTML = source_str(shiku,source);
-  basic_data_position();
-  //現在のピラミッドを次回ロード時に再現するための情報を保存する.
-  save_last_pyramid();
-  //console.log("change_pyramid-4");
-  function source_str(shiku,source){
-    var str="データの出典： 横浜市統計ポータルサイト ";
-    var nengetsu=get_selected_nengetsu();
-    if(nengetsu==undefined){nengetsu=$nengetsu}
->>>>>>> 63d8667 (1.Fixed the problem that the number of people in each age group and the numbers of the three age groups are displayed as "NaN" when there is HITOKU SYORI a secret process in the data by town and village, and displayed the fact that there is a secret data.)
     //console.log("source_str nengetsu");
     //console.log(nengetsu);
     console.log(`🔍 source_str: nengetsu = "${nengetsu}" (型: ${typeof nengetsu})`);
@@ -750,7 +686,6 @@ function getObjectPiramidData(pyramidData) {
 }
 
 //町丁別年齢別CSVデータと被選択町丁配列からピラミッド作成用オブジェクトを作成する。
-<<<<<<< HEAD
 //基本的にはサーバー側で処理し、JSONデータを受け取るので、この処理は行われない。
 //しかし、ローカルストレージにデータを保存するときは全町丁のデータをCSVで保存するため、
 //ローカルストレージのデータを使うときはこの処理が行われる。
@@ -786,12 +721,6 @@ function makePyramidData(csv) {
       if (tempArray[i].indexOf(",")) {
         csvArray[i] = tempArray[i].split(",");
       }
-=======
-//現在はサーバー側で処理しており,この処理はおそらく不要になっていると思われる。
-function makePyramidData(csv){
-    alert("makePyramidData(csv)")
-    var cho             = get_selected_cho();
-    var ary             = createArray(csv);
     var choArray        = get_cho_data(ary,cho);
     var exist_cho       = exist_cho(choArray);
     var not_exist       = not_exist_cho(cho,exist_cho);
@@ -813,7 +742,6 @@ function makePyramidData(csv){
           }
         }
         return csvArray;
->>>>>>> 63d8667 (1.Fixed the problem that the number of people in each age group and the numbers of the three age groups are displayed as "NaN" when there is HITOKU SYORI a secret process in the data by town and village, and displayed the fact that there is a secret data.)
     }
     return csvArray;
   }
@@ -859,7 +787,6 @@ function makePyramidData(csv){
     for (i = 0; i < 102; i++) {
       female[i] = 0;
     }
-<<<<<<< HEAD
     var sumArray = [male, female];
     $hitoku = false;
     for (var r = 0; r < rows; r++) {
@@ -870,35 +797,6 @@ function makePyramidData(csv){
           if (isNaN(mnin)) {
             mnin = 0;
             $hitoku = true;
-=======
-    //複数行の年齢別データを合算する。
-    function sum_rows(csvArray){
-      var rows =  csvArray.length;
-      var male  = [];
-      var female= [];
-      for (i=0; i<102; i++){male[i]  =0;}
-      for (i=0; i<102; i++){female[i]=0;}
-      var sumArray=[male,female];
-      $hitoku=false;
-      for(var r = 0; r<rows; r++){
-        for(var i = 0; i<102; i++){
-          if ( csvArray[r][2]=="男" ){
-            let mnin = Number(csvArray[r][i+3]);
-            //秘匿処理されているときは0とする。
-            if(isNaN(mnin)){
-              mnin=0;
-              $hitoku=true;
-            };
-            sumArray[0][i]=Number(sumArray[0][i])+mnin;
-          } else if ( csvArray[r][2]=="女" ){
-            let fnin = Number(csvArray[r][i+3]);
-            //秘匿処理されているときは0とする。
-            if(isNaN(fnin)){
-              fnin=0
-              $hitoku=true;
-            };
-            sumArray[1][i]=Number(sumArray[1][i])+fnin;
->>>>>>> 63d8667 (1.Fixed the problem that the number of people in each age group and the numbers of the three age groups are displayed as "NaN" when there is HITOKU SYORI a secret process in the data by town and village, and displayed the fact that there is a secret data.)
           }
           sumArray[0][i] = Number(sumArray[0][i]) + mnin;
         } else if (csvArray[r][2] == "女") {
@@ -1099,18 +997,7 @@ function displey_hitoku_comment(hitoku) {
     document.getElementById("hitoku").style.display = "none";
   }
 }
-<<<<<<< HEAD
-=======
-//秘匿処理データがあるとき秘匿データの処理について注記する。
-function displey_hitoku_comment(hitoku){
-  if(hitoku==true){
-    document.getElementById("hitoku").style.display='block';
-  }else{
-    document.getElementById("hitoku").style.display='none';
-  }
-}
 
->>>>>>> 63d8667 (1.Fixed the problem that the number of people in each age group and the numbers of the three age groups are displayed as "NaN" when there is HITOKU SYORI a secret process in the data by town and village, and displayed the fact that there is a secret data.)
 
 //　HTMLの状態を読み取り、情報を取得する処理  ########################################################
 
@@ -2804,3 +2691,5 @@ function htmlToArray(html) {
 function myFunc() {
   console.trace();
 }
+}
+
