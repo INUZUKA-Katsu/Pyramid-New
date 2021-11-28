@@ -278,9 +278,11 @@ class GetDATA
 
   def get_local(file)
     p caller_locations(1,1)[0].label
-    p 'local_file => ' + file
-    p File.exist?(file)
+    #p 'local_file => ' + file
+    #p "File.exist?(file) => " + File.exist?(file).to_s
     tmp_file = file.sub( /#{__dir__}/, "#{__dir__}/tmp")
+    #p "tmp_file => " + tmp_file
+    #p ENV.keys.join(",")
     begin
       if File.exist?(file)
         File.read(file)
@@ -299,6 +301,8 @@ class GetDATA
     unless Dir.exist? File.dirname(tmp_file)
       FileUtils.mkdir_p File.dirname(tmp_file)
     end
+    #p "file => " + file
+    #p "tmp_file => " + tmp_file
     File.open(tmp_file,"w") do |f|
       f.print str
     end
@@ -321,6 +325,7 @@ class GetDATA
     if csv and csv.match(/(,\d+){102}/)
       csv
     else
+      #csvを市サイトから取得する。
       csv_url = csv_source(ku,nengetsu)
       csv = get_https_body(csv_url)
       csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
@@ -378,9 +383,16 @@ class GetDATA
   def make_json_from_csv(csv,kijunbi,cho)
     csv=csv.to_utf8 if RUBY_VERSION[0]=="2"
     ary=[]
+    hitoku=false
     csv.each_line do |line|
       l = line.chomp.split(",")
-      ary << l if cho.include?(l[0]) or l[0]=="町名"
+      #ary << l if cho.include?(l[0]) or l[0]=="町名"
+      if cho.include?(l[0]) or l[0]=="町名"
+        if l.include? "X"
+          hitoku=true
+        end
+        ary << l
+      end
     end
     title     = ary[0].map{|c| c.match(/歳/) ? c.sub!(/歳.*/,"") : c }
     if ary.size > 1
@@ -404,6 +416,7 @@ class GetDATA
     data["source_url"]    = ShiHost+csv_source()
     data["kakusai_betsu"] = j_ary
     data["not_exist"]     = not_exist.size>0 ? not_exist.join(",") : ""
+    data["hitoku"]        = hitoku
     JSON.generate(data)
   end
 
@@ -433,7 +446,7 @@ class GetDATA
     JSON.generate(data)
   end
 
-    #複数の町丁を選択したときに合計の各歳別人口配列を作成する。
+  #複数の町丁を選択したときに合計の各歳別人口配列を作成する。
   def ary_sum(ary)
     #alert "Here!"
     def plus(ary1,ary2)
@@ -561,6 +574,7 @@ end
 #end
 
 def main(param)
+  #p "This is main"
   shiku    = param["ShikuName"]
   nengetsu = param["Year"]
   level    = param["Level"].to_sym
