@@ -721,27 +721,6 @@ function makePyramidData(csv) {
       if (tempArray[i].indexOf(",")) {
         csvArray[i] = tempArray[i].split(",");
       }
-    var choArray        = get_cho_data(ary,cho);
-    var exist_cho       = exist_cho(choArray);
-    var not_exist       = not_exist_cho(cho,exist_cho);
-    var sumArray        = sum_rows(choArray);
-    var pyraData    = {};
-    pyraData["shiku"]         = exist_cho.join(",");
-    pyraData["not_exist"]     = not_exist_cho(cho,exist_cho);
-    pyraData["kijunbi"]       = get_kijunbi();
-    pyraData["source_url"]    = get_source_url();
-    pyraData["kakusai_betsu"] = make_kakusaiData(sumArray);
-    return pyraData;
-    //町丁別csvデータを二次元配列に変換する。
-    function createArray(csvData) {
-        var tempArray = csvData.split("\n");
-        var csvArray = new Array();
-        for(var i = 0; i<tempArray.length;i++){
-          if ( tempArray[i].indexOf(",") ){
-            csvArray[i] = tempArray[i].split(",");
-          }
-        }
-        return csvArray;
     }
     return csvArray;
   }
@@ -2691,5 +2670,5 @@ function htmlToArray(html) {
 function myFunc() {
   console.trace();
 }
-}
+
 

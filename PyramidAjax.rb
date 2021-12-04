@@ -465,7 +465,7 @@ class GetDATA
 
   #"1609","9703"などyymm形式を平成x年x月x日に変換する。
   def kijunbi(nengetsu)
-    if nengetsu[2,2]=="01"
+    if nengetsu[2,2]=="01" or nengetsu[2,2]=="10"
       day="1"
     else
       day="30"
