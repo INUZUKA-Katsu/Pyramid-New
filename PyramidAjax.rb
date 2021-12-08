@@ -10,6 +10,7 @@ require "fileutils"
 require "net/https"
 require 'open-uri'
 require 'openssl'
+require 'csv'
 
 #$KCODE = "utf-8"
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
@@ -90,13 +91,7 @@ class GetDATA
     @ku            = ku
     @nengetsu      = nengetsu
     if nengetsu=="new" and level==:shiku_json
-      ary = []
-      Dir.glob(LocalDirShikuJson+"tsurumi*.txt").each do |f|
-        if ans=f.match(/\d{4}/)
-          ary << ans[0]
-        end
-      end
-      @nengetsu = ary.select{|nengetsu| nengetsu.to_i<9001}.max
+      @nengetsu = get_nengetsu_from_new()
     else
       @nengetsu    = nengetsu
     end
@@ -152,7 +147,15 @@ class GetDATA
       when 89..99 ; "h"+(yy-88).to_s
     end
   end
-
+  def get_nengetsu_from_new
+    ary = []
+    Dir.glob(LocalDirShikuJson+"tsurumi*.txt").each do |f|
+      if ans=f.match(/\d{4}/)
+        ary << ans[0]
+      end
+    end
+    ary.select{|nengetsu| nengetsu.to_i<9001}.max
+  end
   def local_file(syubetsu,nengetsu=@nengetsu)
     root_dir = File.dirname(File.expand_path(__FILE__))
     case syubetsu
@@ -210,13 +213,13 @@ class GetDATA
       nengetsu = @nengetsu
     end
     #p :step3
-    json_file  = local_file(:json,nengetsu)
     #p :step4
-    unless json = get_local(json_file)
+    unless json = get_local(local_file(:json,nengetsu))
       #p :step5
-      json_file = local_file(:json,pre_nen(nengetsu))
-      #p :step6
-      json = get_local(json_file)
+      unless json = get_local(local_file(:json,pre_nen(nengetsu)))
+        #国勢調査実施時は一年前のデータも不存在となるので、最新データを取得する。
+        json = get_local(local_file(:json,get_nengetsu_from_new()))
+      end
     end
     json
   end
@@ -323,14 +326,38 @@ class GetDATA
     #p file + " => " + csv[0,200] if csv
     csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
     if csv and csv.match(/(,\d+){102}/)
-      csv
+      #csvに120歳までのデータがある時は100歳以上を合算する。
+      summarize_over_100_years_old(csv)
     else
       #csvを市サイトから取得する。
       csv_url = csv_source(ku,nengetsu)
       csv = get_https_body(csv_url)
       csv = csv.kconv(Kconv::UTF8,Kconv::SJIS) if csv and NKF.guess(csv).to_s=="Shift_JIS"
+      #csvに120歳までのデータがある時は100歳以上を合算する。
+      csv = summarize_over_100_years_old(csv)
       save_local(file,csv)
       csv
+    end
+  end
+
+  def summarize_over_100_years_old(cho_csv)
+  #令和になってからの町丁別年齢別のCSVは120歳以上までの各歳データが載っているのを100歳以上にまとめる。
+  #引数、戻り値ともにCSVデータ
+    csv_array = CSV.parse(cho_csv)
+    if sp = csv_array[0].index("101歳")
+      csv_array.map! do |line|
+        sum = line.slice((sp-1)..-1).inject{|sum,nin| sum.to_i+nin.to_i}
+        new_line = line.slice(0..sp-1)
+        if new_line[-1]=="100歳"
+          new_line[-1]="100歳以上"
+        else
+          new_line[-1]=sum
+        end
+        new_line.to_csv
+      end
+      csv_array.join
+    else
+      cho_csv
     end
   end
 
@@ -499,7 +526,7 @@ class GetDATA
             when "大正" ; 1911
             when "昭和" ; 1925
             when "平成" ; 1988
-            when "令和" ; 2018            
+            when "令和" ; 2018
             end
       year = $2.to_i+kisu
       "#{$1+$2}年 (#{year}年)"
