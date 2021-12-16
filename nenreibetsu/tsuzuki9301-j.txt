@@ -1,1 +1,1 @@
-["Thu, 13 Sep 2012 04:59:10 GMT","都筑区","平成5年1月1日現在","http:\/\/www.city.yokohama.lg.jp\/ex\/stat\/jinko\/age\/9301\/tsuzuki-j.html"]
+{"last_modified":"Thu, 13 Sep 2012 04:59:10 GMT","kijunbi":"都筑区","shiku":"平成5年1月1日現在","source_url":"https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/choki.files/4.xlsx","kakusai_betsu":[]}

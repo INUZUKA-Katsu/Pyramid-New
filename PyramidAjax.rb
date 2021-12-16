@@ -468,7 +468,7 @@ class GetDATA
     data                  = Hash.new
     data["shiku"]         = "横浜市"
     data["kijunbi"]       = kijunbi
-    data["source_url"]    = "http://www.city.yokohama.lg.jp/ex/stat/jinko/ayumi/data/04.xls"
+    data["source_url"]    = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/choki.files/4.xlsx"
     data["kakusai_betsu"] = j_ary
     JSON.generate(data)
   end
