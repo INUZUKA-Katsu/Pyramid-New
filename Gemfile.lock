@@ -1,7 +1,6 @@
 GEM
   remote: https://rubygems.org/
   specs:
-<<<<<<< HEAD
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     aws-eventstream (1.4.0)
@@ -45,32 +44,6 @@ GEM
       base64
     logger (1.7.0)
     mail (2.8.1)
-=======
-    aws-eventstream (1.2.0)
-    aws-partitions (1.554.0)
-    aws-sdk-core (3.126.0)
-      aws-eventstream (~> 1, >= 1.0.2)
-      aws-partitions (~> 1, >= 1.525.0)
-      aws-sigv4 (~> 1.1)
-      jmespath (~> 1.0)
-    aws-sdk-kms (1.54.0)
-      aws-sdk-core (~> 3, >= 3.126.0)
-      aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.112.0)
-      aws-sdk-core (~> 3, >= 3.126.0)
-      aws-sdk-kms (~> 1)
-      aws-sigv4 (~> 1.4)
-    aws-sigv4 (1.4.0)
-      aws-eventstream (~> 1, >= 1.0.2)
-    dropbox_api (0.1.18)
-      faraday (<= 1.0)
-      oauth2 (~> 1.1)
-    faraday (1.0.0)
-      multipart-post (>= 1.2, < 3)
-    jmespath (1.5.0)
-    jwt (2.2.2)
-    mail (2.7.1)
->>>>>>> a73a97c (rubyバージョンを2.7.5にアップ)
       mini_mime (>= 0.1.1)
       net-imap
       net-pop
