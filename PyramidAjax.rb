@@ -602,7 +602,7 @@ class GetDATA
   end
 end
 
-#市サイトから「cho-option.txt」の文字列データを作成する。(単体で動作する。)
+#市サイトから「cho-option.txt」の文字列データを作成する。(単体で動作する。)・・・heroku環境ではエラーになる.
 def make_cho_option
   url="https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/"
   cho_option=[]
@@ -618,7 +618,7 @@ def make_cho_option
   str
 end
 
-#市サイトから「kujuki_option.txt」の文字列データを作成する。(単体で動作する。)
+#市サイトから「kujuki_option.txt」の文字列データを作成する。(単体で動作する。)・・・heroku環境ではエラーになる.
 def make_kujuki_option
   url="https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/juki/"
   kujuki_option=[]
@@ -712,13 +712,13 @@ def main(param)
   end
 end
 
-#このファイルを読み込んだときの初期化動作
-cho_option    = "#{__dir__}/tmp/option/cho-option.txt"
-kujuki_option = "#{__dir__}/tmp/option/kujuki-option.txt"
-
-if File.exist?(cho_option)==false or date_file_was_created(cho_option)<(Date.today-1)
-  make_cho_option
-end
-if File.exist?(kujuki_option)==false or date_file_was_created(kujuki_option)<(Date.today-1)
-  make_kujuki_option
-end
+#このファイルを読み込んだときの初期化動作(heroku環境ではtmpフォルダへの書き込みでエラーになるのでコメントアウト)
+#cho_option    = "#{__dir__}/tmp/option/cho-option.txt"
+#kujuki_option = "#{__dir__}/tmp/option/kujuki-option.txt"
+#
+#if File.exist?(cho_option)==false or date_file_was_created(cho_option)<(Date.today-1)
+#  make_cho_option
+#end
+#if File.exist?(kujuki_option)==false or date_file_was_created(kujuki_option)<(Date.today-1)
+#  make_kujuki_option
+#end
