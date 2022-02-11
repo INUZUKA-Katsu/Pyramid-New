@@ -18,15 +18,17 @@ Encoding.default_external = "utf-8" if RUBY_VERSION[0]=="2"
 
 JSONFile           = "/nenreibetsu/<ku><nengetsu>-j.txt"
 JSONFile_SYORAI    = "/syoraisuikei/<nen>-suikei.txt"
+JSONFile_KUJUKI    = "/jukijinko/<ku><nen>-t.txt"
 JSONFile_KU_SYORAI = "/syoraisuikei/kubetsu/<ku>-<nen>-suikei.txt"
 CSVFile            = "/nenreibetsu/<ku><nengetsu>.csv"
 ShikuCSVFile       = "/e3yokohama<nengetsu>/e3<ku><nengetsu>.csv"
 AyumiCSVFile       = "/ayumi/ayumi.csv"
-ShiOptionFile      = "/nenreibetsu/shi-option.txt"
-KuOptionFile       = "/nenreibetsu/ku-option.txt"
-ChoOptionFile      = "/nenreibetsu/cho-option.txt"
-AyumiOptionFile    = "/ayumi/ayumi-option.txt"
-SyoraiOptionFile   = "/syoraisuikei/syorai-option.txt"
+ShiOptionFile      = "/option/shi-option.txt"
+KuOptionFile       = "/option/ku-option.txt"
+ChoOptionFile      = "/option/cho-option.txt"
+AyumiOptionFile    = "/option/ayumi-option.txt"
+SyoraiOptionFile   = "/option/syorai-option.txt"
+KuJukiOptionFile   = "/option/kujuki-option.txt"
 LocalDirShikuJson  = 'nenreibetsu/'
 
 #横浜市サイト
@@ -37,6 +39,8 @@ TokeiPortal        = "/city-info/yokohamashi/tokei-chosa/portal"
 ChoTop             = "/jinko/chocho/nenrei"
 #町丁別年齢別人口のcsvファイルのパス(統計ポータルサイト内)
 ChoCSV             = "/jinko/chocho/nenrei/<gen>cho-nen.files/<ku><nengetsu>.csv" #<gen>:h31,r02,r03
+#年齢別住基人口のトップページ
+KuJukiTop          = "/jinko/nenrei/juki"
 
 def alert(s)
     str = "Content-Type: text/html\n\n"
@@ -101,7 +105,6 @@ class GetDATA
     when :shiku_json
       begin
       @json        = get_shiku_data()
-      #p :step7
       rescue => e
         alert(e.message)
       end
@@ -120,6 +123,8 @@ class GetDATA
       #文字コードエラーでJSONへの変換ができなかったときはCSVを返す.
         @json_error= true
       end
+    when :kujuki_json
+      @json        = get_kujuki_data()
     when :ayumi_json
       @csv         = get_csv_of_ayumi()
       @kijunbi     = ayumi_kijunbi(nengetsu)
@@ -132,21 +137,13 @@ class GetDATA
       @html_str    = get_ku_option()
     when :cho_option
       @html_str    = get_cho_option()
+    when :kujuki_option
+      @html_str    = get_kujuki_option()
     when :all_options
       @json        = get_all_options()
     end
   end
 
-  #年月（ex."1909"）から元号年(ex."r1")を取得する
-  def gen(nengetsu)
-    yy = nengetsu[0,2].to_i
-    case yy
-      when 0..19  ; "h"+(yy+12).to_s
-      when 20..59 ; "r"+(yy-18).to_s
-      when 60..88 ; "s"+(yy-25).to_s 
-      when 89..99 ; "h"+(yy-88).to_s
-    end
-  end
   def get_nengetsu_from_new
     ary = []
     Dir.glob(LocalDirShikuJson+"tsurumi*.txt").each do |f|
@@ -154,8 +151,10 @@ class GetDATA
         ary << ans[0]
       end
     end
-    ary.select{|nengetsu| nengetsu.to_i<9001}.max
+    yymm = ary.select{|yymm| yymm.to_i<9001}.max
+    "20" + yymm
   end
+
   def local_file(syubetsu,nengetsu=@nengetsu)
     root_dir = File.dirname(File.expand_path(__FILE__))
     case syubetsu
@@ -170,7 +169,12 @@ class GetDATA
         rescue
           #p :error
         end
-        root_dir + JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
+        root_dir + JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu[2,4])
+      when :json_kujuki
+        nen = nengetsu[2,4]
+        path = root_dir + JSONFile_KUJUKI.sub("<ku>",@ku).sub("<nen>",nen)
+        p path
+        path
       when :json_syorai
         nen = nengetsu[0,4]
         root_dir + JSONFile_SYORAI.sub("<nen>",nen)
@@ -178,14 +182,14 @@ class GetDATA
         nen = nengetsu[0,4]
         root_dir + JSONFile_KU_SYORAI.sub("<ku>",@ku).sub("<nen>",nen)
       when :csv
-        root_dir + CSVFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
+        root_dir + CSVFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu[2,4])
       when :shiku_csv
         if @ku=="age"
           shiku = 'yokohama'
         else
           shiku = @ku
         end
-        root_dir + ShikuCSVFile.sub("<ku>",shiku).gsub("<nengetsu>",nengetsu)
+        root_dir + ShikuCSVFile.sub("<ku>",shiku).gsub("<nengetsu>",nengetsu[2,4])
       when :ayumi_csv
         root_dir + AyumiCSVFile
       when :shi_option
@@ -198,6 +202,8 @@ class GetDATA
         root_dir + AyumiOptionFile
       when :syorai_option
         root_dir + SyoraiOptionFile
+      when :kujuki_option
+        root_dir + KuJukiOptionFile
     end
   end
 
@@ -206,16 +212,12 @@ class GetDATA
     if ku_not_exist = json_of_not_exist_ku()
       return ku_not_exist
     end
-    #p :step2
-    if @nengetsu[2,2]=="09"
+    if @nengetsu[4,2]=="09"
       nengetsu = post_3month(@nengetsu)
     else
       nengetsu = @nengetsu
     end
-    #p :step3
-    #p :step4
     unless json = get_local(local_file(:json,nengetsu))
-      #p :step5
       unless json = get_local(local_file(:json,pre_nen(nengetsu)))
         #国勢調査実施時は一年前のデータも不存在となるので、最新データを取得する。
         json = get_local(local_file(:json,get_nengetsu_from_new()))
@@ -236,6 +238,12 @@ class GetDATA
     json
   end
 
+  def get_kujuki_data()
+    json_file  = local_file(:json_kujuki)
+    json       = get_local(json_file)
+    json
+  end
+
   def get_syorai_ku_data(ku)
     json_file  = local_file(:json_ku_syorai)
     json       = get_local(json_file)
@@ -244,7 +252,7 @@ class GetDATA
   end
 
   def json_of_not_exist_ku()
-    if ["aoba","tsuzuki"].include?(@ku) and ["9301","9401"].include?(@nengetsu)
+    if ["aoba","tsuzuki"].include?(@ku) and ["199301","199401"].include?(@nengetsu)
       data                  = Hash.new
       data["shiku"]         = to_kanji(@ku)
       data["not_exist"]     = data["shiku"]
@@ -258,10 +266,15 @@ class GetDATA
   end
 
   def get_all_options()
-    ku_str  = get_ku_option()
-    shi_str = get_shi_option()
-    cho_str = get_cho_option()
-    JSON.generate( {"ku_option"=>ku_str,"shi_option"=>shi_str,"cho_option"=>cho_str} )
+    ku_str      = get_ku_option()
+    shi_str     = get_shi_option()
+    cho_str     = get_cho_option()
+    kujuki_str  = get_kujuki_option()
+    JSON.generate( {"ku_option"=>ku_str,
+                    "shi_option"=>shi_str,
+                    "cho_option"=>cho_str,
+                    "kujuki_option"=>kujuki_str,
+                  } )
   end
 
   def get_ku_option()
@@ -275,22 +288,24 @@ class GetDATA
   end
 
   def get_cho_option()
+    #"#{__dir__}/tmp/nenreibetsu/cho-option.txt"
     file = local_file(:cho_option)
+    get_local(file)
+  end
+
+  def get_kujuki_option()
+    file = local_file(:kujuki_option)
     get_local(file)
   end
 
   def get_local(file)
     p caller_locations(1,1)[0].label
-    #p 'local_file => ' + file
-    #p "File.exist?(file) => " + File.exist?(file).to_s
     tmp_file = file.sub( /#{__dir__}/, "#{__dir__}/tmp")
-    #p "tmp_file => " + tmp_file
-    #p ENV.keys.join(",")
     begin
-      if File.exist?(file)
-        File.read(file)
-      elsif File.exist?(tmp_file)
+      if File.exist?(tmp_file)
         File.read(tmp_file)
+      elsif File.exist?(file)
+        File.read(file)
       else
         nil
       end
@@ -304,8 +319,6 @@ class GetDATA
     unless Dir.exist? File.dirname(tmp_file)
       FileUtils.mkdir_p File.dirname(tmp_file)
     end
-    #p "file => " + file
-    #p "tmp_file => " + tmp_file
     File.open(tmp_file,"w") do |f|
       f.print str
     end
@@ -379,41 +392,40 @@ class GetDATA
   #最新の年月とcsvファイルを取得する.戻り値は町名リストのhtml文字列
   def get_newest_cho_list(ku)
     cho_nen_top = TokeiPortal+ChoTop+'/'
-    cho_nen_top_old = '/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/'
     top_page_html = get_https_body(cho_nen_top)
-    #puts "top_page_html => "+top_page_html[0,100]
+
     #最新年の町丁別年齢別csvファイルが掲載されているページのhtmlを取得する.
     pattern = %r!<a href=.*?(#{ChoTop}/..cho-nen\.html).>!
     href    = top_page_html.match(/#{pattern}/)[1]
     newest_nen_page = get_https_body(TokeiPortal+href)
-    #puts "newest_nen_page => " + newest_nen_page[0,100]
+
     #目当ての区のcsvファイルのurlを取得する.
     pattern1 = %r!href="(r\d\d?cho-nen.files/#{ku}(\d\d)(\d\d).csv)"!
     ans      = newest_nen_page.match(/#{pattern1}/)
     href1    = ans[1]
-    nengetsu = ans[2]+ans[3]
+    yymm = ans[2]+ans[3]
     if ans[3] == '03'
       #最新データが3月のときは前年の9月のデータのページのURLに差し替える.
-      nengetsu = "#{(ans[2].to_i - 1).to_s}09"
-      href1    = href1.sub(/\d\d?/, (ans[2].to_i - 19).to_s ).sub(/\d{4}/,nengetsu)
+      yymm = "#{(ans[2].to_i - 1).to_s}09"
+      href1    = href1.sub(/\d\d?/, (ans[2].to_i - 19).to_s ).sub(/\d{4}/,yymm)
     end
-    file = local_file(:csv,nengetsu)
+
+    file = local_file(:csv,yymm)
     unless csv = get_local(file)
       url = cho_nen_top+href1
       csv = get_https_body(url).kconv(Kconv::UTF8,Kconv::SJIS)
       save_local(file,csv)
-      #puts "csv => " + csv[0,100]
     end
     return ChoMeiList.new(csv).html
   end
 
   def make_json_from_csv(csv,kijunbi,cho)
+    p :step01
     csv=csv.to_utf8 if RUBY_VERSION[0]=="2"
     ary=[]
     hitoku=false
     csv.each_line do |line|
       l = line.chomp.split(",")
-      #ary << l if cho.include?(l[0]) or l[0]=="町名"
       if cho.include?(l[0]) or l[0]=="町名"
         if l.include? "X"
           hitoku=true
@@ -421,6 +433,7 @@ class GetDATA
         ary << l
       end
     end
+    p :step02
     title     = ary[0].map{|c| c.match(/歳/) ? c.sub!(/歳.*/,"") : c }
     if ary.size > 1
       male      = ary_sum(ary.select{|l| l[2]=="男"})
@@ -437,13 +450,21 @@ class GetDATA
       j_ary     = title.map{|i| [i,"0","0","0"]}
       j_ary.slice!(0, 3)
     end
+    p :step03
     data                  = Hash.new
     data["shiku"]         = exist_cho.join(",")
+    p :step03_1
     data["kijunbi"]       = kijunbi
+    p :step03_2
     data["source_url"]    = ShiHost+csv_source()
+    p :step03_3
     data["kakusai_betsu"] = j_ary
+    p :step03_4
     data["not_exist"]     = not_exist.size>0 ? not_exist.join(",") : ""
+    p :step03_5
     data["hitoku"]        = hitoku
+    p :step04
+    p data
     JSON.generate(data)
   end
 
@@ -455,7 +476,7 @@ class GetDATA
     ary=[]
     csv.each_line do |line|
       l = line.chomp.split(",")
-      ary << l if l[0]=="年" or l[0]==nengetsu
+      ary << l if l[0]=="年" or l[0]==get_gge(nengetsu)
     end
     title     = ary[0].map{|c| c.match(/歳/) ? c.sub!(/歳.*/,"") : c }
     total     = ary[1].map{|nin| keta_kugiri(nin)}
@@ -490,51 +511,28 @@ class GetDATA
     sum.map{|n| n.to_s}
   end
 
-  #"1609","9703"などyymm形式を平成x年x月x日に変換する。
+  #"201609","199701"などyyyymm形式を平成x年x月x日に変換する。
   def kijunbi(nengetsu)
-    if nengetsu[2,2]=="01" or nengetsu[2,2]=="10"
+    if nengetsu[4,2]=="01" or nengetsu[4,2]=="10"
       day="1"
     else
       day="30"
     end
-    nen = nengetsu[0,2].to_i
-    if nen<19
-      "平成#{nen+12}年#{nengetsu[3,1]}月#{day}日現在"
-    elsif nen==19
-      "令和元年#{nengetsu[3,1]}月#{day}日現在"      
-    elsif nen<50
-      "令和#{nen-18}年#{nengetsu[3,1]}月#{day}日現在"
-    else
-      "平成#{nen-88}年#{nengetsu[3,1]}月#{day}日現在"
-    end
+    "#{get_gge(nengetsu)}#{nengetsu[4,2].to_i}月#{day}日現在"
   end
 
   def ayumi_kijunbi(nengetsu)
-    if nengetsu.match(/昭和5[1-9]年$|昭和6\d年$|平成\d年$/)
-      str = nengetsu.sub("年",'年1月1日現在')
-    elsif nengetsu.match("国勢調査")
-      str = nengetsu.sub("年国勢調査","年10月1日現在（国勢調査）")
+    if nengetsu[0,4].to_i<=1975 or nengetsu[4,2]=="10"
+      #get_gge(nengetsu)+"（"+nengetsu[0,4]+"年）10月1日現在"
+      get_gge(nengetsu)+"年10月1日現在"
     else
-      str = nengetsu.sub("年","年10月1日現在")
+      #get_gge(nengetsu)+"（"+nengetsu[0,4]+"年）1月1日現在"
+      get_gge(nengetsu)+"年1月1日現在"
     end
-    add_seireki(str)
-  end
-
-  def add_seireki(nengetsu)
-    nengetsu.sub(/(昭和|大正|平成|令和)(\d+)年/){
-      kisu  = case $1
-            when "大正" ; 1911
-            when "昭和" ; 1925
-            when "平成" ; 1988
-            when "令和" ; 2018
-            end
-      year = $2.to_i+kisu
-      "#{$1+$2}年 (#{year}年)"
-    }
   end
 
   def isAyumi()
-    if @ku=="age" and @nengetsu.match(/年/)
+    if @ku=="age" and @nengetsu[0,4].to_i<=1992
       true
     else
       false
@@ -543,9 +541,36 @@ class GetDATA
 
   def csv_source(ku=@ku,nengetsu=@nengetsu)
     TokeiPortal +
-    ChoCSV.sub("<gen>",gen(nengetsu)).
+    ChoCSV.sub("<gen>",get_ge(nengetsu)).
            sub("<ku>" ,ku).
-           sub("<nengetsu>",nengetsu)
+           sub("<nengetsu>",nengetsu[2,4])
+  end
+
+  #nengetsu（ex."201909"）から元号年(ex."r1")を取得する.
+  #市サイトの町丁別年齢別csvファイルのパスを作成するために使用。2019は"h31"とする。
+  def get_ge(nengetsu)
+    yyyy = nengetsu[0,4].to_i
+    m    = nengetsu[4,2].to_i
+    case yyyy
+    when 2020..2999 ; "r"+(yyyy-2018).to_s
+    when 1989..2019 ; "h"+(yyyy-1988).to_s
+    when 1926..1988 ; "s"+(yyyy-1925).to_s
+    end
+  end
+
+  def get_gge(nengetsu)
+    yyyy = nengetsu[0,4].to_i
+    m    = nengetsu[4,2].to_i
+    case yyyy
+    when 2020..2999 ; "令和"+(yyyy-2018).to_s+"年"
+    when 2019       ; "令和1年"  if m>=5
+                      "平成31年" if m<5
+    when 1990..2018 ; "平成"+(yyyy-1988).to_s+"年"
+    when 1989       ; "平成1年"  if m >1
+                      "昭和64年" if m==1
+    when 1926..1988 ; "昭和"+(yyyy-1925).to_s+"年"
+    when 1912..1925 ; "大正"+(yyyy-1911).to_s+"年"
+    end
   end
 
   def to_han(str)
@@ -564,19 +589,55 @@ class GetDATA
     html.match(/<title>.*?(平成\d+年\d+月\d+日現在).*?<\/title>/u)[1]
   end
   def pre_nen(nengetsu)
-    "#{nengetsu[0,2].to_i-1}#{nengetsu[2,2]}"
+    "#{nengetsu[0,4].to_i-1}#{nengetsu[4,2]}"
   end
   def post_nen(nengetsu)
-    "#{nengetsu[0,2].to_i+1}#{nengetsu[2,2]}"
+    "#{nengetsu[0,4].to_i+1}#{nengetsu[4,2]}"
   end
   def pre_9month(nengetsu)
-    "#{nengetsu[0,2]}01"
+    "#{nengetsu[0,4]}01"
   end
   def post_3month(nengetsu)
-    "#{nengetsu[0,2].to_i+1}01"
+    "#{nengetsu[0,4].to_i+1}01"
   end
 end
 
+#市サイトから「cho-option.txt」の文字列データを作成する。(単体で動作する。)
+def make_cho_option
+  url="https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/"
+  cho_option=[]
+  uri=URI.parse(url)
+  uri.read.scan(/(?<=cho-nen.html">).*?<\/a>/).each do |line|
+    ans   = line.match(/(令和|平成).*?\((\d{4})\)年/)
+    yyyy  = ans[2]
+    gg    = ans[0].sub(/\(#{yyyy}\)/,"")
+    cho_option << "                  <option value=\"#{yyyy}09\">#{gg}9月30日現在</option>"
+  end
+  str = cho_option.join("\n")
+  File.write("#{__dir__}/tmp/nenreibetsu/cho-option.txt",str)
+  str
+end
+
+#市サイトから「kujuki_option.txt」の文字列データを作成する。(単体で動作する。)
+def make_kujuki_option
+  url="https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/juki/"
+  kujuki_option=[]
+  uri=URI.parse(url)
+  uri.read.scan(/(?<=nen.html">).*?<\/a>/).each do |line|
+    ans   = line.match(/(令和|平成).*?\((\d{4})\)年/)
+    yyyy  = ans[2]
+    gg    = ans[0].sub(/\(#{yyyy}\)/,"")
+    kujuki_option << "                  <option value=\"#{yyyy}09\">#{gg}9月30日現在</option>"
+  end
+  str = kujuki_option.join("\n")
+  Dir.mkdir "#{__dir__}/tmp/jukijinko" unless Dir.exist? "#{__dir__}/tmp/jukijinko"
+  File.write("#{__dir__}/tmp/jukijinko/kujuki_option.txt",str)
+  str
+end
+
+def date_file_was_created(file)
+  File::Stat.new(file).mtime.to_date
+end
 
 #***********************************
 #       ここから実行プロセス
@@ -605,6 +666,7 @@ def main(param)
   shiku    = param["ShikuName"]
   nengetsu = param["Year"]
   level    = param["Level"].to_sym
+  p level
   if level == :cho_json
     cho    = JSON.parse(param["Cho"])
   else
@@ -612,7 +674,8 @@ def main(param)
   end
   case level
   when :shiku_json
-    if nengetsu.match(/年$/)
+    p nengetsu[0,4]
+    if nengetsu!="new" and nengetsu[0,4]<="1992"
       level = :ayumi_json
     elsif nengetsu.match(/ft|syorai/)
       case shiku
@@ -620,7 +683,7 @@ def main(param)
       else       ; level = :syorai_ku_json
       end
     end
-    nengetsu = "20"+nengetsu[0,2]+"ft" if nengetsu.match(/syorai/) #お化け対策
+    nengetsu = nengetsu[0,4]+"ft" if nengetsu.match(/syorai/) #お化け対策
   when :shiku_option
     case shiku
     when "age" ; level = :shi_option
@@ -633,21 +696,29 @@ def main(param)
   begin
     obj = GetDATA.new(shiku,nengetsu,level,cho)
     case level
-    when :shiku_json,:cho_json,:ayumi_json,:syorai_json,:syorai_ku_json,:all_options
+    when :shiku_json,:cho_json,:kujuki_json,:ayumi_json,:syorai_json,:syorai_ku_json,:all_options
       if obj.json_error
-        #p :step8
         ["text/plain;charset=utf-8", obj.csv]
       else
-        #p :step9
         ["text/json;charset=utf-8", obj.json]
       end
     when :cho_csv,:cho_csv_for_save
       ["text/plain;charset=utf-8", obj.csv]
     when :ku_option,:shi_option,:cho_option,:cho_list
-      #puts "obj.html_str => " + obj.html_str[0,100]
       ["text/html;charset=utf-8", obj.html_str]
     end
   rescue => e
       alert(e.message + "<br>\n" + e.backtrace.join("<br>\n"))
   end
+end
+
+#このファイルを読み込んだときの初期化動作
+cho_option    = "#{__dir__}/tmp/option/cho-option.txt"
+kujuki_option = "#{__dir__}/tmp/option/kujuki-option.txt"
+
+if File.exist?(cho_option)==false or date_file_was_created(cho_option)<(Date.today-1)
+  make_cho_option
+end
+if File.exist?(kujuki_option)==false or date_file_was_created(kujuki_option)<(Date.today-1)
+  make_kujuki_option
 end
