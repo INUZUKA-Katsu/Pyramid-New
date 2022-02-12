@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #// 横浜市の人口ピラミッド ver2.10 2017.1.14  INUZUKA Katsu
+require "bundler/setup"
 require "json"
 require "time"
 require "cgi"
@@ -11,25 +12,27 @@ require "net/https"
 require 'open-uri'
 require 'openssl'
 require 'csv'
+require './s3client'
 
 #$KCODE = "utf-8"
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 Encoding.default_external = "utf-8" if RUBY_VERSION[0]=="2"
+S3=S3Client.new
 
-JSONFile           = "/nenreibetsu/<ku><nengetsu>-j.txt"
-JSONFile_SYORAI    = "/syoraisuikei/<nen>-suikei.txt"
-JSONFile_KUJUKI    = "/jukijinko/<ku><nen>-t.txt"
-JSONFile_KU_SYORAI = "/syoraisuikei/kubetsu/<ku>-<nen>-suikei.txt"
-CSVFile            = "/nenreibetsu/<ku><nengetsu>.csv"
-ShikuCSVFile       = "/e3yokohama<nengetsu>/e3<ku><nengetsu>.csv"
-AyumiCSVFile       = "/ayumi/ayumi.csv"
-ShiOptionFile      = "/option/shi-option.txt"
-KuOptionFile       = "/option/ku-option.txt"
-ChoOptionFile      = "/option/cho-option.txt"
-AyumiOptionFile    = "/option/ayumi-option.txt"
-SyoraiOptionFile   = "/option/syorai-option.txt"
-KuJukiOptionFile   = "/option/kujuki-option.txt"
-LocalDirShikuJson  = 'nenreibetsu/'
+JSONFile_S3         = "Pyramid/nenreibetsu/<ku><nengetsu>-j.txt"
+JSONFile_SYORAI     = "/syoraisuikei/<nen>-suikei.txt"
+JSONFile_KUJUKI_S3  = "Pyramid/jukijinko/<ku><nen>-t.txt"
+JSONFile_KU_SYORAI  = "/syoraisuikei/kubetsu/<ku>-<nen>-suikei.txt"
+CSVFile_S3          = "Pyramid/nenreibetsu/<ku><nengetsu>.csv"
+ShikuCSVFile        = "/e3yokohama<nengetsu>/e3<ku><nengetsu>.csv"
+AyumiCSVFile        = "/ayumi/ayumi.csv"
+ShiOptionFile_S3    = "Pyramid/option/shi-option.txt"
+KuOptionFile_S3     = "Pyramid/option/ku-option.txt"
+ChoOptionFile_S3    = "Pyramid/option/cho-option.txt"
+AyumiOptionFile_S3  = "Pyramid/option/ayumi-option.txt"
+SyoraiOptionFile_S3 = "Pyramid/option/syorai-option.txt"
+KuJukiOptionFile_S3 = "Pyramid/option/kujuki-option.txt"
+DirShikuJson_S3     = "Pyramid/nenreibetsu/"
 
 #横浜市サイト
 ShiHost            = "https://www.city.yokohama.lg.jp"
@@ -146,7 +149,7 @@ class GetDATA
 
   def get_nengetsu_from_new
     ary = []
-    Dir.glob(LocalDirShikuJson+"tsurumi*.txt").each do |f|
+    S3.get_list(DirShikuJson_S3).select{|f| f.match(/tsurumi.*txt/)}.each do |f|
       if ans=f.match(/\d{4}/)
         ary << ans[0]
       end
@@ -159,22 +162,10 @@ class GetDATA
     root_dir = File.dirname(File.expand_path(__FILE__))
     case syubetsu
       when :json
-        #p :root2
-        begin
-          #p "@ku => " + @ku
-          #p "nengetsu => " + nengetsu
-          #p "root_dir => " + root_dir
-          #p 'JSONFile.sub("<ku>",@ku) => '+JSONFile.sub("<ku>",@ku)
-          #p 'JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)'+JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu)
-        rescue
-          #p :error
-        end
-        root_dir + JSONFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu[2,4])
+        JSONFile_S3.sub("<ku>",@ku).sub("<nengetsu>",nengetsu[2,4])
       when :json_kujuki
         nen = nengetsu[2,4]
-        path = root_dir + JSONFile_KUJUKI.sub("<ku>",@ku).sub("<nen>",nen)
-        p path
-        path
+        JSONFile_KUJUKI_S3.sub("<ku>",@ku).sub("<nen>",nen)
       when :json_syorai
         nen = nengetsu[0,4]
         root_dir + JSONFile_SYORAI.sub("<nen>",nen)
@@ -182,7 +173,7 @@ class GetDATA
         nen = nengetsu[0,4]
         root_dir + JSONFile_KU_SYORAI.sub("<ku>",@ku).sub("<nen>",nen)
       when :csv
-        root_dir + CSVFile.sub("<ku>",@ku).sub("<nengetsu>",nengetsu[2,4])
+        CSVFile_S3.sub("<ku>",@ku).sub("<nengetsu>",nengetsu[2,4])
       when :shiku_csv
         if @ku=="age"
           shiku = 'yokohama'
@@ -193,17 +184,17 @@ class GetDATA
       when :ayumi_csv
         root_dir + AyumiCSVFile
       when :shi_option
-        root_dir + ShiOptionFile
+        ShiOptionFile_S3
       when :ku_option
-        root_dir + KuOptionFile
+        KuOptionFile_S3
       when :cho_option
-        root_dir + ChoOptionFile
+        ChoOptionFile_S3
       when :ayumi_option
-        root_dir + AyumiOptionFile
+        AyumiOptionFile_S3
       when :syorai_option
-        root_dir + SyoraiOptionFile
+        SyoraiOptionFile_S3
       when :kujuki_option
-        root_dir + KuJukiOptionFile
+        KuJukiOptionFile_S3
     end
   end
 
@@ -300,28 +291,17 @@ class GetDATA
 
   def get_local(file)
     p caller_locations(1,1)[0].label
-    tmp_file = file.sub( /#{__dir__}/, "#{__dir__}/tmp")
-    begin
-      if File.exist?(tmp_file)
-        File.read(tmp_file)
-      elsif File.exist?(file)
-        File.read(file)
-      else
-        nil
-      end
-    rescue
+    if file[0,7]=='Pyramid' and S3.exist? file
+      S3.read(file)
+    elsif File.exist? file
+      File.read(file)
+    else
       nil
     end
   end
 
   def save_local(file,str)
-    tmp_file = file.sub( /#{__dir__}/, "#{__dir__}/tmp")
-    unless Dir.exist? File.dirname(tmp_file)
-      FileUtils.mkdir_p File.dirname(tmp_file)
-    end
-    File.open(tmp_file,"w") do |f|
-      f.print str
-    end
+    S3.write(file,str)
   end
 
   def kakusai_betsu(html)
@@ -602,43 +582,6 @@ class GetDATA
   end
 end
 
-#市サイトから「cho-option.txt」の文字列データを作成する。(単体で動作する。)・・・heroku環境ではエラーになる.
-def make_cho_option
-  url="https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/"
-  cho_option=[]
-  uri=URI.parse(url)
-  uri.read.scan(/(?<=cho-nen.html">).*?<\/a>/).each do |line|
-    ans   = line.match(/(令和|平成).*?\((\d{4})\)年/)
-    yyyy  = ans[2]
-    gg    = ans[0].sub(/\(#{yyyy}\)/,"")
-    cho_option << "                  <option value=\"#{yyyy}09\">#{gg}9月30日現在</option>"
-  end
-  str = cho_option.join("\n")
-  File.write("#{__dir__}/tmp/nenreibetsu/cho-option.txt",str)
-  str
-end
-
-#市サイトから「kujuki_option.txt」の文字列データを作成する。(単体で動作する。)・・・heroku環境ではエラーになる.
-def make_kujuki_option
-  url="https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/juki/"
-  kujuki_option=[]
-  uri=URI.parse(url)
-  uri.read.scan(/(?<=nen.html">).*?<\/a>/).each do |line|
-    ans   = line.match(/(令和|平成).*?\((\d{4})\)年/)
-    yyyy  = ans[2]
-    gg    = ans[0].sub(/\(#{yyyy}\)/,"")
-    kujuki_option << "                  <option value=\"#{yyyy}09\">#{gg}9月30日現在</option>"
-  end
-  str = kujuki_option.join("\n")
-  Dir.mkdir "#{__dir__}/tmp/jukijinko" unless Dir.exist? "#{__dir__}/tmp/jukijinko"
-  File.write("#{__dir__}/tmp/jukijinko/kujuki_option.txt",str)
-  str
-end
-
-def date_file_was_created(file)
-  File::Stat.new(file).mtime.to_date
-end
-
 #***********************************
 #       ここから実行プロセス
 #***********************************
@@ -712,13 +655,4 @@ def main(param)
   end
 end
 
-#このファイルを読み込んだときの初期化動作(heroku環境ではtmpフォルダへの書き込みでエラーになるのでコメントアウト)
-#cho_option    = "#{__dir__}/tmp/option/cho-option.txt"
-#kujuki_option = "#{__dir__}/tmp/option/kujuki-option.txt"
-#
-#if File.exist?(cho_option)==false or date_file_was_created(cho_option)<(Date.today-1)
-#  make_cho_option
-#end
-#if File.exist?(kujuki_option)==false or date_file_was_created(kujuki_option)<(Date.today-1)
-#  make_kujuki_option
-#end
+#このファイルを読み込んだときの初期化動作
