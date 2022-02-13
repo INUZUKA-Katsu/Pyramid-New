@@ -4,8 +4,8 @@ require 'aws-sdk-s3'
 class S3Client
   attr_reader :bucket
   def initialize
-    p ENV['AWS_ACCESS_KEY_ID']
-    p ENV['AWS_SECRET_ACCESS_KEY']
+    #p ENV['AWS_ACCESS_KEY_ID']
+    #p ENV['AWS_SECRET_ACCESS_KEY']
     @resource = Aws::S3::Resource.new(
       :region => 'us-east-1',
       :access_key_id   => ENV['AWS_ACCESS_KEY_ID'],
@@ -15,6 +15,9 @@ class S3Client
   end
   def read(file_name)
     @bucket.object(file_name).get.body.read
+  end
+  def download(file_name,tofullpath)
+    @bucket.object(file_name).get(response_target: tofullpath)
   end
   def write(file_name,str)
     @bucket.put_object(key: file_name, body: str)
