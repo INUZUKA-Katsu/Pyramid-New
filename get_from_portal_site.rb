@@ -196,7 +196,8 @@ def get_csv_url_list
   links.each do |link|
     agent = Mechanize.new
     agent.user_agent_alias = 'Mac Safari'
-    csv_links += agent.get(Site+link).links_with(:href => /cho-nen.files\/\w+\d\d09.csv/).map{|a| URI.join(Site+link,a.href).to_s}
+    url = URI(Site).merge(link).to_s
+    csv_links += agent.get(url).links_with(:href => /cho-nen.files\/\w+\d\d09.csv/).map{|a| URI(url).merge(a.href).to_s}
   end
   h = {}
   csv_links.each do |csv|
