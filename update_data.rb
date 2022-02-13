@@ -11,6 +11,7 @@ require 'roo'
 require 'json'
 require 'net/ftp'
 require 'net/smtp'
+require 'mechanize'
 require 'mail'
 require 'logger'
 require './s3client'
@@ -98,9 +99,21 @@ $logger = Logger.new(STDOUT)
   p "人口データUpdate終了。"
   
   
+  #************************************
+  #                                   *
+  # 2 区町丁別年齢別CSVファイル取得・更新   *
+  #                                   *
+  #************************************
+
+  get_rack_or_old.keys.each do |url|
+    p url
+    dest_file = get_rack_or_old[url]
+    S3.write(dest_file, URI.parse(url).read.toutf8)
+  end
+
   #********************************
   #                               *
-  # 2 市区オプションファイル更新処理   *
+  # 3 市区オプションファイル更新処理   *
   #                               *
   #********************************
   
@@ -110,7 +123,7 @@ $logger = Logger.new(STDOUT)
   
   #********************************
   #                               *
-  # 3 町丁オプションファイル更新処理   *
+  # 4 町丁オプションファイル更新処理   *
   #                               *
   #********************************
 

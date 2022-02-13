@@ -181,6 +181,58 @@ def get_last_modified_of_json(shiku,yy)
   end
 end
 
+#######################################################
+#ここからは市サイトの町丁別年齢別CSVの取得・更新プログラム
+#######################################################
+
+#戻り値は、市サイトの町丁別年齢別CSVのURL=>更新日時のハッシュ
+def get_csv_url_list
+  agent = Mechanize.new
+  agent.user_agent_alias = 'Mac Safari'
+  
+  links = agent.get(Site+Parent_url_cho).links_with(:href => /cho-nen\.html/).map{|link| link.href}
+
+  csv_links = []
+  links.each do |link|
+    agent = Mechanize.new
+    agent.user_agent_alias = 'Mac Safari'
+    csv_links += agent.get(Site+link).links_with(:href => /cho-nen.files\/\w+\d\d09.csv/).map{|a| URI.join(Site+link,a.href).to_s}
+  end
+  h = {}
+  csv_links.each do |csv|
+    h[csv] = URI.open(csv).last_modified.localtime
+  end
+  h
+end
+#p File.basename(get_csv_url_list.keys[0])
+
+#戻り値は、AWSの町丁別CSVファイル名=>更新日時のハッシュ
+def get_local_csv_list
+  h = {}
+  S3.get_list(Local_csv_cho).each do |l|
+    if l[-3,3]=='csv'
+      #p File.basename(l)
+      h[File.basename(l)] = S3.last_modified(l).localtime
+    end
+  end
+  h
+end
+
+def get_rack_or_old
+  site_csv  = get_csv_url_list
+  local_csv = get_local_csv_list
+  #不足するもの又は古いもの
+  rack_or_old = {}
+  site_csv.keys.each do |url|
+    csv = File.basename(url)
+    if not local_csv.keys.include?(csv) or site_csv[url] > local_csv[csv]
+      rack_or_old[url] = Local_csv_cho+csv
+    end
+  end
+  rack_or_old
+end
+
+#########################################################
 def send_mail(subject_str,body_str)
   mail = Mail.new do
      from    "czk07503@nifty.com"
