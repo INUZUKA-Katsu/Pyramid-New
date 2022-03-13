@@ -35,11 +35,34 @@
    p {margin-top:0em ; margin-bottom:0;}
    p.ma {margin-top:0.8em ;margin-bottom:0.8em}
 
+   div#ohikkoshi {
+      display: block;
+      border: 2px solid red;
+      position: absolute;
+      font-size:90%;
+      font-weight:normal;
+      text-align:center;
+      padding: 0.5em;
+      margin-top:5em;
+      margin-left: 5%;
+      width : 35%;
+      height: 5em;
+      top   : 2em;
+      left  : 0;
+      background-color: #FFFFCC;
+      opacity      : 1.00;
+   }
+   #ohikkoshi.p{
+     margin: 0.5em;
+   }
   -->
  </style>
 
      <script type="text/javascript">
      <!--
+         //5秒後に"https://toshin-kensaku.herokuapp.com/joho"にリダイレクトする。
+         setTimeout("location.href='https://toshin-kensaku.herokuapp.com/joho/'",1000*5);
+         
          function exit(str){
            try {
              throw new Error('終了!');
@@ -138,6 +161,11 @@
 
 <h1 class="header">横浜市例規集、ほか各種検索</h1>
 
+<div id="ohikkoshi">
+  <p>この検索ページは、次のURLに移転しました。</p>
+  <p> ⇒ <a href="https://toshin-kensaku.herokuapp.com/joho">https://toshin-kensaku.herokuapp.com/joho</a></p>
+  <p>5秒後に自動的に新サイトにジャンプします。</p>
+</div>  
 
 <div class="link">
  <p class="ma">
