@@ -543,11 +543,9 @@ class GetDATA
     m    = nengetsu[4,2].to_i
     case yyyy
     when 2020..2999 ; "令和"+(yyyy-2018).to_s+"年"
-    when 2019       ; "令和1年"  if m>=5
-                      "平成31年" if m<5
+    when 2019       ; m==1 ? "平成31年" : "令和元年"
     when 1990..2018 ; "平成"+(yyyy-1988).to_s+"年"
-    when 1989       ; "平成1年"  if m >1
-                      "昭和64年" if m==1
+    when 1989       ; m==1 ? "昭和64年" : "平成元年"
     when 1926..1988 ; "昭和"+(yyyy-1925).to_s+"年"
     when 1912..1925 ; "大正"+(yyyy-1911).to_s+"年"
     end
