@@ -4,48 +4,65 @@
 		<meta charset="UTF-8">
     <title>MCCワーシップクワイアーの持ち歌</title>
     <style type="text/css">
-      div.body {width: 900px;
-                margin-left: auto; margin-right: auto;
-               }
-      div.h4   {font-style:oblique;font-size:16px;}
-      div.nen  {margin-top:1em;}
-      dt       {padding:1em 0 0.5em 2em;font-size:16px;}
-      dd       {padding:1em 0 0 1em;font-size:16px;}
-      dd div   {display:inline-block;vertical-align:top;width:20em;font-size:16px;}
-      
-      @media screen and (max-width: 1000px){
-        /* デスクトップファースト*/
-        /* 1000pxまでの画面で表示するときのスタイル */
-        h1       {font-size: 16px;}
+        /* スマートフォンファースト*/
+        /* 700px未満の画面で表示するときのスタイル */
+        div.body {width: 80%;
+                  margin-left: auto; margin-right: auto;
+                 }
+        h1       {font-size: 32px;}
+        h4       {margin-bottom: 1em;font-size: 26px;}
+        li div   {display:inline-block;vertical-align:middle;width:6em;}
+        div.h4   {font-style:oblique;font-size:40px;}
+        div.nen  {margin-top:1em;}
+        dt       {padding:1em 0 0.5em 2em;font-size:32px;}
+        dd       {padding:1em 0 0 1em;font-size:24px;}
+        dd div   {display:inline-block;
+                  vertical-align:30%;
+                  padding-right:2em;
+                  width:40%;
+                  font-size:24px;
+                  }
+        audio     {width:60px;
+                  vertical-align:150%;
+        }
+
+      @media screen and (min-width: 820px){
+        /* 830px以上の画面で表示するときのスタイル */
+        h1       {font-size: 48px;}
+        h4       {margin-bottom: 2em;}
+        li       {margin-left:2em;}
+        div.h4   {font-style:oblique;font-size: 32px;
+                  margin:0 0 50px 0;
+                 }
+        dt       {padding:1em 0 0.5em 2em;font-size:32px;}
+        dd       {padding:1em 0 0 1em;font-size:32px;
+                  border-style:solid;
+                 }
+        dd div   {display:inline-block;
+                  vertical-align: 30%;
+                  width:40%;
+                  font-size:32px;}
+        audio    {width:300px;
+                  vertical-align:50%;
+        }
+
+      @media screen and (min-width: 1280px){
+        /* 1000px以上の画面で表示するときのスタイル */
+        /*h1       {font-size: 100%;}*/
         h4       {margin-bottom: 2em;
-        	      font-size: 14px !important;}
+        	      font-size: 120%;}
         li       {margin-left:2em;}
         div.h4   {margin-bottom: 2em;margin-top: 2em;
-                  font-style:oblique; font-size:13px;}
-        dt       {padding:1em 0 0.5em 2em;font-size:12px;}
-        dd       {padding:1em 0 0 1em;font-size:32px;}
-        dd div   {display:inline-block;vertical-align:top;width:14em;font-size:32px;}
-      }
-
-      @media screen and (max-width: 830px){
-        /* 830pxまでの画面で表示するときのスタイル */
-        h4        {margin-bottom: 2em;}
-        li        {margin-left:2em;}
-        div.h4   {font-style:oblique;font-size: 16px;}
+                  font-style:oblique; font-size:18px;}
         dt       {padding:1em 0 0.5em 2em;font-size:16px;}
         dd       {padding:1em 0 0 1em;font-size:16px;}
-        dd div   {display:inline-block;vertical-align:top;width:10em;}
-      }
-
-      @media screen and (max-width: 700px){
-        /* 700pxまでの画面で表示するときのスタイル */
-        h4       {margin-bottom: 1em;}
-        li       {margin-left:1em;margin-bottom:2em;}
-        li div   {display:inline-block;vertical-align:middle;width:6em;}
-        div.h4   {font-style:oblique;font-size:85%;}
-        dt       {padding:1em 0 0.5em 2em;font-size:32px;}
-        dd       {padding:1em 0 0 1em;font-size:32px;}
-        dd div   {display:inline-block;vertical-align:top;width:10em;}
+        dd div   {display:inline-block;
+                  vertical-align:70%;
+                  width:20em;
+                  font-size:16px;}
+        audio    {width:450px;
+                  vertical-align:100%;
+        }
       }
 
 		</style>
