@@ -17,7 +17,7 @@ def make_shiku_option(shiku)
   option_ary = []
   #  Dir.glob("/Users/inuzuka0601/Sites/Stat/nenreibetsu/age*-j.txt").
   #puts S3.get_list("Pyramid/nenreibetsu/").select{|f| f.match(/#{shiku}\d{4}/) and f[-6,6]=="-j.txt"}
-  S3.get_list(Local_json_shiku).select{|f| f.match(/#{shiku}\d{4}/) and f[-6,6]=="-j.txt"}.
+  S3.get_list(AWS_json_shiku).select{|f| f.match(/#{shiku}\d{4}/) and f[-6,6]=="-j.txt"}.
       map{|f| f.match(/#{shiku}(\d+)/)[1]}.
       map{|yymm| yymm[0]=='9' ? '19'+yymm : '20'+yymm}.
       each do |yyyymm|
@@ -27,12 +27,12 @@ def make_shiku_option(shiku)
   option_ary = option_ary.sort.reverse
   option_ary[0]=' '*18+'<option value="new" selected>　　 最新</option>'
   str = option_ary.join("\n")
-  syorai = S3.read(Local_syorai_option).split("\n").
+  syorai = S3.read(AWS_syorai_option).split("\n").
            select{|line| not yyyy_ary.include? line.match(/\d{4}/)[0] }.
            map{|line| ' '*18+line}.
            join("\n")
   if shiku=="age"
-    ayumi = S3.read(Local_ayumi_option)
+    ayumi = S3.read(AWS_ayumi_option)
     [syorai,str,ayumi].join("\n")
   else
     [syorai,str].join("\n")

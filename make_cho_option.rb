@@ -11,7 +11,7 @@ def make_cho_option
     cho_option << "                  <option value=\"#{yyyy}09\">#{gg}9月30日現在</option>"
   end
   str = cho_option.join("\n")
-  S3.write(Local_cho_option,str)
+  S3.write(AWS_cho_option,str)
   str
 end
 
@@ -27,6 +27,6 @@ def make_kujuki_option
     kujuki_option << "                  <option value=\"#{yyyy}09\">#{gg}9月30日現在</option>"
   end
   str = kujuki_option.join("\n")
-  S3.write(Local_kujuki_option,str)
+  S3.write(AWS_kujuki_option,str)
   str
 end

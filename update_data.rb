@@ -1,19 +1,22 @@
 #coding:utf-8
-require 'bundler/setup'
+
 require "time"
 require "cgi"
 require "kconv"
 require "fileutils"
+require 'net/ftp'
 require "net/https"
+require 'net/smtp'
 require 'open-uri'
 require 'openssl'
-require 'roo'
 require 'json'
-require 'net/ftp'
-require 'net/smtp'
+require 'logger'
+
+require 'bundler/setup'
+require 'roo'
 require 'mechanize'
 require 'mail'
-require 'logger'
+
 require './s3client'
 require './get_from_portal_site'
 require './make_shiku_option'
@@ -39,18 +42,27 @@ Child_url_cho    = '<gen>cho-nen.files/<ku><nengetsu>.csv'
 Parent_url_shikujuki = "jinko/nenrei/juki/"
 
 #ローカルフォルダ
-Local_excel_shiku = 'Pyramid/excel/'
-Local_json_shiku  = 'Pyramid/nenreibetsu/'
-Local_csv_cho     = 'Pyramid/nenreibetsu/'
+AWS_excel_shiku = 'Pyramid/excel/'
+AWS_json_shiku  = 'Pyramid/nenreibetsu/'
+AWS_csv_cho     = 'Pyramid/nenreibetsu/'
 
 #オプションファイル
-Local_shi_option    = "Pyramid/option/shi-option.txt"
-Local_ku_option     = "Pyramid/option/ku-option.txt"
-Local_ayumi_option  = "Pyramid/option/ayumi-option.txt"
-Local_syorai_option = "Pyramid/option/syorai-option.txt"
-Local_cho_option    = "Pyramid/option/cho-option.txt"
-Local_kujuki_option = "Pyramid/option/kujuki-option.txt"
+AWS_shi_option    = "Pyramid/option/shi-option.txt"
+AWS_ku_option     = "Pyramid/option/ku-option.txt"
+AWS_ayumi_option  = "Pyramid/option/ayumi-option.txt"
+AWS_syorai_option = "Pyramid/option/syorai-option.txt"
+AWS_cho_option    = "Pyramid/option/cho-option.txt"
+AWS_kujuki_option = "Pyramid/option/kujuki-option.txt"
 
+#AWSのファイルリスト
+AWS_excel_list = 'Pyramid/excel/excel_list.json'
+AWS_txt_list   = 'Pyramid/nenreibetsu/txt_list.json'
+AWS_csv_list   = 'Pyramid/nenreibetsu/csv_list.json'
+
+#データが更新される1月と10月以外の月は直ちに終了する。
+exit if Time.now.month != 1 and Time.now.month != 10
+#奇数の日は直ちに終了する。
+exit if Time.now.day % 2 == 1
 
 $logger = Logger.new(STDOUT)
 
@@ -59,45 +71,56 @@ $logger = Logger.new(STDOUT)
   # 1 推計人口の新データ確認、更新処理  *
   #                               *
   #********************************
-  
+  shiku_update = false
+
   #ローカルにない市区年齢別人口のexcelファイルをダウンロードする.
-  # 1. ポータルサイトのファイル一覧を取得し、
+  # 1. ポータルサイトの"hyo22.xlsxファイルのurlの一覧を取得し、
   portal_site_shiku_excel_list = get_url_list_shiku()
+
+  # 2 AWS S3に保存されているexcelと市区のjsonファイルのリストを取得する.
+  s3_excel_hash = JSON.parse(S3.read(AWS_excel_list))
+  s3_txt_hash   = JSON.parse(S3.read(AWS_txt_list))
+
+  # 3. ポータルサイトのファイル一覧のうちAWS S3にないものをリストアップする。戻り値はuriの配列。
+  need_to_download_shiku_excel_list = select_not_downloaded( portal_site_shiku_excel_list, s3_excel_hash )
+  #puts need_to_download_shiku_excel_list
   
-  # 2. そのうちローカルにないものをリストアップする。
-  need_to_download_shiku_excel_file = select_not_downloaded( portal_site_shiku_excel_list, Local_excel_shiku )
-  p 'need_to_download_shiku_excel_file'
-  p need_to_download_shiku_excel_file
-  puts
-  
-  # 3. リストアップしたファイルをダウンロードする。
-  if need_to_download_shiku_excel_file.size>0
-    p '市サイトからダウンロードする.=>'+need_to_download_shiku_excel_file.to_s
-    download_by_list( need_to_download_shiku_excel_file , Local_excel_shiku )
+  # 4. リストアップしたファイルをダウンロードする。また、AWSのexcelファイルリストを更新する。
+  if need_to_download_shiku_excel_list.size>0
+    p '市サイトからダウンロードする.=>'+need_to_download_shiku_excel_list.to_s
+    download_by_list( need_to_download_shiku_excel_list , AWS_excel_shiku )
+    update_s3_excel_hash(s3_excel_hash,need_to_download_shiku_excel_list)
+  else
+    p '新しいExcelファイルはありませんでした。'
   end
-  
-  # 4. ローカルのexcelとjsonを比較し、不足しているjsonを作成し、保存する。
+  #ここまでOK(2022.5.3)
+
+  # 5. ローカルのexcelとjsonを比較し、不足しているjsonを作成し、保存する。
   p "ローカルのexcelとjsonを比較し、不足しているjsonを作成し、保存する"
-  list1 = not_made_json_shiku
+  list1 = not_made_json_shiku( s3_excel_hash, s3_txt_hash )
   if list1.size>0
     list1.each do |ary|
-      save_json_from_excel_hyo22( ary, Local_json_shiku )
+      s3_txt_hash = save_json_from_excel_hyo22( ary, AWS_json_shiku, s3_txt_hash )
     end
+    S3.write( AWS_txt_list, JSON.generate(s3_txt_hash) )
+    shiku_update = true
   else
     p "不足しているjsonはありませんでした."
   end
-  # 5. ローカルのexcelとjsonを比較し、excelの方が新しいときjsonを作成し、上書き保存する。
+
+  # 6. ローカルのexcelとjsonを比較し、excelの方が新しいときjsonを作成し、上書き保存する。
   p "excelとjsonのmtimeを比較し、excelの方が新しいとき、jsonを再作成し、上書き保存する"
-  list2 = is_old_json_shiku
+  list2 = is_old_json_shiku( s3_excel_hash )
   if list2.size>0
     list2.each do |ary|
-      save_json_from_excel_hyo22( ary, Local_json_shiku )
+      s3_txt_hash = save_json_from_excel_hyo22( ary, AWS_json_shiku , s3_txt_hash )
     end
+    S3.write( AWS_txt_list, JSON.generate(s3_txt_hash) )    
+    shiku_update = true
   else
     p "excelよりmtimeの古いjsonはありませんでした。"
   end
   p "人口データUpdate終了。"
-  
   
   #************************************
   #                                   *
@@ -105,10 +128,25 @@ $logger = Logger.new(STDOUT)
   #                                   *
   #************************************
 
-  get_rack_or_old.keys.each do |url|
-    p url
-    dest_file = get_rack_or_old[url]
-    S3.write(dest_file, URI.parse(url).read.toutf8)
+  site_csv_list = get_csv_url_list
+  aws_csv_list  = get_aws_csv_list
+  new_csv_list  = get_rack_or_old( site_csv_list, aws_csv_list )
+  
+  if new_csv_list.size>0
+    new_csv_list.keys.each do |url|
+      p url
+      dest_file = new_csv_list[url]
+      dest_contents = URI.parse(url).read.toutf8
+      p dest_file
+      p dest_contents[0,50]
+      puts
+      S3.write(dest_file, dest_contents)
+      aws_csv_list[ File.basename(dest_file) ] = Time.now.floor.localtime.to_s
+    end
+    S3.write( AWS_csv_list, JSON.generate(aws_csv_list))
+    cho_update = true
+  else
+    cho_update = false
   end
 
   #********************************
@@ -117,9 +155,10 @@ $logger = Logger.new(STDOUT)
   #                               *
   #********************************
   
-  S3.write(Local_shi_option, make_shiku_option("age"))
-  S3.write(Local_ku_option, make_shiku_option("tsurumi"))
-  
+  if shiku_update
+    S3.write( AWS_shi_option, make_shiku_option("age") )
+    S3.write( AWS_ku_option, make_shiku_option("tsurumi") )
+  end
   
   #********************************
   #                               *
@@ -127,20 +166,22 @@ $logger = Logger.new(STDOUT)
   #                               *
   #********************************
 
-  if not S3.exist?(Local_cho_option) or S3.last_modified(Local_cho_option).to_date<(Date.today-1)
-    p :made_new_option
-    puts make_cho_option.split("\n")
-  else
-    p :existed_option
-    puts S3.read(Local_cho_option).split("\n")
-  end
-
-  if not S3.exist?(Local_kujuki_option) or S3.last_modified(Local_kujuki_option).to_date<(Date.today-1)
-    p :made_new_option
-    puts make_kujuki_option.split("\n")
-  else
-    p :existed_option
-    puts S3.read(Local_kujuki_option).split("\n")
+  if cho_update
+    if not S3.exist?(AWS_cho_option) or S3.last_modified(AWS_cho_option).to_date<(Date.today-1)
+      p :made_new_option
+      puts make_cho_option.split("\n")
+    else
+      p :existed_option
+      puts S3.read(AWS_cho_option).split("\n")
+    end
+  
+    if not S3.exist?(AWS_kujuki_option) or S3.last_modified(AWS_kujuki_option).to_date<(Date.today-1)
+      p :made_new_option
+      puts make_kujuki_option.split("\n")
+    else
+      p :existed_option
+      puts S3.read(AWS_kujuki_option).split("\n")
+    end
   end
 
 
