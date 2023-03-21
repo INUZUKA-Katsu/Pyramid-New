@@ -4,7 +4,7 @@ require "time"
 require "cgi"
 require "kconv"
 require "fileutils"
-require 'net/ftp'
+require "net/ftp"
 require "net/https"
 require 'net/smtp'
 require 'open-uri'
@@ -60,10 +60,15 @@ AWS_txt_list   = 'Pyramid/nenreibetsu/txt_list.json'
 AWS_csv_list   = 'Pyramid/nenreibetsu/csv_list.json'
 
 #データが更新される1月と10月以外の月は直ちに終了する。
-exit if Time.now.month != 1 and Time.now.month != 10
+if Time.now.month != 1 and Time.now.month != 10
+  puts "1月と10月以外の月はここでプログラムを終了します。"
+  exit
+end
 #奇数の日は直ちに終了する。
-exit if Time.now.day % 2 == 1
-
+if Time.now.day % 2 == 1
+  puts "奇数の日はここでプログラムを終了します。" 
+  exit
+end
 $logger = Logger.new(STDOUT)
 
   #********************************
@@ -111,6 +116,14 @@ $logger = Logger.new(STDOUT)
   # 6. ローカルのexcelとjsonを比較し、excelの方が新しいときjsonを作成し、上書き保存する。
   p "excelとjsonのmtimeを比較し、excelの方が新しいとき、jsonを再作成し、上書き保存する"
   list2 = is_old_json_shiku( s3_excel_hash )
+  p "list2"
+  p list2.to_s
+  puts
+  p "AWS_json_shiku"
+  p AWS_json_shiku.to_s
+  puts
+  p "s3_txt_hash"
+  p s3_txt_hash.to_s
   if list2.size>0
     list2.each do |ary|
       s3_txt_hash = save_json_from_excel_hyo22( ary, AWS_json_shiku , s3_txt_hash )

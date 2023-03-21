@@ -178,7 +178,10 @@ def save_json_from_excel_hyo22( ary, dest_folder, s3_txt_hash )
      kijunbi ||= sheet.row(r).find{|c| c!=nil and c.match(/日現在/)}
      d1 = sheet.row(r)[0..3]
      if d1[0]
-       if d1[0].class==Integer or d1[0].tr("０-９","0-9").sub("歳","").match(/^\d+$/)
+       if d1[0].class==Integer
+         ary1 << d1
+       elsif d1[0].tr("０-９","0-9").sub("歳","").match(/^\d+$/)
+         d1[0] = d1[0].tr("０-９","0-9").sub("歳","").to_i
          ary1 << d1
        elsif d1[0].match(/総[　 ]*数/)
         d1[0] = '総数'
@@ -189,6 +192,9 @@ def save_json_from_excel_hyo22( ary, dest_folder, s3_txt_hash )
      if d2[0]
        if d2[0].class==Integer
          ary2 << d2
+       elsif d2[0].tr("０-９","0-9").sub("歳","").match(/^\d+$/)
+         d2[0] = d2[0].tr("０-９","0-9").sub("歳","").to_i
+         ary1 << d2
        elsif d2[0].match(/100[　 ]*歳[　 ]*以[　 ]*上|年[　 ]*齢[　 ]*不[　 ]*詳$/)
          d2[0] = 100 if d2[0][0,3]=='100'
          ary2 << d2
