@@ -7,24 +7,27 @@ window.onload = function(){
   if(targetElmsArray.length>0){
     
     const sendData = getSendData(targetElmsArray);
-    ajax("missingMp3="+sendData); 
+    ajax("missingMp3="+sendData,targetElmsArray); 
   
   }else{
     //alert("All mp3 are ready.");
   }
 }
-function ajax(sendData){
+function ajax(sendData,elmsArray){
   var xmlHttp = new XMLHttpRequest();
   if(null == xmlHttp ) { // 初期化失敗時
     return ;
   }
   //応答時の処理定義
   xmlHttp.onreadystatechange = function(){
-     if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
-       //alert("done");
-       //キャッシュを使ってページをリロードする.
-       window.location.reload(false);
-     }
+    if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
+      //alert("done");
+      //キャッシュを使ってページをリロードする.
+      //window.location.reload(false);
+      elmsArray.forEach(function(elm){
+        elm.load();
+      });
+    }
   }
   xmlHttp.open("POST" , "/get_mp3.cgi" , true);
   xmlHttp.setRequestHeader("content-type",
