@@ -5,6 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/choir.css">
 		<script type="text/javascript" src="/js/get_mp3.js"></script>
+    <script type="text/javascript">
+      const audio = new Audio();
+      function play_part(seibu,part){
+        if(seibu=='soprano'){
+          var num='01';
+        }else if(seibu=='alto'){
+          var num='02';
+        }else if(seibu=='tenor'){
+          var num='03';
+        }else if(seibu=='bass'){
+          var num='04';
+        }
+        if(part=='H'){
+          var t='0,22';
+        }else if(part=='I'){
+          var t='21.7,46.8';
+        }else if(part=='J'){
+          var t='46.5,72';
+        }else if(part=='K'){
+          var t='72,98';
+        }else if(part=='L'){
+          var t='98.2';
+        }
+        if(seibu=='full'){
+          audio.src = '/tmp/mcc/mp3/christmas/The Holy City/The Holy City H-.mp3#t='+t;
+        }else{
+          audio.src = '/tmp/mcc/mp3/christmas/The Holy City/' + num + ' The Holy City H-(' + seibu + ').mp3#t='+t;
+        }
+        audio.play();
+      }
+      function stop_audio(){
+        audio.pause () ;
+        audio.currentTime = 0;
+      }
+    </script>
     <title>'The Holy City'パート別練習用音源</title>
 	</head>
 	<body>
@@ -17,25 +52,79 @@
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/01 The Holy City (soprano).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/01 The Holy City (soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
+    <li style="list-style: none">
+      <div>「まぼろしのなかで」(H)から後の部分</div>
+      <audio src='/tmp/mcc/mp3/christmas/The Holy City/01 The Holy City H-(soprano).mp3' controls loop preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/01 The Holy City H-(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br><button onclick="play_part('soprano','H')">H</button>
+      <button onclick="play_part('soprano','I')">I</button>
+      <button onclick="play_part('soprano','J')">J</button>
+      <button onclick="play_part('soprano','K')">K</button>
+      <button onclick="play_part('soprano','L')">L</button>
+      <button onclick="stop_audio()">stop</button>
+    </li>
     <li>
       <div>アルト</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/02 The Holy City (alto).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/02 The Holy City (alto).mp3' download><img src='/mcc/img/download-m.png'></a>
+    </li>
+    <li style="list-style: none">
+      <div>「まぼろしのなかで」(H)から後の部分</div>
+      <audio src='/tmp/mcc/mp3/christmas/The Holy City/02 The Holy City H-(alto).mp3' controls loop preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/02 The Holy City H-(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br><button onclick="play_part('alto','H')">H</button>
+      <button onclick="play_part('alto','I')">I</button>
+      <button onclick="play_part('alto','J')">J</button>
+      <button onclick="play_part('alto','K')">K</button>
+      <button onclick="play_part('alto','L')">L</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
     <li>
       <div>テノール</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/03 The Holy City (tenor).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/03 The Holy City (tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
+    <li style="list-style: none">
+      <div>「まぼろしのなかで」(H)から後の部分</div>
+      <audio src='/tmp/mcc/mp3/christmas/The Holy City/03 The Holy City H-(tenor).mp3' controls loop preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/03 The Holy City H-(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br><button onclick="play_part('tenor','H')">H</button>
+      <button onclick="play_part('tenor','I')">I</button>
+      <button onclick="play_part('tenor','J')">J</button>
+      <button onclick="play_part('tenor','K')">K</button>
+      <button onclick="play_part('tenor','L')">L</button>
+      <button onclick="stop_audio()">stop</button>
+    </li>
     <li>
       <div>バス</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/04 The Holy City (bass).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/04 The Holy City (bass).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
+    <li style="list-style: none">
+      <div>「まぼろしのなかで」(H)から後の部分</div>
+      <audio src='/tmp/mcc/mp3/christmas/The Holy City/04 The Holy City H-(bass).mp3' controls loop preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/04 The Holy City H-(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br><button onclick="play_part('bass','H')">H</button>
+      <button onclick="play_part('bass','I')">I</button>
+      <button onclick="play_part('bass','J')">J</button>
+      <button onclick="play_part('bass','K')">K</button>
+      <button onclick="play_part('bass','L')">L</button>
+      <button onclick="stop_audio()">stop</button>
+    </li>
     <li>
       <div>コーラス</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City.mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City.mp3' download><img src='/mcc/img/download-m.png'></a>
+    <li style="list-style: none">
+      <div>「まぼろしのなかで」(H)から後の部分</div>
+      <audio src='/tmp/mcc/mp3/christmas/The Holy City/The Holy City H-.mp3' controls preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/The Holy City H-.mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br><button onclick="play_part('full','H')">H</button>
+      <button onclick="play_part('full','I')">I</button>
+      <button onclick="play_part('full','J')">J</button>
+      <button onclick="play_part('full','K')">K</button>
+      <button onclick="play_part('full','L')">L</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
   </ul>
 <div>
