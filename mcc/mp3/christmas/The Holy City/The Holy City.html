@@ -8,31 +8,25 @@
     <script type="text/javascript">
       const audio = new Audio();
       function play_part(seibu,part){
-        if(seibu=='soprano'){
-          var num='01';
-        }else if(seibu=='alto'){
-          var num='02';
-        }else if(seibu=='tenor'){
-          var num='03';
-        }else if(seibu=='bass'){
-          var num='04';
-        }
-        if(part=='H'){
-          var t='0,22';
-        }else if(part=='I'){
-          var t='21.7,46.8';
-        }else if(part=='J'){
-          var t='46.9,72';
-        }else if(part=='K'){
-          var t='72.5,98';
-        }else if(part=='L'){
-          var t='98.2';
-        }
+        let nums={'soprano':'01',
+                  'alto'   :'02',
+                  'tenor'  :'03',
+                  'bass'   :'04'
+                 };
+        let t={'H':'0,22',
+               'I':'21.7,46.8',
+               'J':'46.9,72',
+               'K':'72.5,98',
+               'L':'98.2'
+             };
         if(seibu=='full'){
-          audio.src = '/tmp/mcc/mp3/christmas/The Holy City/The Holy City H-.mp3#t='+t;
+          audio.src = '/tmp/mcc/mp3/christmas/The Holy City/The Holy City H-.mp3#t='+t[part];
+        }else if(part=='55'){
+          audio.src = '/tmp/mcc/mp3/christmas/The Holy City/The Holy City 55.mp3';
         }else{
-          audio.src = '/tmp/mcc/mp3/christmas/The Holy City/' + num + ' The Holy City H-(' + seibu + ').mp3#t='+t;
+          audio.src = '/tmp/mcc/mp3/christmas/The Holy City/' + nums[seibu] + ' The Holy City H-(' + seibu + ').mp3#t='+t[part];
         }
+        audio.loop = true;
         audio.play();
       }
       function stop_audio(){
@@ -56,7 +50,8 @@
       <div>「まぼろしのなかで」(H)から後の部分</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/01 The Holy City H-(soprano).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/01 The Holy City H-(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br><button onclick="play_part('soprano','H')">H</button>
+      <br>
+      <button onclick="play_part('soprano','H')">H</button>
       <button onclick="play_part('soprano','I')">I</button>
       <button onclick="play_part('soprano','J')">J</button>
       <button onclick="play_part('soprano','K')">K</button>
@@ -72,7 +67,8 @@
       <div>「まぼろしのなかで」(H)から後の部分</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/02 The Holy City H-(alto).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/02 The Holy City H-(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br><button onclick="play_part('alto','H')">H</button>
+      <br>
+      <button onclick="play_part('alto','H')">H</button>
       <button onclick="play_part('alto','I')">I</button>
       <button onclick="play_part('alto','J')">J</button>
       <button onclick="play_part('alto','K')">K</button>
@@ -88,7 +84,10 @@
       <div>「まぼろしのなかで」(H)から後の部分</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/03 The Holy City H-(tenor).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/03 The Holy City H-(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br><button onclick="play_part('tenor','H')">H</button>
+      <audio style='display:none' src='/tmp/mcc/mp3/christmas/The Holy City/The Holy City 55.mp3' controls loop preload="metadata"></audio>
+      <br>
+      <button onclick="play_part('tenor','H')">H</button>
+      <button onclick="play_part('tenor','55')">わたしはみた</button>      
       <button onclick="play_part('tenor','I')">I</button>
       <button onclick="play_part('tenor','J')">J</button>
       <button onclick="play_part('tenor','K')">K</button>
@@ -119,7 +118,8 @@
       <div>「まぼろしのなかで」(H)から後の部分</div>
       <audio src='/tmp/mcc/mp3/christmas/The Holy City/The Holy City H-.mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The Holy City/The Holy City H-.mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br><button onclick="play_part('full','H')">H</button>
+      <br>
+      <button onclick="play_part('full','H')">H</button>
       <button onclick="play_part('full','I')">I</button>
       <button onclick="play_part('full','J')">J</button>
       <button onclick="play_part('full','K')">K</button>
@@ -134,6 +134,7 @@
   <p><a href="./The Holy City(2023.7.16版).pdf" download>2023.7.16版楽譜</a></p>
 </div>
 <div class='link'>
+  <a href='../O-Little-Town-of-Bethlehem/O-Little-Town-of-Bethlehem.html'>⇒ ああベツレヘムのページへ</a><br>
   <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a>
 </div>
 </div>

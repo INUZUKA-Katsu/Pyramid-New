@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/choir.css">
     <script type="text/javascript" src="/js/get_mp3.js"></script>
+    <script type="text/javascript">
+      const audio = new Audio();
+      function play_part(){
+          audio.src = '/tmp/mcc/mp3/christmas/O-Little-Town-of-Bethlehem/知らずや今宵.mp3';
+        audio.loop = true;
+        audio.play();
+      }
+      function stop_audio(){
+        audio.pause () ;
+        audio.currentTime = 0;
+      }
+    </script>
 		<title>'ああベツレヘムよ'パート別練習用音源</title>
 	</head>
 	<body>
@@ -26,6 +38,10 @@
       <div>テノール</div>
       <audio src='/tmp/mcc/mp3/christmas/O-Little-Town-of-Bethlehem/03 O-Little-Town-of-Bethlehem(tenor).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/O-Little-Town-of-Bethlehem/03 O-Little-Town-of-Bethlehem(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <audio style='display:none' src='/tmp/mcc/mp3/christmas/O-Little-Town-of-Bethlehem/知らずや今宵.mp3' controls loop preload="metadata"></audio>
+      <br>
+      <button onclick="play_part()">あしたの星よ</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
     <li>
       <div>バス</div>
@@ -55,7 +71,9 @@
     <span style="font-size:50%">※ 1番は前半を女性、後半を男性が主旋律を歌う。2、4番はパートに分かれる。</span>
   </div>
 </div>
-<div class='link'><a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a></div>
-
+<div class='link'>
+  <a href='../The%20Holy%20City/The%20Holy%20City.html'>⇒ The Holy City のページへ</a><br>
+  <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a>
+</div>
 	</body>
 </html>
