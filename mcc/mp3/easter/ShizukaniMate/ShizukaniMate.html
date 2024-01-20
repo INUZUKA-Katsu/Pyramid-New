@@ -43,16 +43,7 @@
               audio.src = '/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(' + seibu + ').mp3#t='+t[part];
             }
         }
-        //audio.loop = true;
-        audio.addEventListener('ended', () => {
-          alert('end!');
-          audio.play();
-        });
-        audio.play();
-      }
-      function play_audio(src){
-        cnt++
-        audio.src = src;
+        audio.loop = true; //部分再生のときは繰り返しは無効
         audio.play();
       }
       function stop_audio(){
