@@ -46,9 +46,10 @@
         audio.loop = true; //部分再生のときは繰り返しは無効
         audio.play();
       }
-      function stop_audio(){
+      function stop_audio(seibu){
         clearInterval(intervalId);
         audio.pause () ;
+        document.getElementById(seibu).pause();
         //audio.currentTime = 0;
       }
     </script>
@@ -61,7 +62,7 @@
   <ul>
     <li>
       <div>ソプラノ</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' controls loop preload="metadata" id='soprano'></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('soprano','A')">A</button>
@@ -70,11 +71,11 @@
       <button onclick="play_repeat('soprano','D')">D</button>
       <button onclick="play_repeat('soprano','E')">E</button>
       <button onclick="play_repeat('soprano','F')">F</button>
-      <button onclick="stop_audio()">stop</button>
+      <button onclick="stop_audio('soprano')">stop</button>
     </li>
     <li>
       <div>アルト</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' controls loop preload="metadata" id='alto'></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('alto','A')">A</button>
@@ -83,11 +84,11 @@
       <button onclick="play_repeat('alto','D')">D</button>
       <button onclick="play_repeat('alto','E')">E</button>
       <button onclick="play_repeat('alto','F')">F</button>
-      <button onclick="stop_audio()">stop</button>
+      <button onclick="stop_audio('alto')">stop</button>
     </li>
     <li>
       <div>テノール</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' controls loop preload="metadata" id='tenor'></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('tenor','A')">A</button>
@@ -96,11 +97,11 @@
       <button onclick="play_repeat('tenor','D')">D</button>
       <button onclick="play_repeat('tenor','E')">E</button>
       <button onclick="play_repeat('tenor','F')">F</button>
-      <button onclick="stop_audio()">stop</button>
+      <button onclick="stop_audio('tenor')">stop</button>
     </li>
     <li>
       <div>バス</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' controls loop preload="metadata" id='bass'></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('bass','A')">A</button>
@@ -109,11 +110,11 @@
       <button onclick="play_repeat('bass','D')">D</button>
       <button onclick="play_repeat('bass','E')">E</button>
       <button onclick="play_repeat('bass','F')">F</button>
-      <button onclick="stop_audio()">stop</button>
+      <button onclick="stop_audio('bass')">stop</button>
     </li>
     <li>
       <div>コーラス</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' controls loop preload="metadata" id='full'></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('full','A')">A</button>
@@ -122,7 +123,7 @@
       <button onclick="play_repeat('full','D')">D</button>
       <button onclick="play_repeat('full','E')">E</button>
       <button onclick="play_repeat('full','F')">F</button>
-      <button onclick="stop_audio()">stop</button>
+      <button onclick="stop_audio('full')">stop</button>
     </li>
   </ul>
 <div>
