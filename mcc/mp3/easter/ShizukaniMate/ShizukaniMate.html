@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/choir.css">
     <style type="text/css">
@@ -22,11 +22,12 @@
       function play_repeat(seibu,part){
         let t={
                'A':'0,11.2',
-               'B':'11.3,22.7',
-               'C':'22.7,34.4',
+               'B':'11.5,22.7',
+               'C':'22.9,34.4',
                'D':'34.4,45.5',
-               'E':'45.55,56.9',
-               'F':'56.9'
+               'E':'46.6,56.9',
+               'F':'57.2,68',
+               'G':'137,147'
               };
 
         let src;
@@ -54,109 +55,124 @@
       }
     </script>
     <title>'しずかに待てわがたまよ（聖歌294）'パート別練習用音源</title>
-	</head>
-	<body>
-<div class="body">
-<h1>パート別練習用音源</h1>
- <h4>しずかに待てわがたまよ（聖歌294）</h4>
-  <ul>
-    <li>
-      <div>ソプラノ</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' controls loop preload="metadata" id='soprano'></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
+  </head>
+  <body>
+    <div class="body">
+    <div style="display:block;font-size:60%;line-height:120%;text-indent:-1.5em;width:300px;color:#000080;">※ 午後10時から午前8時までの間は、動き出すまで少々時間がかかります。10数秒で動き出すのでお待ちください。</div>
+    <h1>パート別練習用音源</h1>
+     <h4>しずかに待てわがたまよ（聖歌294）</h4>
+      <ul>
+        <li>
+          <div>ソプラノ</div>
+          <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' controls loop preload="metadata" id='soprano'></audio>
+          &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
+          <br>
+          <button onclick="play_repeat('soprano','A')">A</button>
+          <button onclick="play_repeat('soprano','B')">B</button>
+          <button onclick="play_repeat('soprano','C')">C</button>
+          <button onclick="play_repeat('soprano','D')">D</button>
+          <button onclick="play_repeat('soprano','E')">E</button>
+          <button onclick="play_repeat('soprano','F')">F</button>
+          <button onclick="play_repeat('soprano','G')">G</button>
+          <button onclick="stop_audio('soprano')">stop</button>
+        </li>
+        <li>
+          <div>アルト</div>
+          <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' controls loop preload="metadata" id='alto'></audio>
+          &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
+          <br>
+          <button onclick="play_repeat('alto','A')">A</button>
+          <button onclick="play_repeat('alto','B')">B</button>
+          <button onclick="play_repeat('alto','C')">C</button>
+          <button onclick="play_repeat('alto','D')">D</button>
+          <button onclick="play_repeat('alto','E')">E</button>
+          <button onclick="play_repeat('alto','F')">F</button>
+          <button onclick="play_repeat('alto','G')">G</button>
+          <button onclick="stop_audio('alto')">stop</button>
+        </li>
+        <li>
+          <div>テノール</div>
+          <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' controls loop preload="metadata" id='tenor'></audio>
+          &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
+          <br>
+          <button onclick="play_repeat('tenor','A')">A</button>
+          <button onclick="play_repeat('tenor','B')">B</button>
+          <button onclick="play_repeat('tenor','C')">C</button>
+          <button onclick="play_repeat('tenor','D')">D</button>
+          <button onclick="play_repeat('tenor','E')">E</button>
+          <button onclick="play_repeat('tenor','F')">F</button>
+          <button onclick="play_repeat('tenor','G')">G</button>
+          <button onclick="stop_audio('tenor')">stop</button>
+        </li>
+        <li>
+          <div>バス</div>
+          <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' controls loop preload="metadata" id='bass'></audio>
+          &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
+          <br>
+          <button onclick="play_repeat('bass','A')">A</button>
+          <button onclick="play_repeat('bass','B')">B</button>
+          <button onclick="play_repeat('bass','C')">C</button>
+          <button onclick="play_repeat('bass','D')">D</button>
+          <button onclick="play_repeat('bass','E')">E</button>
+          <button onclick="play_repeat('bass','F')">F</button>
+          <button onclick="play_repeat('bass','G')">G</button>
+          <button onclick="stop_audio('bass')">stop</button>
+        </li>
+        <li>
+          <div>コーラス</div>
+          <audio src='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' controls loop preload="metadata" id='full'></audio>
+          &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' download><img src='/mcc/img/download-m.png'></a>
+          <br>
+          <button onclick="play_repeat('full','A')">A</button>
+          <button onclick="play_repeat('full','B')">B</button>
+          <button onclick="play_repeat('full','C')">C</button>
+          <button onclick="play_repeat('full','D')">D</button>
+          <button onclick="play_repeat('full','E')">E</button>
+          <button onclick="play_repeat('full','F')">F</button>
+          <button onclick="play_repeat('full','G')">G</button>
+          <button onclick="stop_audio('full')">stop</button>
+        </li>
+        <li>
+          <div>Be Still My Soul (Exultate Singers)</div>
+          <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/Be Still My Soul(Exultate Singers).mp3' controls preload="metadata"></audio>
+          &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/Be Still My Soul(Exultate Singers).mp3' download><img src='/mcc/img/download-m.png'></a>
+        </li>
+        <li>
+          <div>Sibelius Finlandia (BBC Prom)</div>
+          <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/Sibelius Finlandia (BBC Prom).mp3' controls preload="metadata"></audio>
+          &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/Sibelius Finlandia (BBC Prom).mp3' download><img src='/mcc/img/download-m.png'></a>
+        </li>
+      </ul>
+    <div>
       <br>
-      <button onclick="play_repeat('soprano','A')">A</button>
-      <button onclick="play_repeat('soprano','B')">B</button>
-      <button onclick="play_repeat('soprano','C')">C</button>
-      <button onclick="play_repeat('soprano','D')">D</button>
-      <button onclick="play_repeat('soprano','E')">E</button>
-      <button onclick="play_repeat('soprano','F')">F</button>
-      <button onclick="stop_audio('soprano')">stop</button>
-    </li>
-    <li>
-      <div>アルト</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' controls loop preload="metadata" id='alto'></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br>
-      <button onclick="play_repeat('alto','A')">A</button>
-      <button onclick="play_repeat('alto','B')">B</button>
-      <button onclick="play_repeat('alto','C')">C</button>
-      <button onclick="play_repeat('alto','D')">D</button>
-      <button onclick="play_repeat('alto','E')">E</button>
-      <button onclick="play_repeat('alto','F')">F</button>
-      <button onclick="stop_audio('alto')">stop</button>
-    </li>
-    <li>
-      <div>テノール</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' controls loop preload="metadata" id='tenor'></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br>
-      <button onclick="play_repeat('tenor','A')">A</button>
-      <button onclick="play_repeat('tenor','B')">B</button>
-      <button onclick="play_repeat('tenor','C')">C</button>
-      <button onclick="play_repeat('tenor','D')">D</button>
-      <button onclick="play_repeat('tenor','E')">E</button>
-      <button onclick="play_repeat('tenor','F')">F</button>
-      <button onclick="stop_audio('tenor')">stop</button>
-    </li>
-    <li>
-      <div>バス</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' controls loop preload="metadata" id='bass'></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br>
-      <button onclick="play_repeat('bass','A')">A</button>
-      <button onclick="play_repeat('bass','B')">B</button>
-      <button onclick="play_repeat('bass','C')">C</button>
-      <button onclick="play_repeat('bass','D')">D</button>
-      <button onclick="play_repeat('bass','E')">E</button>
-      <button onclick="play_repeat('bass','F')">F</button>
-      <button onclick="stop_audio('bass')">stop</button>
-    </li>
-    <li>
-      <div>コーラス</div>
-      <audio src='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' controls loop preload="metadata" id='full'></audio>
-      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' download><img src='/mcc/img/download-m.png'></a>
-      <br>
-      <button onclick="play_repeat('full','A')">A</button>
-      <button onclick="play_repeat('full','B')">B</button>
-      <button onclick="play_repeat('full','C')">C</button>
-      <button onclick="play_repeat('full','D')">D</button>
-      <button onclick="play_repeat('full','E')">E</button>
-      <button onclick="play_repeat('full','F')">F</button>
-      <button onclick="stop_audio('full')">stop</button>
-    </li>
-  </ul>
-<div>
-
-  <br>
-  <div class="lyrics">
-    1 <span class="part">A</span> しずかに<span>3</span>　まてわがたまよ<span>4</span><br>
-    　<span class="part">B</span> 肩もつ<span>3</span>　神はませり<span>5</span><br>
-    　<span class="part">C</span> しのびて<span>3</span>　十字架をになえ<span>4</span><br>
-    　<span class="part">D</span> なが神<span>3</span>　たすけたまわん<span>5</span><br>
-    　<span class="part">E</span> いばらの<span>3</span>　道の彼方に<span>4</span><br>
-    　<span class="part">F</span> たえなる<span>3</span>　よろこびあり<span>5</span><br>
-
-    2 しずかに<span>3</span>　まてわがたまよ<span>4</span><br>
-    　なが道<span>3</span>　神は知らす<span>5</span><br>
-    　くらやみ<span>3</span>　空をおおえど<span>4</span><br>
-    　かなたに<span>3</span>　かがやきあり<span>5</span><br>
-    　なみかぜ<span>3</span>　荒れくるうとも<span>4</span><br>
-    　ただちに<span>3</span>　神はしずめん<span>5</span><br>
+      <div class="lyrics">
+        1 <span class="part">A</span> 　しずかに<span>3</span>　まてわがたまよ<span>4</span><br>
+        　<span class="part">B</span> 　肩もつ<span>3</span>　　神はませり<span>5</span><br>
+        　<span class="part">C</span>  <span>mf</span>しのびて<span>3</span>　十字架をになえ<span>4</span><br>
+        　<span class="part">D</span>　なが神<span>3</span>　　<span>f </span>たすけたま<span>p</span>わ<span>f</span>ん<span>5</span><br>
+        　<span class="part">E</span>  <span>　f </span>いばらの<span>3</span>　道の彼方に<span>4</span><br>
+        　<span class="part">F</span> 　たえなる<span>3</span>　よろこびあり<span>5</span><br>
     
-    3 しずかに<span>3</span>　まてわがたまよ<span>4</span><br>
-    　神におう<span>3</span>　朝は近し<span>5</span><br>
-    　そのとき<span>3</span>　空に雲なく<span>4</span><br>
-    　なみだの<span>3</span>　霧もはれて<span>5</span><br>
-    　かがやく<span>3</span>　み顔をあおぎ<span>4</span><br>
-    　わがたま<span>3</span>　みちたるをえん<span>5</span><br>
-
-    <span style="font-size:50%">※ 上付きの数字は何拍伸ばすかを示す.</span>
-  </div>
-
-<div class='link'>
-  <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a>
-</div>
-</div>
+        2 <span class="part">A</span> 　しずかに<span>3</span>　まてわがたまよ<span>4</span><br>
+        　<span class="part">B</span> 　なが道<span>3</span>　　神は知らす<span>5</span><br>
+        　<span class="part">C</span>  <span>mf</span>くらやみ<span>3</span>　空をおおえど<span>4</span><br>
+        　<span class="part">D</span>　かなたに<span>3</span>　<span>f </span>かがやきあ<span>p</span>り<span>f　5</span><br>
+        　<span class="part">E</span>  <span>　f </span>なみかぜ<span>3</span>　荒れくるうとも<span>4</span><br>
+        　<span class="part">F</span> 　ただちに<span>3</span>　神はしずめん<span>5</span><br>
+        
+        3 <span class="part">A</span> 　しずかに<span>3</span>　まてわがたまよ<span>4</span><br>
+        　<span class="part">B</span> 　神におう<span>3</span>　朝は近し<span>5</span><br>
+        　<span class="part">C</span>  <span>mf</span>そのとき<span>3</span>　空に雲なく<span>4</span><br>
+        　<span class="part">D</span>　なみだの<span>3</span>　<span>f </span>霧もはれ<span>p</span>て<span>f　5</span><br>
+        　<span class="part">E</span>  <span>　f </span>かがやく<span>3</span>　み顔をあおぎ<span>4</span><br>
+        　<span class="part">F</span> 　わがたま<span>3</span>　みちたるをえん<span>5</span><br>
+        　<span class="part">G</span> 　アーメン<br>
+    
+        <span style="font-size:50%">※ 上付きの数字は何拍伸ばすかを示す.</span>
+      </div>
+      <div class='link'>
+        <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a>
+      </div>
+    </div>
   </body>
 </html>
