@@ -11,7 +11,21 @@
       li div   {display:inline-block;vertical-align:middle;width:10em;}
       audio    {height:24px;}
       div.link {margin-left:2em;margin-top:2em;}
+      video    {display: block;
+                max-width: 300px;
+                }
 		</style>
+    <script language="javascript" type="text/javascript">
+      function plus_password(target){
+        if(target==undefined){
+          target=location.pathname;
+        }
+        var password = prompt("Please enter the password:");
+        if (password != null && password !== "") {
+          window.location.href = target + "&password=" + password;
+        }
+      };
+    </script>
 		<title>'大いなる方に(変ホ長調)'パート別練習用音源</title>
 	</head>
 	<body>
@@ -44,7 +58,12 @@
       <audio src='/tmp/mcc/mp3/other/Give Thanks(Em).mp3' controls preload="metadata" loop></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/other/Give Thanks(Em).mp3' download><img src='/mcc/img/download-m.png'></a>
     </li>
-    <li><a href='https://www.dropbox.com/scl/fi/ki1u7w50wumwx8sth5yuq/20240505.mp4?rlkey=ujccttyi4vbrrxvqcvvhljc5h&st=i37sr7r3&dl=0'>2024年5月5日動画（裕洋兄指揮、大いなる方に⇒Carry Me）</a></li>
+    <li>
+      <a href='#' onclick="plus_password()">5月5日の練習時の指揮の様子（動画）</a>
+      <video controls controlslist="nodownload">
+      <source type='video/mp4' src='https://dl.dropboxusercontent.com/scl/fi/ki1u7w50wumwx8sth5yuq/20240505.mp4?rlkey=ujccttyi4vbrrxvqcvvhljc5h&st=0pxfeyap' />
+      </video>
+    </li>
   </ul>
 </div>
 
@@ -56,3 +75,4 @@
 
 	</body>
 </html>
+
