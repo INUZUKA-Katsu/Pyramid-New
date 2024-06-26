@@ -10,6 +10,8 @@ Dir.chdir(__dir__)
 #p Dir.pwd
 
 $access_token = ENV['DROPBOX_ACCESS_TOKEN']
+$access_token = "yqqyQxpAqngAAAAAAAAAAdYt0WfwqexuF4ahEUugRoOFxetIGwz1qVH09zlvfYBm"
+
 $client = DropboxApi::Client.new($access_token)
 
 def get_files_path_list(folder,files,kakuchoshi)
