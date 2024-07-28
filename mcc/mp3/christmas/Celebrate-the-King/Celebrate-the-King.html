@@ -5,6 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/choir.css">
 		<script type="text/javascript" src="/js/get_mp3.js"></script>
+		<script type='text/javascript'>
+      function plus_password(target){
+        var password = prompt("Please enter the password:");
+        if (password != null && password !== "") {
+          window.location.href = target + "&password=" + password;
+        }
+      }
+      const audio = new Audio();
+      const t={
+               'A':'0.5,53.6',
+               'B':'53.6,84.5',
+               'C':'83.3,116',
+               'D':'116,137.2',
+               'E':'137,174',
+               'F':'174,203'
+              };
+      const num={
+               'soprano':'01',
+               'alto':'02',
+               'tenor':'03',
+               'bass':'04'
+              }
+      var time_se;
+
+      function play_repeat(seibu,part){
+        if(part==undefined){
+            if(seibu=='full'){
+              audio.src = '/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3';
+            }else{
+              audio.src = '/tmp/mcc/mp3/christmas/2-' + num[seibu] + '%20Celebrate-the-King/Celebrate-the-King (' + seibu + ').mp3';
+            }
+        }else{
+            if(seibu=='full'){
+              audio.src = '/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3';
+              time_se = t[part];
+              audio.currentTime = time_se.split(",")[0];
+            }else{
+              audio.src = '/tmp/mcc/mp3/christmas/Celebrate-the-King/2-' + num[seibu] + '%20Celebrate-the-King (' + seibu + ').mp3';
+              time_se = t[part];
+              audio.currentTime = time_se.split(",")[0];
+            }
+        }
+        audio.play();
+        audio.addEventListener('timeupdate',loop, false);
+      }
+      function loop() {
+        let startTime=time_se.split(",")[0];
+        let endTime=time_se.split(",")[1];
+        //console.log(audio.currentTime);
+        //console.log(endTime);
+        if( audio.currentTime >= endTime ) {
+          audio.currentTime = startTime;
+          audio.pause();
+          sleepSetTimeout(1500,() => audio.play());
+        }
+      }
+      function sleepSetTimeout(ms,callback){
+        setTimeout(callback,ms);
+      }
+      function stop_audio(seibu){
+        audio.pause() ;
+        //document.getElementById(seibu).pause();
+      }
+		</script>
     <title>'Celebrate the King'パート別練習用音源</title>
 	</head>
 	<body>
@@ -18,31 +82,76 @@
       <div>ソプラノ</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-01 Celebrate-the-King (soprano).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-01 Celebrate-the-King (soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('soprano','A')">A(もろびと、世に下りし御子を)</button>
+      <button onclick="play_repeat('soprano','B')">B(みつかいたちの)</button>
+      <button onclick="play_repeat('soprano','C')">C(グローリア)</button>
+      <button onclick="play_repeat('soprano','D')">D(いそぎゆきて)</button>
+      <button onclick="play_repeat('soprano','E')">E(あーたれも聞け)</button>
+      <button onclick="play_repeat('soprano','F')">F(ノエル)</button>
+      <button onclick="stop_audio('soprano')">stop</button>
     </li>
     <li>
       <div>アルト</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-02 Celebrate-the-King (alto).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-02 Celebrate-the-King (alto).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('alto','A')">A(もろびと、世に下りし御子を)</button>
+      <button onclick="play_repeat('alto','B')">B(みつかいたちの)</button>
+      <button onclick="play_repeat('alto','C')">C(グローリア)</button>
+      <button onclick="play_repeat('alto','D')">D(いそぎゆきて)</button>
+      <button onclick="play_repeat('alto','E')">E(あーたれも聞け)</button>
+      <button onclick="play_repeat('alto','F')">F(ノエル)</button>
+      <button onclick="stop_audio('alto')">stop</button>
     </li>
     <li>
       <div>テノール</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (tenor).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('tenor','A')">A(もろびと、世に下りし御子を)</button>
+      <button onclick="play_repeat('tenor','B')">B(みつかいたちの)</button>
+      <button onclick="play_repeat('tenor','C')">C(グローリア)</button>
+      <button onclick="play_repeat('tenor','D')">D(いそぎゆきて)</button>
+      <button onclick="play_repeat('tenor','E')">E(あーたれも聞け)</button>
+      <button onclick="play_repeat('tenor','F')">F(ノエル)</button>
+      <button onclick="stop_audio('tenor')">stop</button>
     </li>
     <li>
       <div>バス</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-04 Celebrate-the-King (bass).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-04 Celebrate-the-King (bass).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('bass','A')">A(もろびと、世に下りし御子を)</button>
+      <button onclick="play_repeat('bass','B')">B(みつかいたちの)</button>
+      <button onclick="play_repeat('bass','C')">C(グローリア)</button>
+      <button onclick="play_repeat('bass','D')">D(いそぎゆきて)</button>
+      <button onclick="play_repeat('bass','E')">E(あーたれも聞け)</button>
+      <button onclick="play_repeat('bass','F')">F(ノエル)</button>
+      <button onclick="stop_audio('bass')">stop</button>
     </li>
     <li>
       <div>コーラス</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('full','A')">A(もろびと、世に下りし御子を)</button>
+      <button onclick="play_repeat('full','B')">B(みつかいたちの)</button>
+      <button onclick="play_repeat('full','C')">C(グローリア)</button>
+      <button onclick="play_repeat('full','D')">D(いそぎゆきて)</button>
+      <button onclick="play_repeat('full','E')">E(あーたれも聞け)</button>
+      <button onclick="play_repeat('full','F')">F(ノエル)</button>
+      <button onclick="stop_audio('full')">stop</button>
+    </li>
+  </ul>
+  <ul>
+    <li>
+      <p style="text-align:left;"><a href='#' onclick="plus_password('./Celebrate-the-King.pdf')">楽譜</a></p>
     </li>
   </ul>
 </div>
 <div class='link'>
-  <a href='../Hallelujah-chorus-4part/Hallelujah-chorus-4part.html'>⇒ハレルヤコーラスの音源へ</a>
+  <a href='../The First Noel/The First Noel.html'>⇒The First Noelの音源へ</a>
   <br>
   <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a>
 </div>
