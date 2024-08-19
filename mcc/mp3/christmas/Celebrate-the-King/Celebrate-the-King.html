@@ -15,7 +15,8 @@
       const audio = new Audio();
       const btns=document.getElementsByTagName("button");
       const t={
-               'A':'0.5,53.6',
+               'A':'0.5,53.8',
+               'A2':'42,53.8',
                'B':'53.6,84.5',
                'C':'83.3,116',
                'D':'116,137.2',
@@ -23,7 +24,8 @@
                'F':'174,203'
               };
         const vcl_t={
-               'A':'0.5,51.5',
+               'A':'0.5,51.7',
+               'A2':'40.5,51.7',
                'B':'51.6,80.5',
                'C':'80.5,112',
                'D':'111.5,134',
@@ -78,13 +80,14 @@
         if( audio.currentTime >= endTime ) {
           audio.currentTime = startTime;
           //alert(audio.currentTime);
-          sleepSetTimeout(1500,() => audio.play());
+          sleepSetTimeout(3000,() => audio.play());
         }
       }
       function sleepSetTimeout(ms,callback){
         setTimeout(callback,ms);
       }
       function stop_audio(seibu){
+        audio.pause();
         audio.pause();
         recolor_all();
         //document.getElementById(seibu).pause();
@@ -113,24 +116,26 @@
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-01 Celebrate-the-King (soprano).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-01 Celebrate-the-King (soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('soprano','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('soprano','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('soprano','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('soprano','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('soprano','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('soprano','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('soprano','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('soprano','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('soprano','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('soprano','C',this)">C グローリア</button>
+      <button onclick="play_repeat('soprano','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('soprano','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('soprano','F',this)">F ノエル</button>
       <button onclick="stop_audio('soprano')">stop</button>
 
       <div class="vcl">AI Vocal</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-01 Celebrate-the-King (vcl_soprano).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-01 Celebrate-the-King (vcl_soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('vcl_soprano','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('vcl_soprano','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('vcl_soprano','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('vcl_soprano','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('vcl_soprano','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('vcl_soprano','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('vcl_soprano','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('vcl_soprano','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('vcl_soprano','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('vcl_soprano','C',this)">C グローリア</button>
+      <button onclick="play_repeat('vcl_soprano','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('vcl_soprano','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('vcl_soprano','F',this)">F ノエル</button>
       <button onclick="stop_audio('vcl_soprano')">stop</button>
     </li>
     <li>
@@ -138,24 +143,26 @@
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-02 Celebrate-the-King (alto).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-02 Celebrate-the-King (alto).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('alto','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('alto','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('alto','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('alto','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('alto','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('alto','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('alto','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('alto','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('alto','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('alto','C',this)">C グローリア</button>
+      <button onclick="play_repeat('alto','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('alto','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('alto','F',this)">F ノエル</button>
       <button onclick="stop_audio('alto')">stop</button>
 
       <div class="vcl">AI Vocal</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-02 Celebrate-the-King (vcl_alto).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-02 Celebrate-the-King (vcl_alto).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('vcl_alto','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('vcl_alto','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('vcl_alto','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('vcl_alto','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('vcl_alto','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('vcl_alto','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('vcl_alto','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('vcl_alto','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('vcl_alto','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('vcl_alto','C',this)">C グローリア</button>
+      <button onclick="play_repeat('vcl_alto','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('vcl_alto','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('vcl_alto','F',this)">F ノエル</button>
       <button onclick="stop_audio('vcl_alto')">stop</button>
     </li>
     <li>
@@ -163,24 +170,26 @@
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (tenor).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('tenor','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('tenor','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('tenor','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('tenor','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('tenor','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('tenor','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('tenor','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('tenor','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('tenor','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('tenor','C',this)">C グローリア</button>
+      <button onclick="play_repeat('tenor','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('tenor','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('tenor','F',this)">F ノエル</button>
       <button onclick="stop_audio('tenor')">stop</button>
 
       <div class="vcl">AI Vocal</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (vcl_tenor).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (vcl_tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('vcl_tenor','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('vcl_tenor','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('vcl_tenor','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('vcl_tenor','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('vcl_tenor','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('vcl_tenor','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('vcl_tenor','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('vcl_tenor','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('vcl_tenor','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('vcl_tenor','C',this)">C グローリア</button>
+      <button onclick="play_repeat('vcl_tenor','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('vcl_tenor','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('vcl_tenor','F',this)">F ノエル</button>
       <button onclick="stop_audio('vcl_tenor')">stop</button>
     </li>
     <li>
@@ -188,12 +197,13 @@
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-04 Celebrate-the-King (bass).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-04 Celebrate-the-King (bass).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('bass','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('bass','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('bass','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('bass','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('bass','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('bass','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('bass','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('bass','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('bass','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('bass','C',this)">C グローリア</button>
+      <button onclick="play_repeat('bass','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('bass','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('bass','F',this)">F ノエル</button>
       <button onclick="stop_audio('bass')">stop</button>
     </li>
     <li>
@@ -201,24 +211,26 @@
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('full','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('full','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('full','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('full','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('full','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('full','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('full','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('full','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('full','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('full','C',this)">C グローリア</button>
+      <button onclick="play_repeat('full','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('full','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('full','F',this)">F ノエル</button>
       <button onclick="stop_audio('full')">stop</button>
 
       <div class="vcl">AI Vocal</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-05 Celebrate-the-King (vcl_full).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-05 Celebrate-the-King (vcl_full).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('vcl_full','A',this)">A(もろびと、世に下りし御子を)</button>
-      <button onclick="play_repeat('vcl_full','B',this)">B(みつかいたちの)</button>
-      <button onclick="play_repeat('vcl_full','C',this)">C(グローリア)</button>
-      <button onclick="play_repeat('vcl_full','D',this)">D(いそぎゆきて)</button>
-      <button onclick="play_repeat('vcl_full','E',this)">E(あーたれも聞け)</button>
-      <button onclick="play_repeat('vcl_full','F',this)">F(ノエル)</button>
+      <button onclick="play_repeat('vcl_full','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('vcl_full','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('vcl_full','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('vcl_full','C',this)">C グローリア</button>
+      <button onclick="play_repeat('vcl_full','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('vcl_full','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('vcl_full','F',this)">F ノエル</button>
       <button onclick="stop_audio('vcl_full')">stop</button>
     </li>
   </ul>
