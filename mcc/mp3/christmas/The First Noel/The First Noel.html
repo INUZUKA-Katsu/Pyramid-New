@@ -27,10 +27,16 @@
                'D':'80.1,114'
               };
       const vcl_t={
-               'A':'0,28.6',
-               'B':'28.8,40.1',
-               'C':'40.6,64.5',
-               'D':'64.7,90.8'
+               'A':'0,29.2',
+               'B':'29.2,40.9',
+               'C':'41,64.5',
+               'D':'64.5,90.8'
+              };
+      const vcl_t_alt={
+               'A':'0,30.8',
+               'B':'30.8,43.1',
+               'C':'43.1,66.7',
+               'D':'66.7,92.8'
               };
       const num={
                'soprano':'01',
@@ -57,19 +63,18 @@
             if(seibu=='full'){
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel.mp3';
               time_se = tt[part];
-              //audio.currentTime = time_se.split(",")[0];
+            }else if(seibu=='vcl_alto'){
+              audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
+              time_se = vcl_t_alt[part];
             }else if(seibu.substr(0,3)=='vcl'){
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
               time_se = vcl_t[part];
-              //audio.currentTime = time_se.split(",")[0];             
             }else if(seibu=='soprano' || seibu=='alto'){
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
               time_se = ts[part];
-              //audio.currentTime = time_se.split(",")[0];
             }else{
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
               time_se = tt[part];
-              //audio.currentTime = time_se.split(",")[0];
             }
             audio.currentTime = time_se.split(",")[0];
         }
@@ -189,6 +194,16 @@
       <button onclick="play_repeat('bass','C',this)">C(あおげば･･･輝き渡れリ)</button>
       <button onclick="play_repeat('bass','D',this)">D(よろこび讃えよ･･･)</button>
       <button onclick="stop_audio('bass')">stop</button>
+
+      <div class="vcl">AI Vocal</div>
+      <audio src='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass).mp3' controls loop preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('vcl_bass','A',this)">A(･･･あめよりひびきぬ)</button>
+      <button onclick="play_repeat('vcl_bass','B',this)">B(よろこび･･･生まれぬ)</button>
+      <button onclick="play_repeat('vcl_bass','C',this)">C(あおげば･･･輝き渡れリ)</button>
+      <button onclick="play_repeat('vcl_bass','D',this)">D(よろこび讃えよ･･･)</button>
+      <button onclick="stop_audio('vcl_bass')">stop</button>
     </li>
     <li>
       <div class="part">コーラス</div>
