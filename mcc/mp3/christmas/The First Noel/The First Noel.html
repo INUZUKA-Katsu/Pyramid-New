@@ -18,13 +18,19 @@
                'A':'0,35.8',
                'B':'36,50.2',
                'C':'50.8,80',
-               'D':'80.5,114'
+               'D':'80.5,113.5'
+              };
+      const ta={
+               'A':'0,36.3',
+               'B':'36.5,50.1',
+               'C':'50.1,80',
+               'D':'80.1,113.5'
               };
       const tt={
                'A':'0,35.8',
                'B':'36,50.2',
                'C':'50.8,80',
-               'D':'80.1,114'
+               'D':'80.1,113.5'
               };
       const vcl_t={
                'A':'0,29.2',
@@ -63,15 +69,15 @@
             if(seibu=='full'){
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel.mp3';
               time_se = tt[part];
-            }else if(seibu=='vcl_alto'){
-              audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
-              time_se = vcl_t_alt[part];
             }else if(seibu.substr(0,3)=='vcl'){
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
               time_se = vcl_t[part];
-            }else if(seibu=='soprano' || seibu=='alto'){
+            }else if(seibu=='soprano'){
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
               time_se = ts[part];
+            }else if(seibu=='alto'){
+              audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
+              time_se = ta[part];
             }else{
               audio.src = '/tmp/mcc/mp3/christmas/The First Noel/' + num[seibu] + '%20The First Noel (' + seibu + ').mp3';
               time_se = tt[part];
