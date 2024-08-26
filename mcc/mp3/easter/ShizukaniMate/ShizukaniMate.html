@@ -16,43 +16,30 @@
     </style>
 		<script type="text/javascript" src="/js/get_mp3.js"></script>
     <script type="text/javascript">
+      var elms = document.getElementsByTagName('audio');
       const audio = new Audio();
-      let intervalId;
-      let cnt=0;
-      function play_repeat(seibu,part){
-        let t={
-               'A':'0,11.2',
-               'B':'11.5,22.7',
-               'C':'22.9,34.4',
-               'D':'34.4,45.5',
-               'E':'46.6,56.9',
-               'F':'57.2,68',
-               'G':'137,147',
-               'G2':'0,8'
-              };
-
-        let src;
-        if(part==undefined){
-            if(seibu=='full'){
-              audio.src = '/tmp/mcc/mp3/easter/ShizukaniMate.mp3';
-            }else{
-              audio.src = '/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(' + seibu + ').mp3';
-            }
+      const btns=document.getElementsByTagName("button");
+      var t_range;
+      var t_ranges={};
+      var seibus=["soprano","alto","tenor","bass","full"]
+      seibus.forEach(seibu=>{
+        t_ranges[seibu]={
+            'A':'0,11.2',
+            'B':'11.5,22.7',
+            'C':'22.9,34.4',
+            'D':'34.4,45.5',
+            'E':'46.6,56.9',
+            'F':'57.2,68',
+            'G':'137,147',
+            'G2':'0,8'
+        };
+      })
+      function get_audio_src(seibu){
+        if(seibu=="full"||seibu==undefined){
+          return src='/tmp/mcc/mp3/easter/ShizukaniMate.mp3';
         }else{
-            if(seibu=='full'){
-              audio.src = '/tmp/mcc/mp3/easter/ShizukaniMate.mp3#t='+t[part];
-            }else{
-              audio.src = '/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(' + seibu + ').mp3#t='+t[part];
-            }
+          return src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(' + seibu + ').mp3';
         }
-        audio.loop = true; //部分再生のときは繰り返しは無効
-        audio.play();
-      }
-      function stop_audio(seibu){
-        clearInterval(intervalId);
-        audio.pause () ;
-        document.getElementById(seibu).pause();
-        //audio.currentTime = 0;
       }
     </script>
     <title>'しずかに待てわがたまよ（聖歌294）'パート別練習用音源</title>
@@ -61,87 +48,88 @@
     <div class="body">
     <div style="display:block;font-size:60%;line-height:120%;text-indent:-1.5em;width:300px;color:#000080;">※ 午後10時から午前8時までの間は、動き出すまで少々時間がかかります。10数秒で動き出すのでお待ちください。</div>
     <h1>パート別練習用音源</h1>
+    <div>
      <h4>しずかに待てわがたまよ（聖歌294）</h4>
-      <ul>
+      <ul style="list-style: none;">
         <li>
-          <div>ソプラノ</div>
+          <div class="part">ソプラノ</div>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' controls loop preload="metadata" id='soprano'></audio>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano_amen).mp3' preload="metadata" id='soprano_amen'></audio>
           &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
           <br>
-          <button onclick="play_repeat('soprano','A')">A</button>
-          <button onclick="play_repeat('soprano','B')">B</button>
-          <button onclick="play_repeat('soprano','C')">C</button>
-          <button onclick="play_repeat('soprano','D')">D</button>
-          <button onclick="play_repeat('soprano','E')">E</button>
-          <button onclick="play_repeat('soprano','F')">F</button>
-          <button onclick="play_repeat('soprano','G')">G</button>
-          <button onclick="play_repeat('soprano_amen','G2')">G2</button>
+          <button onclick="play_repeat('soprano','A',this)">A</button>
+          <button onclick="play_repeat('soprano','B',this)">B</button>
+          <button onclick="play_repeat('soprano','C',this)">C</button>
+          <button onclick="play_repeat('soprano','D',this)">D</button>
+          <button onclick="play_repeat('soprano','E',this)">E</button>
+          <button onclick="play_repeat('soprano','F',this)">F</button>
+          <button onclick="play_repeat('soprano','G',this)">G</button>
+          <button onclick="play_repeat('soprano_amen','G2',this)">G2</button>
           <button onclick="stop_audio('soprano')">stop</button>
         </li>
         <li>
-          <div>アルト</div>
+          <div class="part">アルト</div>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' controls loop preload="metadata" id='alto'></audio>
           &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
           <br>
-          <button onclick="play_repeat('alto','A')">A</button>
-          <button onclick="play_repeat('alto','B')">B</button>
-          <button onclick="play_repeat('alto','C')">C</button>
-          <button onclick="play_repeat('alto','D')">D</button>
-          <button onclick="play_repeat('alto','E')">E</button>
-          <button onclick="play_repeat('alto','F')">F</button>
-          <button onclick="play_repeat('alto','G')">G</button>
+          <button onclick="play_repeat('alto','A',this)">A</button>
+          <button onclick="play_repeat('alto','B',this)">B</button>
+          <button onclick="play_repeat('alto','C',this)">C</button>
+          <button onclick="play_repeat('alto','D',this)">D</button>
+          <button onclick="play_repeat('alto','E',this)">E</button>
+          <button onclick="play_repeat('alto','F',this)">F</button>
+          <button onclick="play_repeat('alto','G',this)">G</button>
           <button onclick="stop_audio('alto')">stop</button>
         </li>
         <li>
-          <div>テノール</div>
+          <div class="part">テノール</div>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' controls loop preload="metadata" id='tenor'></audio>
           &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
           <br>
-          <button onclick="play_repeat('tenor','A')">A</button>
-          <button onclick="play_repeat('tenor','B')">B</button>
-          <button onclick="play_repeat('tenor','C')">C</button>
-          <button onclick="play_repeat('tenor','D')">D</button>
-          <button onclick="play_repeat('tenor','E')">E</button>
-          <button onclick="play_repeat('tenor','F')">F</button>
-          <button onclick="play_repeat('tenor','G')">G</button>
+          <button onclick="play_repeat('tenor','A',this)">A</button>
+          <button onclick="play_repeat('tenor','B',this)">B</button>
+          <button onclick="play_repeat('tenor','C',this)">C</button>
+          <button onclick="play_repeat('tenor','D',this)">D</button>
+          <button onclick="play_repeat('tenor','E',this)">E</button>
+          <button onclick="play_repeat('tenor','F',this)">F</button>
+          <button onclick="play_repeat('tenor','G',this)">G</button>
           <button onclick="stop_audio('tenor')">stop</button>
         </li>
         <li>
-          <div>バス</div>
+          <div class="part">バス</div>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' controls loop preload="metadata" id='bass'></audio>
           &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/ShizukaniMate(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
           <br>
-          <button onclick="play_repeat('bass','A')">A</button>
-          <button onclick="play_repeat('bass','B')">B</button>
-          <button onclick="play_repeat('bass','C')">C</button>
-          <button onclick="play_repeat('bass','D')">D</button>
-          <button onclick="play_repeat('bass','E')">E</button>
-          <button onclick="play_repeat('bass','F')">F</button>
-          <button onclick="play_repeat('bass','G')">G</button>
+          <button onclick="play_repeat('bass','A',this)">A</button>
+          <button onclick="play_repeat('bass','B',this)">B</button>
+          <button onclick="play_repeat('bass','C',this)">C</button>
+          <button onclick="play_repeat('bass','D',this)">D</button>
+          <button onclick="play_repeat('bass','E',this)">E</button>
+          <button onclick="play_repeat('bass','F',this)">F</button>
+          <button onclick="play_repeat('bass','G',this)">G</button>
           <button onclick="stop_audio('bass')">stop</button>
         </li>
         <li>
-          <div>コーラス</div>
+          <div class="part">コーラス</div>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' controls loop preload="metadata" id='full'></audio>
           &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate.mp3' download><img src='/mcc/img/download-m.png'></a>
           <br>
-          <button onclick="play_repeat('full','A')">A</button>
-          <button onclick="play_repeat('full','B')">B</button>
-          <button onclick="play_repeat('full','C')">C</button>
-          <button onclick="play_repeat('full','D')">D</button>
-          <button onclick="play_repeat('full','E')">E</button>
-          <button onclick="play_repeat('full','F')">F</button>
-          <button onclick="play_repeat('full','G')">G</button>
+          <button onclick="play_repeat('full','A',this)">A</button>
+          <button onclick="play_repeat('full','B',this)">B</button>
+          <button onclick="play_repeat('full','C',this)">C</button>
+          <button onclick="play_repeat('full','D',this)">D</button>
+          <button onclick="play_repeat('full','E',this)">E</button>
+          <button onclick="play_repeat('full','F',this)">F</button>
+          <button onclick="play_repeat('full','G',this)">G</button>
           <button onclick="stop_audio('full')">stop</button>
         </li>
         <li>
-          <div>Be Still My Soul (Exultate Singers)</div>
+          <div class="part">Be Still My Soul (Exultate Singers)</div>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/Be Still My Soul(Exultate Singers).mp3' controls preload="metadata"></audio>
           &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/Be Still My Soul(Exultate Singers).mp3' download><img src='/mcc/img/download-m.png'></a>
         </li>
         <li>
-          <div>Sibelius Finlandia (BBC Prom)</div>
+          <div class="part">Sibelius Finlandia (BBC Prom)</div>
           <audio src='/tmp/mcc/mp3/easter/ShizukaniMate/Sibelius Finlandia (BBC Prom).mp3' controls preload="metadata"></audio>
           &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/ShizukaniMate/Sibelius Finlandia (BBC Prom).mp3' download><img src='/mcc/img/download-m.png'></a>
         </li>
@@ -176,6 +164,7 @@
       <div class='link'>
         <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a>
       </div>
+    </div>
     </div>
   </body>
 </html>

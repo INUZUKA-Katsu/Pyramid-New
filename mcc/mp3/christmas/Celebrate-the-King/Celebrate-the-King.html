@@ -6,32 +6,35 @@
     <link rel="stylesheet" href="/css/choir.css">
 		<script type="text/javascript" src="/js/get_mp3.js"></script>
 		<script type='text/javascript'>
-      function plus_password(target){
-        var password = prompt("Please enter the password:");
-        if (password != null && password !== "") {
-          window.location.href = target + "&password=" + password;
-        }
-      }
-      const audio = new Audio();
-      const btns=document.getElementsByTagName("button");
-      const t={
-               'A':'0.5,53.8',
-               'A2':'42,53.8',
-               'B':'53.6,84.5',
-               'C':'83.3,116',
-               'D':'116,137.2',
-               'E':'137,174',
-               'F':'174,203'
-              };
-        const vcl_t={
-               'A':'0.5,51.7',
-               'A2':'40.5,51.7',
-               'B':'51.6,80.5',
-               'C':'80.5,112',
-               'D':'111.5,134',
-               'E':'134,169.9',
-               'F':'169.9,197'
-              };
+      var t_range;
+      var t_ranges={};
+      t_ranges["soprano"]={
+        'A':'0.5,53.8',
+        'A2':'42,53.8',
+        'B':'53.6,84.5',
+        'C':'83.3,116',
+        'D':'116,137.2',
+        'E':'137,174',
+        'F':'174,203'
+      };
+      t_ranges["alto"] =t_ranges["soprano"];
+      t_ranges["tenor"]=t_ranges["soprano"];
+      t_ranges["bass"] =t_ranges["soprano"];
+      t_ranges["full"] =t_ranges["soprano"];
+      t_ranges["vcl_soprano"]={
+        'A':'0.5,51.7',
+        'A2':'40.5,51.7',
+        'B':'51.6,80.5',
+        'C':'80.5,112',
+        'D':'111.5,134',
+        'E':'134,169.9',
+        'F':'169.9,197'
+      };
+      t_ranges["vcl_alto"] =t_ranges["vcl_soprano"];
+      t_ranges["vcl_tenor"]=t_ranges["vcl_soprano"];
+      t_ranges["vcl_bass"]==t_ranges["vcl_soprano"];
+      t_ranges["vcl_full"]==t_ranges["vcl_soprano"];
+
       const num={
                'soprano':'01',
                'alto':'02',
@@ -43,62 +46,11 @@
                'vcl_bass':'04',
                'vcl_full':'05'
               }
-      var time_se;
-
-      function play_repeat(seibu,part,btn){
-        button_color(btn);
-        if(part==undefined){
-            if(seibu=='full'){
-              audio.src = '/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3';
-            }else{
-              audio.src = '/tmp/mcc/mp3/christmas/2-' + num[seibu] + '%20Celebrate-the-King/Celebrate-the-King (' + seibu + ').mp3';
-            }
+      function get_audio_src(seibu){
+        if(seibu=="full"||seibu==undefined){
+          return src='/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3';
         }else{
-            if(seibu=='full'){
-              audio.src = '/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3';
-              time_se = t[part];
-              audio.currentTime = time_se.split(",")[0];
-            }else{
-              audio.src = '/tmp/mcc/mp3/christmas/Celebrate-the-King/2-' + num[seibu] + '%20Celebrate-the-King (' + seibu + ').mp3';
-              if(seibu.substr(0,3)=='vcl'){
-                time_se = vcl_t[part];
-              }else{
-                time_se = t[part];
-              }
-              //alert(time_se);
-              audio.currentTime = time_se.split(",")[0];
-            }
-        }
-        audio.play();
-        audio.addEventListener('timeupdate',loop, false);
-      }
-      function loop() {
-        let startTime=time_se.split(",")[0];
-        let endTime=time_se.split(",")[1];
-        //console.log(audio.currentTime);
-        //console.log(endTime);
-        if( audio.currentTime >= endTime ) {
-          audio.currentTime = startTime;
-          //alert(audio.currentTime);
-          sleepSetTimeout(3000,() => audio.play());
-        }
-      }
-      function sleepSetTimeout(ms,callback){
-        setTimeout(callback,ms);
-      }
-      function stop_audio(seibu){
-        audio.pause();
-        audio.pause();
-        recolor_all();
-        //document.getElementById(seibu).pause();
-      }
-      function button_color(btn){
-        recolor_all();
-        btn.style.fontWeight="bold";
-      }
-      function recolor_all(){
-        for(var i=0; i<btns.length; i++){
-          btns[i].style.fontWeight="";
+          return src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-' + num[seibu] + '%20Celebrate-the-King (' + seibu + ').mp3';
         }
       }
 		</script>

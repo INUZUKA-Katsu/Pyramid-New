@@ -5,27 +5,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="/js/get_mp3.js"></script>
 		<script type='text/javascript'>
-      function plus_password(target){
-        var password = prompt("Please enter the password:");
-        if (password != null && password !== "") {
-          window.location.href = target + "&password=" + password;
-        }
+      var nums={
+        'soprano':'01 ',
+        'alto'   :'02 ',
+        'tenor'  :'03 ',
+        'bass'   :'04 ',
+        'full'   :'05 '
       }
-      const audio = new Audio();
-      let nums={'soprano':'01 ',
-                'alto'   :'02 ',
-                'tenor'  :'03 ',
-                'bass'   :'04 ',
-                'full'   :''
-               };
-      function play_part(seibu,part){
-        audio.src = '/tmp/mcc/mp3/other/Carry Me/' + nums[seibu] + 'Carry Me(' + seibu + ','+part+').mp3';
-        audio.play();
-        audio.repeat=true;
-      }
-      function stop_audio(){
-        audio.pause () ;
-        audio.currentTime = 0;
+      function get_audio_src(seibu,part){
+        return '/tmp/mcc/mp3/other/Carry Me/' + nums[seibu] + 'Carry Me(' + seibu + ','+part+').mp3';
       }
 		</script>
 		<style type="text/css">
@@ -64,6 +52,7 @@
         div.words {right:10em;}
       }
 		</style>
+    <link rel="stylesheet" href="/css/choir.css">
     <title>'Carry Me'パート別練習用音源</title>
 	</head>
 	<body>
@@ -72,60 +61,60 @@
 
 <div class='nen'>
   <h4>Carry Me</h4>
-  <ul>
+  <ul style="list-style: none;">
     <li>
-      <div>ソプラノ</div>
+      <div class="part">ソプラノ</div>
       <audio src='/tmp/mcc/mp3/other/Carry Me/01 Carry Me(soprano).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/other/Carry Me/01 Carry Me(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
       <audio src='/tmp/mcc/mp3/other/Carry Me/01 Carry Me(soprano,25).mp3' preload="metadata"></audio>
       <audio src='/tmp/mcc/mp3/other/Carry Me/01 Carry Me(soprano,35).mp3' preload="metadata"></audio>
       <br>
-      <button onclick="play_part('soprano','25')">ほほをつたわる(25)</button>
-      <button onclick="play_part('soprano','35')">主よあがめます(35)</button>
+      <button onclick="play_repeat('soprano','25',this)">ほほをつたわる(25)</button>
+      <button onclick="play_repeat('soprano','35',this)">主よあがめます(35)</button>
       <button onclick="stop_audio()">stop</button>
     </li>
     <li>
-      <div>アルト</div>
+      <div class="part">アルト</div>
       <audio src='/tmp/mcc/mp3/other/Carry Me/02 Carry Me(alto).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/other/Carry Me/02 Carry Me(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
       <audio src='/tmp/mcc/mp3/other/Carry Me/02 Carry Me(alto,25).mp3' preload="metadata"></audio>
       <audio src='/tmp/mcc/mp3/other/Carry Me/02 Carry Me(alto,35).mp3' preload="metadata"></audio>
       <br>
-      <button onclick="play_part('alto','25')">ほほをつたわる(25)</button>
-      <button onclick="play_part('alto','35')">主よあがめます(35)</button>
+      <button onclick="play_repeat('alto','25',this)">ほほをつたわる(25)</button>
+      <button onclick="play_repeat('alto','35',this)">主よあがめます(35)</button>
       <button onclick="stop_audio()">stop</button>
     </li>
     <li>
-      <div>テナー</div>
+      <div class="part">テナー</div>
       <audio src='/tmp/mcc/mp3/other/Carry Me/03 Carry Me(tenor).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/other/Carry Me/03 Carry Me(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
       <audio src='/tmp/mcc/mp3/other/Carry Me/03 Carry Me(tenor,25).mp3' preload="metadata"></audio>
       <audio src='/tmp/mcc/mp3/other/Carry Me/03 Carry Me(tenor,35).mp3' preload="metadata"></audio>
       <br>
-      <button onclick="play_part('tenor','25')">ほほをつたわる(25)</button>
-      <button onclick="play_part('tenor','35')">主よあがめます(35)</button>
+      <button onclick="play_repeat('tenor','25',this)">ほほをつたわる(25)</button>
+      <button onclick="play_repeat('tenor','35',this)">主よあがめます(35)</button>
       <button onclick="stop_audio()">stop</button>
     </li>
     <li>
-      <div>バス</div>
+      <div class="part">バス</div>
       <audio src='/tmp/mcc/mp3/other/Carry Me/04 Carry Me(bass).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/other/Carry Me/04 Carry Me(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
       <audio src='/tmp/mcc/mp3/other/Carry Me/04 Carry Me(bass,25).mp3' preload="metadata"></audio>
       <audio src='/tmp/mcc/mp3/other/Carry Me/04 Carry Me(bass,35).mp3' preload="metadata"></audio>
       <br>
-      <button onclick="play_part('bass','25')">ほほをつたわる(25)</button>
-      <button onclick="play_part('bass','35')">主よあがめます(35)</button>
+      <button onclick="play_repeat('bass','25',this)">ほほをつたわる(25)</button>
+      <button onclick="play_repeat('bass','35',this)">主よあがめます(35)</button>
       <button onclick="stop_audio()">stop</button>
     </li>
     <li>
-      <div>コーラス</div>
+      <div class="part">コーラス</div>
       <audio src='/tmp/mcc/mp3/other/Carry Me.mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/other/Carry Me.mp3' download><img src='/mcc/img/download-m.png'></a>
-      <audio src='/tmp/mcc/mp3/other/Carry Me/Carry Me(full,25).mp3' preload="metadata"></audio>
-      <audio src='/tmp/mcc/mp3/other/Carry Me/Carry Me(full,35).mp3' preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/other/Carry Me/05 Carry Me(full,25).mp3' preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/other/Carry Me/05 Carry Me(full,35).mp3' preload="metadata"></audio>
       <br>
-      <button onclick="play_part('full','25')">ほほをつたわる(25)</button>
-      <button onclick="play_part('full','35')">主よあがめます(35)</button>
+      <button onclick="play_repeat('full','25',this)">ほほをつたわる(25)</button>
+      <button onclick="play_repeat('full','35',this)">主よあがめます(35)</button>
       <button onclick="stop_audio()">stop</button>
     </li>
   </ul>

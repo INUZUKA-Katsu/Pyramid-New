@@ -1,7 +1,7 @@
 
       		div.h4   {font-size:1.2em;font-style:oblique;}
 			    div.nen  {margin-top:1em;margin-left:auto;margin-right:auto;}
-          div.part {display:block;margin-left:-1em;font-size:1.1em;font-weight:bold;}
+          div.part {display:block;margin-left:-1em;font-size:1.1em;font-weight:bold;width:auto;}
           div.vcl  {display:block;margin-top:0.5em;width:auto;}
       		h4       {margin:1em 0 1em 1em;font-size:150%;font-style:oblique;}
           li       {margin-left:0;}

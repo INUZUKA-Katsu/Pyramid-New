@@ -1,17 +1,47 @@
+var elms;
+var btns;
+var audio;
+
 window.onload = function(){
-  var elms = document.getElementsByTagName('audio');
+  elms = document.getElementsByTagName('audio');
+  audio = new Audio();
+  btns=document.getElementsByTagName("button");
+  console.log(elms);
   var elmsArray = Array.from(elms);
+  set_addEventListener(elmsArray);
   var targetElmsArray = elmsArray.filter((elm)=>{
     return elm.readyState==0
   });
   if(targetElmsArray.length>0){
     
     const sendData = getSendData(targetElmsArray);
+    console.log(sendData);
     ajax("missingMp3="+sendData,targetElmsArray); 
   
   }else{
     //alert("All mp3 are ready.");
   }
+}
+
+function set_addEventListener(elmsArray){
+  elmsArray.forEach(elm => {
+    elm.addEventListener('play', () => {
+        elmsArray.forEach(otherElm => {
+          if (otherElm !== elm) {
+            //console.log(otherElm.src);
+            otherElm.pause();
+          }
+        });
+        if(audio!=undefined){
+          audio.pause();
+          recolor_all();
+        }
+    });    
+  });
+}
+function get_mp3(elm){
+  let data = getSendData([elm]);
+  ajax("missingMp3="+data,[elm]);
 }
 function ajax(sendData,elmsArray){
   var xmlHttp = new XMLHttpRequest();
@@ -42,4 +72,63 @@ function getSendData(elmsArray){
       urls.push(mp3_uri);
   });
   return encodeURI(JSON.stringify(urls));
+}
+function play_repeat(seibu,part,btn){
+  stop_audio_controls();
+  button_color(btn);
+  audio.src = get_audio_src(seibu,part);
+  if(typeof t_ranges==='undefined'){
+    audio.currentTime = 0;
+  }else{
+    t_range=t_ranges[seibu][part];
+    audio.currentTime = t_range.split(",")[0];
+  }
+  audio.play();
+  audio.addEventListener('timeupdate',loop, false);
+}
+function loop() {
+  if(typeof t_ranges==='undefined'){
+    let startTime=0;
+    if( audio.ended ) {
+      audio.currentTime = startTime;
+      sleepSetTimeout(3000,() => audio.play());
+    }  
+  }else{
+    let startTime=t_range.split(",")[0];
+    let endTime=t_range.split(",")[1];
+      if( audio.currentTime >= endTime ) {
+        audio.currentTime = startTime;
+        sleepSetTimeout(3000,() => audio.play());
+      }
+    }
+}
+function sleepSetTimeout(ms,callback){
+  setTimeout(callback,ms);
+}
+function stop_audio_controls(){
+  let audios=document.querySelectorAll("audio");
+  audios.forEach(audio=>{
+    //console.log(audio.src);
+    audio.pause();
+  })
+}
+function stop_audio(){
+  audio.pause();
+  recolor_all();
+  stop_audio_controls();
+}
+function button_color(btn){
+  recolor_all();
+  //btn.style.color="red";
+  btn.style.fontWeight="bold";
+}
+function recolor_all(){
+  let btnsArray = Array.from(btns);
+  btnsArray.forEach(btn=>{btn.style.fontWeight="";})
+}
+function plus_password(target){
+  var password = prompt("Please enter the password:");
+  if (password != null && password !== "") {
+    window.location.href = target + "&password=" + password;
+  }
 }
