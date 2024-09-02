@@ -76,7 +76,7 @@ function getSendData(elmsArray){
 function play_repeat(seibu,part,btn){
   stop_audio_controls();
   button_color(btn);
-  audio.src = get_audio_src(seibu,part);
+  audio.src = get_audio_src(seibu);
   if(typeof t_ranges==='undefined'){
     audio.currentTime = 0;
   }else{
