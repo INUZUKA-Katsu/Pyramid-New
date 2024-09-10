@@ -21,6 +21,14 @@ window.onload = function(){
   }else{
     //alert("All mp3 are ready.");
   }
+  let textAreas = document.getElementsByTagName("textarea");
+  if(textAreas.length>0){
+    if(window.innerWidth>650){
+      textAreas[0].cols=80;
+    }else if(window.innerWidth>400){
+      textAreas[0].cols=50;
+    }
+  } 
 }
 
 function set_addEventListener(elmsArray){
