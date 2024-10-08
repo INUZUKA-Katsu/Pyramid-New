@@ -84,18 +84,28 @@ function getSendData(elmsArray){
 function play_repeat(seibu,part,btn){
   stop_audio_controls();
   button_color(btn);
-  audio.src = get_audio_src(seibu);
-  if(typeof t_ranges==='undefined'){
+  if(get_audio_src.length==1){
+    audio.src = get_audio_src(seibu);
+  }else{
+    //一部分再生用に専用のオーディオファイルを用意している場合
+    audio.src = get_audio_src(seibu,part);
+  }
+  if(typeof get_trange==='undefined'){
     audio.currentTime = 0;
   }else{
-    t_range=t_ranges[seibu][part];
+    if(get_trange.length==3){
+      t_range=get_trange(seibu,tempo,part);
+    }else{
+      t_range=get_trange(seibu,part);
+    }
+    console.log(t_range);
     audio.currentTime = t_range.split(",")[0];
   }
   audio.play();
   audio.addEventListener('timeupdate',loop, false);
 }
 function loop() {
-  if(typeof t_ranges==='undefined'){
+  if(typeof get_trange==='undefined'){
     let startTime=0;
     if( audio.ended ) {
       audio.currentTime = startTime;

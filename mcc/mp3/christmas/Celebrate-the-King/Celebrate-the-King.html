@@ -4,37 +4,40 @@
 		<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/choir.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="/mcc/img/favicon.ico">
 		<script type="text/javascript" src="/js/get_mp3.js"></script>
 		<script type='text/javascript'>
       var t_range;
-      var t_ranges={};
-      t_ranges["soprano"]={
-        'A':'0.5,53.8',
-        'A2':'42,53.8',
-        'B':'53.6,84.5',
-        'C':'83.3,116',
-        'D':'116,137.2',
-        'E':'137,174',
-        'F':'174,203'
-      };
-      t_ranges["alto"] =t_ranges["soprano"];
-      t_ranges["tenor"]=t_ranges["soprano"];
-      t_ranges["bass"] =t_ranges["soprano"];
-      t_ranges["full"] =t_ranges["soprano"];
-      t_ranges["vcl_soprano"]={
-        'A':'0.5,51.7',
-        'A2':'40.5,51.7',
-        'B':'51.6,80.5',
-        'C':'80.5,112',
-        'D':'111.5,134',
-        'E':'134,169.9',
-        'F':'169.9,197'
-      };
-      t_ranges["vcl_alto"] =t_ranges["vcl_soprano"];
-      t_ranges["vcl_tenor"]=t_ranges["vcl_soprano"];
-      t_ranges["vcl_bass"]==t_ranges["vcl_soprano"];
-      t_ranges["vcl_full"]==t_ranges["vcl_soprano"];
-
+      var t_ranges=[
+        [
+         ["soprano","alto","tenor","bass","full"],
+         {
+            'A':'0.5,53.8',
+            'A2':'42,53.8',
+            'B':'53.6,84.5',
+            'C':'83.3,116',
+            'D':'116,137.2',
+            'E':'137,174',
+            'F':'174,203'
+         }
+        ],
+        [
+          ["vcl_soprano","vcl_alto","vcl_tenor","vcl_bass","vcl_full"],
+          {
+            'A':'0.5,51.7',
+            'A2':'40.5,51.7',
+            'B':'51.6,80.5',
+            'C':'80.5,112',
+            'D':'111.5,134',
+            'E':'134,169.9',
+            'F':'169.9,197'
+          }
+        ]
+      ]
+      function get_trange(seibu,part){
+        tset=t_ranges.find(elm => elm[0].some(item => item==seibu));
+        return tset[1][part];
+      }
       const num={
                'soprano':'01',
                'alto':'02',
@@ -134,6 +137,20 @@
       <div class="vcl">AI Vocal</div>
       <audio src='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (vcl_tenor).mp3' controls loop preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/Celebrate-the-King/2-03 Celebrate-the-King (vcl_tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('vcl_tenor','A',this)">A もろびと、世に下りし御子を</button>
+      <button onclick="play_repeat('vcl_tenor','A2',this)">(アレルヤ~平和の君をたたえよ)</button>
+      <button onclick="play_repeat('vcl_tenor','B',this)">B みつかいたちの</button>
+      <button onclick="play_repeat('vcl_tenor','C',this)">C グローリア</button>
+      <button onclick="play_repeat('vcl_tenor','D',this)">D いそぎゆきて</button>
+      <button onclick="play_repeat('vcl_tenor','E',this)">E あーたれも聞け</button>
+      <button onclick="play_repeat('vcl_tenor','F',this)">F ノエル</button>
+      <button onclick="stop_audio('vcl_tenor')">stop</button>
+    </li>
+    <li>
+      <div class="part">テノールテスト</div>
+      <div class="vcl">AI Vocal</div>
+      <audio src='https://dl.dropboxusercontent.com/scl/fi/qfuu0o7k8d76typqjebmg/2-03-Celebrate-the-King-vcl_tenor.mp3?rlkey=sb5x6v4rbeajvcbrsi79rt5hl' controls loop preload="metadata"></audio>
       <br>
       <button onclick="play_repeat('vcl_tenor','A',this)">A もろびと、世に下りし御子を</button>
       <button onclick="play_repeat('vcl_tenor','A2',this)">(アレルヤ~平和の君をたたえよ)</button>

@@ -4,6 +4,7 @@
 		<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/choir.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="/mcc/img/favicon.ico">
     <!--link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/mcc/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/mcc/img/favicon-16x16.png">
@@ -14,95 +15,171 @@
   	<script type="text/javascript" src="/js/get_mp3.js"></script>
 		<script type='text/javascript'>
       var t_range;
-      var t_ranges={};
-      t_ranges["soprano"]={
-               'A':'0,35.8',
-               'B':'36,50.2',
-               'C':'50.8,80',
-               'D':'80.5,113.5'
-              };
-      t_ranges["alto"]={
-               'A':'0,36.3',
-               'B':'36.5,50.1',
-               'C':'50.1,80',
-               'D':'80.1,113.5'
-              };
-      t_ranges["tenor"]={
-               'A':'0,35.8',
-               'B':'36,50.2',
-               'C':'50.8,80',
-               'D':'80.1,113.5'
-              };
-      t_ranges["bass"]=t_ranges["tenor"];
-      t_ranges["full"]=t_ranges["tenor"];
-      t_ranges["vcl_soprano"]={
-               'A':'0,29.2',
-               'B':'29.2,40.9',
-               'C':'41,64.5',
-               'D':'64.5,90.8'
-              };
-      t_ranges["vcl_alto"]=t_ranges["vcl_soprano"];
-      t_ranges["vcl_tenor"]={
-               'A':'0,29.2',
-               'B':'28.9,40.6',
-               'C':'41,64.5',
-               'D':'64.9,90.8'
-              };
-      t_ranges["vcl_bass"]=t_ranges["vcl_tenor"];
-      t_ranges["vcl_full"]=t_ranges["vcl_soprano"];
-      t_ranges["vcl_soprano_tmp98"]={
-               'A':'0,35.1',
-               'B':'35.2,49.6',
-               'C':'50.4,79.4',
-               'D':'79,111.8'
-              };
-      t_ranges["vcl_alto_tmp98"] =t_ranges["vcl_soprano_tmp98"]
-      t_ranges["vcl_tenor_tmp98"]=t_ranges["vcl_soprano_tmp98"]
-      t_ranges["vcl_bass_tmp98"] =t_ranges["vcl_soprano_tmp98"]
-      t_ranges["vcl_full_tmp98"] =t_ranges["vcl_soprano_tmp98"]
-
-      const num={
-               'soprano':'01',
-               'alto':'02',
-               'tenor':'03',
-               'bass':'04',
-               'vcl_soprano':'01',
-               'vcl_alto':'02',
-               'vcl_tenor':'03',
-               'vcl_bass':'04',
-               'vcl_full':'05',
-               'vcl_soprano_tmp98':'01',
-               'vcl_alto_tmp98':'02',
-               'vcl_tenor_tmp98':'03',
-               'vcl_bass_tmp98':'04',
-               'vcl_full_tmp98':'05'
-      }
-      var tmp={
+      var t_ranges=[   
+            [
+              ['soprano'],
+              {
+                'A': '0,35.8',
+                'B': '36,50.2',
+                'C': '50.8,80',
+                'D': '80.5,113.5'
+              }
+            ],
+            [
+              ['alto'],
+              {
+                'A': '0,36.3',
+                'B': '36.5,50.1',
+                'C': '50.1,80',
+                'D': '80.1,113.5'
+              }
+            ],
+            [
+              ['tenor','bass','full'],
+              {
+                'A': '0,35.8',
+                'B': '36,50.2',
+                'C': '50.8,80',
+                'D': '80.1,113.5'
+              }
+            ],
+            {120:
+              [
+                [
+                  ['vcl_soprano','vcl_alto','vcl_full'],
+                  {
+                    'A': '0,29.2',
+                    'B': '29.2,40.9',
+                    'C': '41,64.5',
+                    'D': '64.5,90.8'
+                  }
+                ],
+                [
+                  ['vcl_tenor','vcl_bass'],
+                  {
+                    'A': '0,29.2',
+                    'B': '28.9,40.6',
+                    'C': '41,64.5',
+                    'D': '64.9,90.8'
+                  }
+                ]
+              ],
+            98:
+              [
+                [
+                  ['vcl_soprano','vcl_alto','vcl_tenor','vcl_bass','vcl_full'],
+                  {
+                    'A': '0,35.1',
+                    'B': '35.2,49.6',
+                    'C': '50.4,79.4',
+                    'D': '79,111.8'
+                  }
+                ]
+              ]
+            }
+          ]
+      var tempo={
         'vcl_soprano':120,
-        'vcl_alto'   :120,
-        'vcl_tenor'  :120,
-        'vcl_bass'   :120,
-        'vcl_full'   :120
+        'vcl_alto':120,
+        'vcl_tenor':120,
+        'vcl_bass':120,
+        'vcl_full':120
       }
-      function get_src(seibu){
-        let tmp120={
+      function get_trange(seibu,tempo,part){
+        if(tempo[seibu]==undefined){
+          let tset=t_ranges.find(elm => elm[0].some(item => item==seibu));
+          return tset[1][part];
+        }else{
+          let t_hash=t_ranges.find(elm => Object.keys(elm).some(item => item==tempo[seibu]));
+          let tset=t_hash[tempo[seibu]].find(elm => elm[0].some(item => item==seibu));
+          return tset[1][part];
+        }
+      }
+      //function get_trange(seibu,tempo,part){
+      //  console.log("get_trange");
+      //  console.log("seibu,tempo,part: "+seibu+","+tempo[seibu]+","+part);
+      //  switch(seibu){
+      //    case 'soprano':
+      //      switch(part){
+      //         case 'A':return '0,35.8';
+      //         case 'B':return '36,50.2';
+      //         case 'C':return '50.8,80';
+      //         case 'D':return '80.5,113.5';
+      //      }
+      //      break;
+      //    case 'alto':
+      //      switch(part){
+      //         case 'A':return '0,36.3';
+      //         case 'B':return '36.5,50.1';
+      //         case 'C':return '50.1,80';
+      //         case 'D':return '80.1,113.5';
+      //      }
+      //      break;
+      //    case 'tenor':
+      //    case 'bass':
+      //    case 'full':
+      //      switch(part){
+      //         case 'A':return '0,35.8';
+      //         case 'B':return '36,50.2';
+      //         case 'C':return '50.8,80';
+      //         case 'D':return '80.1,113.5';
+      //      }
+      //      break;
+      //    default:
+      //      switch(tempo[seibu]){
+      //        case 120:
+      //          console.log("tempo=120");
+      //          switch(seibu){
+      //            case 'vcl_soprano':
+      //            case 'vcl_alto':
+      //            case 'vcl_full':
+      //               switch(part){
+      //                  case 'A':return '0,29.2';
+      //                  case 'B':return '29.2,40.9';
+      //                  case 'C':return '41,64.5';
+      //                  case 'D':return '64.5,90.8';
+      //               }
+      //               break;
+      //             case 'vcl_tenor':
+      //             case 'vcl_bass':
+      //               switch(part){
+      //                  case 'A':return '0,29.2';
+      //                  case 'B':return '28.9,40.6';
+      //                  case 'C':return '41,64.5';
+      //                  case 'D':return '64.9,90.8';
+      //               }
+      //          }
+      //          break;
+      //        case 98:
+      //          console.log("tempo=98");
+      //          switch(part){
+      //            case 'A':return '0,35.1';
+      //            case 'B':return '35.2,49.6';
+      //            case 'C':return '50.4,79.4';
+      //            case 'D':return '79,111.8';
+      //          }
+      //      }
+      //   }
+      //}
+      function get_src(seibu,tempo){
+        let src_tmp120={
           'vcl_soprano' : 'https://dl.dropboxusercontent.com/scl/fi/av5l6tm0ewz9bxd6alkcx/01-The-First-Noel-vcl_soprano.mp3?rlkey=dblm1ito9dhqg87uctoffxlb6',
           'vcl_alto'    : 'https://dl.dropboxusercontent.com/scl/fi/z501g41h3nb1po2c2qeed/02-The-First-Noel-vcl_alto.mp3?rlkey=mtf9xz26py8n4rkw88ggchssu' ,
           'vcl_tenor'   : 'https://dl.dropboxusercontent.com/scl/fi/j7aw9po2nfcz81k5jpkmh/03-The-First-Noel-vcl_tenor.mp3?rlkey=0hfkqjawgxgtiyks131wk0h86' ,
           'vcl_bass'    : 'https://dl.dropboxusercontent.com/scl/fi/4jqv1hx2s54wp738fgnrm/04-The-First-Noel-vcl_bass.mp3?rlkey=tmd0cdc83u4c9qr71e20ayteo' ,
           'vcl_full'    : 'https://dl.dropboxusercontent.com/scl/fi/pvrezs0qbsalbcolbfgo0/05-The-First-Noel-vcl_full.mp3?rlkey=q9bp7kghugir8qr52o254'
         }
-        let tmp98={
+        let src_tmp98={
           'vcl_soprano' : 'https://dl.dropboxusercontent.com/scl/fi/hoe8e19egi635ck8186e2/01-The-First-Noel-vcl_soprano_tmp98.mp3?rlkey=t562ux8hzssd0hoz2hd7ctu9z',
           'vcl_alto'    : 'https://dl.dropboxusercontent.com/scl/fi/ztrtbx0mffvb734dw7qbf/02-The-First-Noel-vcl_alto_tmp98.mp3?rlkey=mwo3ct2q2n4q70x9rrlfeqy4v',
           'vcl_tenor'   : 'https://dl.dropboxusercontent.com/scl/fi/v24bqxwgdjov8voz63s62/03-The-First-Noel-vcl_tenor_tmp98.mp3?rlkey=smqcui8tsrtrxrhamb1mtnvv5',
           'vcl_bass'    : 'https://dl.dropboxusercontent.com/scl/fi/lw3y60jw9an7lmqt91xgg/04-The-First-Noel-vcl_bass_tmp98.mp3?rlkey=9f17f79c7mz62i21ap8rd40ck',
           'vcl_full'    : 'https://dl.dropboxusercontent.com/scl/fi/un7ly5y2b3a5i421ae2mt/05-The-First-Noel-vcl_full_tmp98.mp3?rlkey=so8mnbd9fdtq3nlf1m6d3t1pt' 
         }
-        if(tmp[seibu]==120){
-          return tmp120[seibu];
-        }else if(tmp[seibu]==98){
-          return tmp98[seibu];
+        if(tempo[seibu]==120){
+          return src_tmp120[seibu];
+        }else if(tempo[seibu]==98){
+          return src_tmp98[seibu];
         }
       } 
       function get_audio_src(seibu){
@@ -117,30 +194,28 @@
         let parent_elm=elm.parentElement;
         let tmp_elm=parent_elm.getElementsByTagName("span")[0];
         //テンポ表示を書き換える
-        if(tmp[seibu]==120){
-          tmp[seibu]=98;
+        if(tempo[seibu]==120){
+          tempo[seibu]=98;
           tmp_elm.innerHTML="=98";
-          var new_seibu=seibu+"_tmp98";
         }else{
-          tmp[seibu]=120;
+          tempo[seibu]=120;
           tmp_elm.innerHTML="=120";
-          var new_seibu = seibu;
         }
         //差し替え前のオーディオタグのsrc
         let previous_src=elm.src;
         //オーディオタグのsrcを差し替える
-        elm.src=get_src(seibu);
+        elm.src=get_src(seibu,tempo);
         if(elm.readyState==0){
           get_mp3(elm);
         }
         //ダウンロード用aタグのhrefを差し替える
         a_elm=parent_elm.getElementsByTagName("a")[0];
-        a_elm.href=get_src(seibu);
+        a_elm.href=get_src(seibu,tempo);
         //部分再生中だったら変更後のテンポで再生しなおす。
         console.log("seibu:"+seibu);
-        console.log("new_seibu:"+new_seibu);
+        console.log("tempo[seibu]:"+tempo[seibu]);
         console.log(audio.src);
-        console.log(get_src(seibu));
+        console.log(get_src(seibu,tempo));
         if(audio.src==previous_src&&audio.paused!=true){
           let btn=get_playing_button(parent_elm,seibu); 
           audio.pause;
