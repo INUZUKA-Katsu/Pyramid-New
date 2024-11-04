@@ -55,7 +55,7 @@
                   }
                 ],
                 [
-                  ['vcl_tenor','vcl_bass'],
+                  ['vcl_tenor','vcl_all_tenor','vcl_bass'],
                   {
                     'A': '0,29.2',
                     'B': '28.9,40.6',
@@ -67,7 +67,7 @@
             98:
               [
                 [
-                  ['vcl_soprano','vcl_alto','vcl_tenor','vcl_bass','vcl_full'],
+                  ['vcl_soprano','vcl_alto','vcl_tenor','vcl_all_tenor','vcl_bass','vcl_full'],
                   {
                     'A': '0,35.1',
                     'B': '35.2,49.6',
@@ -82,6 +82,7 @@
         'vcl_soprano':120,
         'vcl_alto':120,
         'vcl_tenor':120,
+        'vcl_all_tenor':120,
         'vcl_bass':120,
         'vcl_full':120
       }
@@ -163,18 +164,20 @@
       //}
       function get_src(seibu,tempo){
         let src_tmp120={
-          'vcl_soprano' : 'https://dl.dropboxusercontent.com/scl/fi/av5l6tm0ewz9bxd6alkcx/01-The-First-Noel-vcl_soprano.mp3?rlkey=dblm1ito9dhqg87uctoffxlb6',
-          'vcl_alto'    : 'https://dl.dropboxusercontent.com/scl/fi/z501g41h3nb1po2c2qeed/02-The-First-Noel-vcl_alto.mp3?rlkey=mtf9xz26py8n4rkw88ggchssu' ,
-          'vcl_tenor'   : 'https://dl.dropboxusercontent.com/scl/fi/j7aw9po2nfcz81k5jpkmh/03-The-First-Noel-vcl_tenor.mp3?rlkey=0hfkqjawgxgtiyks131wk0h86' ,
-          'vcl_bass'    : 'https://dl.dropboxusercontent.com/scl/fi/4jqv1hx2s54wp738fgnrm/04-The-First-Noel-vcl_bass.mp3?rlkey=tmd0cdc83u4c9qr71e20ayteo' ,
-          'vcl_full'    : 'https://dl.dropboxusercontent.com/scl/fi/pvrezs0qbsalbcolbfgo0/05-The-First-Noel-vcl_full.mp3?rlkey=q9bp7kghugir8qr52o254'
+          'vcl_soprano'   : 'https://dl.dropboxusercontent.com/scl/fi/av5l6tm0ewz9bxd6alkcx/01-The-First-Noel-vcl_soprano.mp3?rlkey=dblm1ito9dhqg87uctoffxlb6',
+          'vcl_alto'      : 'https://dl.dropboxusercontent.com/scl/fi/z501g41h3nb1po2c2qeed/02-The-First-Noel-vcl_alto.mp3?rlkey=mtf9xz26py8n4rkw88ggchssu' ,
+          'vcl_tenor'     : 'https://dl.dropboxusercontent.com/scl/fi/j7aw9po2nfcz81k5jpkmh/03-The-First-Noel-vcl_tenor.mp3?rlkey=0hfkqjawgxgtiyks131wk0h86' ,
+          'vcl_all_tenor' : 'https://dl.dropboxusercontent.com/scl/fi/zbd9zcqk6gf3w6hnhkapl/03-The-First-Noel-vcl_all_tenor.mp3?rlkey=k4gaqsrkb333ax2ynae331z9j' ,
+          'vcl_bass'      : 'https://dl.dropboxusercontent.com/scl/fi/4jqv1hx2s54wp738fgnrm/04-The-First-Noel-vcl_bass.mp3?rlkey=tmd0cdc83u4c9qr71e20ayteo' ,
+          'vcl_full'      : 'https://dl.dropboxusercontent.com/scl/fi/pvrezs0qbsalbcolbfgo0/05-The-First-Noel-vcl_full.mp3?rlkey=q9bp7kghugir8qr52o254'
         }
         let src_tmp98={
-          'vcl_soprano' : 'https://dl.dropboxusercontent.com/scl/fi/hoe8e19egi635ck8186e2/01-The-First-Noel-vcl_soprano_tmp98.mp3?rlkey=t562ux8hzssd0hoz2hd7ctu9z',
-          'vcl_alto'    : 'https://dl.dropboxusercontent.com/scl/fi/ztrtbx0mffvb734dw7qbf/02-The-First-Noel-vcl_alto_tmp98.mp3?rlkey=mwo3ct2q2n4q70x9rrlfeqy4v',
-          'vcl_tenor'   : 'https://dl.dropboxusercontent.com/scl/fi/v24bqxwgdjov8voz63s62/03-The-First-Noel-vcl_tenor_tmp98.mp3?rlkey=smqcui8tsrtrxrhamb1mtnvv5',
-          'vcl_bass'    : 'https://dl.dropboxusercontent.com/scl/fi/lw3y60jw9an7lmqt91xgg/04-The-First-Noel-vcl_bass_tmp98.mp3?rlkey=9f17f79c7mz62i21ap8rd40ck',
-          'vcl_full'    : 'https://dl.dropboxusercontent.com/scl/fi/un7ly5y2b3a5i421ae2mt/05-The-First-Noel-vcl_full_tmp98.mp3?rlkey=so8mnbd9fdtq3nlf1m6d3t1pt' 
+          'vcl_soprano'   : 'https://dl.dropboxusercontent.com/scl/fi/hoe8e19egi635ck8186e2/01-The-First-Noel-vcl_soprano_tmp98.mp3?rlkey=t562ux8hzssd0hoz2hd7ctu9z',
+          'vcl_alto'      : 'https://dl.dropboxusercontent.com/scl/fi/ztrtbx0mffvb734dw7qbf/02-The-First-Noel-vcl_alto_tmp98.mp3?rlkey=mwo3ct2q2n4q70x9rrlfeqy4v',
+          'vcl_tenor'     : 'https://dl.dropboxusercontent.com/scl/fi/v24bqxwgdjov8voz63s62/03-The-First-Noel-vcl_tenor_tmp98.mp3?rlkey=smqcui8tsrtrxrhamb1mtnvv5',
+          'vcl_all_tenor' : 'https://dl.dropboxusercontent.com/scl/fi/3uyi420qsh9hfdcit4xxh/03-The-First-Noel-vcl_all_tenor_tmp98.mp3?rlkey=b4lvbkfa31m8b617ikpy333wm',
+          'vcl_bass'      : 'https://dl.dropboxusercontent.com/scl/fi/lw3y60jw9an7lmqt91xgg/04-The-First-Noel-vcl_bass_tmp98.mp3?rlkey=9f17f79c7mz62i21ap8rd40ck',
+          'vcl_full'      : 'https://dl.dropboxusercontent.com/scl/fi/un7ly5y2b3a5i421ae2mt/05-The-First-Noel-vcl_full_tmp98.mp3?rlkey=so8mnbd9fdtq3nlf1m6d3t1pt' 
         }
         if(tempo[seibu]==120){
           return src_tmp120[seibu];
@@ -310,15 +313,15 @@
       <div class="vcl">
         AI Vocal
         &nbsp;&nbsp;&#9833;<span>=120</span>
-        &nbsp;&nbsp;<button onclick="change_tempo('vcl_tenor')">テンポ切替</button>
+        &nbsp;&nbsp;<button onclick="change_tempo('vcl_all_tenor')">テンポ切替</button><span style="font-size:70%;font-weight:normal;">  ※8ページ上段を主旋律からテノールの旋律に変更しました。</span>
       </div>
-      <audio id="vcl_tenor" src='https://dl.dropboxusercontent.com/scl/fi/j7aw9po2nfcz81k5jpkmh/03-The-First-Noel-vcl_tenor.mp3?rlkey=0hfkqjawgxgtiyks131wk0h86' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/j7aw9po2nfcz81k5jpkmh/03-The-First-Noel-vcl_tenor.mp3?rlkey=0hfkqjawgxgtiyks131wk0h86' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="vcl_all_tenor" src='https://dl.dropboxusercontent.com/scl/fi/zbd9zcqk6gf3w6hnhkapl/03-The-First-Noel-vcl_all_tenor.mp3?rlkey=k4gaqsrkb333ax2ynae331z9j' controls loop preload="metadata"></audio>
+      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/zbd9zcqk6gf3w6hnhkapl/03-The-First-Noel-vcl_all_tenor.mp3?rlkey=k4gaqsrkb333ax2ynae331z9j' download><img src='/mcc/img/download-m.png'></a>
       <br>
-      <button onclick="play_repeat('vcl_tenor','A',this)">A(･･･あめよりひびきぬ)</button>
-      <button onclick="play_repeat('vcl_tenor','B',this)">B(よろこび･･･生まれぬ)</button>
-      <button onclick="play_repeat('vcl_tenor','C',this)">C(あおげば･･･輝き渡れリ)</button>
-      <button onclick="play_repeat('vcl_tenor','D',this)">D(よろこび讃えよ･･･)</button>
+      <button onclick="play_repeat('vcl_all_tenor','A',this)">A(･･･あめよりひびきぬ)</button>
+      <button onclick="play_repeat('vcl_all_tenor','B',this)">B(よろこび･･･生まれぬ)</button>
+      <button onclick="play_repeat('vcl_all_tenor','C',this)">C(あおげば･･･輝き渡れリ)</button>
+      <button onclick="play_repeat('vcl_all_tenor','D',this)">D(よろこび讃えよ･･･)</button>
       <button onclick="stop_audio()">stop</button>
     </li>
     <li>
