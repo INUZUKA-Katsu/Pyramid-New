@@ -144,9 +144,47 @@ function recolor_all(){
   let btnsArray = Array.from(btns);
   btnsArray.forEach(btn=>{btn.style.fontWeight="";})
 }
-function plus_password(target){
+function plus_password(target,add_info){
   var password = prompt("Please enter the password:");
   if (password != null && password !== "") {
-    window.location.href = target + "&password=" + password;
+    if(add_info==undefined){
+      window.location.href = target + "&password=" + password;
+    }else{
+      //連絡事項欄の書き込みに係る処理
+      var data={"password":password,"info":target};
+      return JSON.stringify(data);
+    }
   }
+}
+//以下は、連絡事項のテキストエリアの書き込みに係る処理
+function cancelText(){
+  document.getElementById("returnText").value="";
+}
+function addText(){
+  var elm=document.getElementById("returnText");
+
+  if(elm.value==""){
+    alert("追記する内容が何も入力されていません。");
+    return ;
+  }  
+  var sendData=plus_password(elm.value,"addText");
+  //sendDataは、{"info":テキストデータ,"password":password}のjsonデータ
+  //alert(sendData);
+  var xmlHttp = new XMLHttpRequest();
+  //応答時の処理定義
+  xmlHttp.onreadystatechange = function(){
+    if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
+      var response=xmlHttp.responseText;
+      if(response=="パスワードが違います."){
+        alert("パスワードが違います！");
+      }else{
+        elm.value="";
+        document.getElementById("comuBoard").value=response;
+      }
+    }
+  }
+  //POSTリクエスト
+  xmlHttp.open("POST","./Choir.cgi" , true);
+  xmlHttp.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+  xmlHttp.send(sendData);
 }

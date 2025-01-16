@@ -8,7 +8,7 @@
     <script type="text/javascript" src="/js/get_mp3.js"></script>
 		<script type='text/javascript'>
 		    function showWidth(){
-		        alert(window.parent.screen.width);
+		      alert(window.parent.screen.width);
 		    }
 		    //showWidth();
 		</script>
@@ -25,6 +25,12 @@
                       }
       			div.link {margin-left:2em;margin-top:2em; }
       			p {line-height: 1.0;}
+            label {
+              display:block;
+              width:15em;
+              font-size:80%;
+            }
+            .input {display:flex;}
       			@media screen and (min-width: 700px){
               h4       {margin-bottom: 1em;}
               li       {margin-left:1em;margin-bottom:2em;}
@@ -110,8 +116,18 @@
     </li>
     <li><div class="part">連　絡</div>
       <div class="textarea">
-        <textarea readonly cols="32" rows="10"><!--連絡事項--></textarea>
-      </div>  
+        <textarea id="comuBoard" readonly cols="32" rows="10"><!--連絡事項--></textarea>
+      </div>
+    </li>
+    <li>
+      <div class="textarea">
+        <label for="returnText">連絡事項の先頭に追記する</label>
+        <textarea id="returnText" cols="32" rows="5"></textarea>
+        <div class="input">
+          <input type="button" name="return" value="実行" onclick="addText()">
+          <input type="button" name="cancel" value="キャンセル" onclick="cancelText()" style="margin-left:5px;">
+        </div>
+      </div>
     </li>
     <li>
       <div class="part">
