@@ -7,10 +7,23 @@
     <link rel="stylesheet" href="/css/choir.css">
     <script type="text/javascript" src="/js/get_mp3.js"></script>
 		<script type='text/javascript'>
-		    function showWidth(){
-		      alert(window.parent.screen.width);
-		    }
-		    //showWidth() ;
+		    function get_src(seibu){
+          var part_HMT = {
+            "soprano" : "https://dl.dropboxusercontent.com/scl/fi/pu1yu1z0ot4juj9gwsbwj/HMT-soprano.mp3?rlkey=vnh5hva5regc9yusuf0adndnh",
+            "alto"    : "https://dl.dropboxusercontent.com/scl/fi/g0y3c8le7oaxe3oajmtwd/HMT-alto.mp3?rlkey=66azle3ubttwdd0lu8wn83idh",
+            "tenor"   : "https://dl.dropboxusercontent.com/scl/fi/v16t2cat7mrmf14lmmtv1/HMT-tenor.mp3?rlkey=2jgqwldb6vehbhs3a05amfdnj",
+            "bass"    : "https://dl.dropboxusercontent.com/scl/fi/t9cgo4j85wfd5x1h4oxt6/HMT-bass.mp3?rlkey=1qaainewddj5wdk12vosks31d",
+            "full"    : "https://dl.dropboxusercontent.com/scl/fi/dqi0lgdxzu20sppy6rq84/HMT-full.mp3?rlkey=f6of4kf0kaphnyiehvbiej2ad"
+          };
+          var part_固定 = {
+            "soprano" : "https://dl.dropboxusercontent.com/scl/fi/vd0pryj3ea270et2azsnj/soprano.mp3?rlkey=z20qpxwv6s7ietdhcwewqavh6",
+            "alto"    : "https://dl.dropboxusercontent.com/scl/fi/248d5xdd6d26t9c94nht9/alto.mp3?rlkey=71o33lgi5efiwwczn82rildqa",
+            "tenor"   : "https://dl.dropboxusercontent.com/scl/fi/ow9mu51z1y7x26b0rve06/tenor.mp3?rlkey=ouip1k6qi13u9y0ugu3xsgc2y",
+            "bass"    : "https://dl.dropboxusercontent.com/scl/fi/um81wcssfre49hmnvelf4/bass.mp3?rlkey=3tp4pnir7xkb8nb39vyuzmzzt",
+            "full"    : "https://dl.dropboxusercontent.com/scl/fi/hl1ubbs32uwxdhqzc22pt/full.mp3?rlkey=mpssl58ymdvtoqgbakodt0b17"
+          };
+          return part_HMT[seibu];
+        }
 		</script>
 		<style type="text/css">
 			div.h4   {font-size:1.2em;font-style:oblique;}
@@ -65,26 +78,41 @@
       <div>ソプラノ</div>
       <audio src='/tmp/mcc/mp3/easter/chichinonamida/01 chichinonamida(soprano).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/01 chichinonamida(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('soprano','',this)">愛するひとり子を十字架につけた</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
     <li>
       <div>アルト</div>
       <audio src='/tmp/mcc/mp3/easter/chichinonamida/02 chichinonamida(alto).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/02 chichinonamida(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('alto','',this)">愛するひとり子を十字架につけた</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
     <li>
       <div>テノール</div>
       <audio src='/tmp/mcc/mp3/easter/chichinonamida/03 chichinonamida(tenor).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/03 chichinonamida(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('tenor','',this)">愛するひとり子を十字架につけた</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
     <li>
       <div>バス</div>
       <audio src='/tmp/mcc/mp3/easter/chichinonamida/04 chichinonamida(bass).mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/04 chichinonamida(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('bass','',this)">愛するひとり子を十字架につけた</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
     <li>
       <div>コーラス</div>
       <audio src='/tmp/mcc/mp3/easter/chichinonamida.mp3' controls preload="metadata"></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida.mp3' download><img src='/mcc/img/download-m.png'></a>
+      <br>
+      <button onclick="play_repeat('full','',this)">愛するひとり子を十字架につけた</button>
+      <button onclick="stop_audio()">stop</button>
     </li>
   </ul>
 </div>

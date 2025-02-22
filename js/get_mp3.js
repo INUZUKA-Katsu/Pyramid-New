@@ -84,11 +84,20 @@ function getSendData(elmsArray){
 function play_repeat(seibu,part,btn){
   stop_audio_controls();
   button_color(btn);
-  if(get_audio_src.length==1){
-    audio.src = get_audio_src(seibu);
+  console.log("step1");
+  if(get_audio_src(seibu)!=null){
+    console.log("step2-1");
+    if(get_audio_src(seibu).length==1){
+      console.log("step2-1-1");      
+      audio.src = get_audio_src(seibu);
+    }else{
+      console.log("step2-1-2");      
+      //一部分再生用に専用のオーディオファイルを用意している場合
+      audio.src = get_audio_src(seibu,part);
+    }
   }else{
-    //一部分再生用に専用のオーディオファイルを用意している場合
-    audio.src = get_audio_src(seibu,part);
+    console.log("step2-2");
+    audio.src = get_src(seibu);
   }
   if(typeof get_trange==='undefined'){
     audio.currentTime = 0;
@@ -143,6 +152,17 @@ function button_color(btn){
 function recolor_all(){
   let btnsArray = Array.from(btns);
   btnsArray.forEach(btn=>{btn.style.fontWeight="";})
+}
+function get_audio_src(seibu){
+  let elm=document.getElementById(seibu);
+  console.log(elm==null);
+  if(elm!=null){
+    console.log("step_get_audio_src-1");
+    return elm.src;
+  }else{
+    console.log("step_get_audio_src-2");
+    return null;
+  }
 }
 function plus_password(target,add_info){
   var password = prompt("Please enter the password:");
