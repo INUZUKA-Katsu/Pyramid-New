@@ -1,6 +1,7 @@
 var elms;
 var btns;
 var audio;
+var t_range;
 
 window.onload = function(){
   elms = document.getElementsByTagName('audio');
@@ -85,36 +86,29 @@ function play_repeat(seibu,part,btn){
   stop_audio_controls();
   button_color(btn);
   console.log("step1");
-  if(get_audio_src(seibu)!=null){
-    console.log("step2-1");
-    if(get_audio_src(seibu).length==1){
-      console.log("step2-1-1");      
-      audio.src = get_audio_src(seibu);
-    }else{
-      console.log("step2-1-2");      
-      //一部分再生用に専用のオーディオファイルを用意している場合
-      audio.src = get_audio_src(seibu,part);
-    }
-  }else{
-    console.log("step2-2");
+
+  // 音源ファイルのパスを取得
+  if(part==''){
     audio.src = get_src(seibu);
+  }else{
+    audio.src = get_src(seibu,part);
   }
+
+  // 再生部分
   if(typeof get_trange==='undefined'){
+    t_range='';
     audio.currentTime = 0;
   }else{
-    if(get_trange.length==3){
-      t_range=get_trange(seibu,tempo,part);
-    }else{
-      t_range=get_trange(seibu,part);
-    }
+    t_range=get_trange(seibu,part);
     console.log(t_range);
     audio.currentTime = t_range.split(",")[0];
   }
   audio.play();
   audio.addEventListener('timeupdate',loop, false);
 }
-function loop() {
-  if(typeof get_trange==='undefined'){
+function loop(){
+  console.log("t_range => "+t_range)
+  if(t_range==''){
     let startTime=0;
     if( audio.ended ) {
       audio.currentTime = startTime;
@@ -152,17 +146,6 @@ function button_color(btn){
 function recolor_all(){
   let btnsArray = Array.from(btns);
   btnsArray.forEach(btn=>{btn.style.fontWeight="";})
-}
-function get_audio_src(seibu){
-  let elm=document.getElementById(seibu);
-  console.log(elm==null);
-  if(elm!=null){
-    console.log("step_get_audio_src-1");
-    return elm.src;
-  }else{
-    console.log("step_get_audio_src-2");
-    return null;
-  }
 }
 function plus_password(target,add_info){
   var password = prompt("Please enter the password:");

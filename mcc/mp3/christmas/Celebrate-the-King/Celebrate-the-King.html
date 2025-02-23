@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/mcc/img/favicon.ico">
 		<script type="text/javascript" src="/js/get_mp3.js"></script>
 		<script type='text/javascript'>
-      var t_range;
       var t_ranges=[
         [
          ["soprano","alto","tenor","bass","full"],
@@ -49,7 +48,7 @@
                'vcl_bass':'04',
                'vcl_full':'05'
               }
-      function get_audio_src(seibu){
+      function get_src(seibu){
         if(seibu=="full"||seibu==undefined){
           return src='/tmp/mcc/mp3/christmas/Celebrate-the-King.mp3';
         }else{

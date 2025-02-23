@@ -18,7 +18,6 @@
 		<script type="text/javascript" src="/js/get_mp3.js"></script>
     <script type="text/javascript">
       var elms = document.getElementsByTagName('audio');
-      var t_range;
       var t_ranges={};
       var seibus=["soprano","alto","tenor","bass","full"]
       seibus.forEach(seibu=>{
@@ -36,7 +35,7 @@
       function get_trange(seibu,part){
         return t_ranges[seibu][part];
       }
-      function get_audio_src(seibu){
+      function get_src(seibu){
         if(seibu=="full"||seibu==undefined){
           return src='/tmp/mcc/mp3/easter/ShizukaniMate.mp3';
         }else{
