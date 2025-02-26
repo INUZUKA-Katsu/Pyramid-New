@@ -37,21 +37,11 @@ HYOKIYURE =<<EOS
 潮|しお
 我|われ
 罪|つみ
+上|うえ
+安|やす
 御|み
 血|ち
 EOS
-
-def get_expand_reg(search_key_word)
-  reg = search_key_word
-  HYOKIYURE.each_line do |item|
-    reg.gsub!(/#{item.chomp}/,"(#{item.chomp})")
-  end
-  reg
-end
-
-def num_search?(key_word)
-  key_word.match(/^[0-9０-９]+$/)
-end
 
 #***** NumSearch　聖歌番号による検索 *****
 #戻り値は [[title1、cgi_key1],[title2、cgi_key2]・・・]
@@ -83,9 +73,9 @@ def search_title_by_cgi_key(cgi_key)
   end
 end
 
+#*****　LyricSearch　歌詞に含まれる語句による検索 ******
 def search_lyric(key_word)
   def file_include(str,reg)
-    str.gsub!(/ |　/,"")
     ans=str.match(/#{reg}/)
     if ans
       ans[0].gsub(/^./,'　\0')
@@ -98,8 +88,8 @@ def search_lyric(key_word)
     title,lyric = ans[1],ans[3]
     [title,lyric]
   end
-  reg = "(^.*\n){,1}^.*" + get_expand_reg(key_word) + ".*$\n?(^.*$\n?){,1}"
-  puts "reg => " + reg.gsub(/\n/,"¥n")
+  reg = "(^.+\n){,1}^.*" + get_expand_reg(key_word) + ".*$\n?(^.+$\n?){,1}"
+  #puts "reg => " + reg.gsub(/\n/,"¥n")
   res = {}
   files = Dir.glob("#{__dir__}/lyric_files/*.txt")
   #Herokuのリソースエラーにならないようにスレッド数を200に制限.
@@ -129,6 +119,169 @@ def search_lyric(key_word)
   res
 end
 #p search_lyric("ちしおしたたる")
+
+# ********* メインプログラム ******************
+# ********* (config.ruからここに来る。)********
+def get_lyric_by_ajax(param)
+  request=param.values[0]
+  mode=param.keys[0]
+  priority=param['priority'] #聖歌(総合版)を優先するか.優先がデフォルト.
+
+  if mode=='cgi_key'
+    cgi_key=request
+    return {'lyric'=>get_lyric_from_local(cgi_key)}
+  
+  elsif mode=='NumSearch'
+    def add_book_name(num,title,cgi_key)
+      return "聖歌(総合版)#{num}番 #{title}" if cgi_key.include? 'SOUGOU'
+      return "新聖歌#{num}番 #{title}" if cgi_key.include? 'SHIN'
+      "聖歌#{num}番 #{title}"
+    end
+    num=request
+    found_num_ary=search_title_and_cgi_key(num,priority)
+    if found_num_ary.size==1
+      cgi_key = found_num_ary[0][1]
+      return {'lyric'=>get_lyric_from_local(cgi_key)}
+    elsif found_num_ary.size>1
+      sections=[]
+      key_index={}
+      found_num_ary.each{|ary|
+         title, cgi_key = ary
+         front_part_of_lyric = get_front_part_of_lyric(cgi_key,'indent')
+         sections << front_part_of_lyric.sub(/『.*』/, '\0　'+select_button(cgi_key)).gsub(/\n{2,}/,"\n")
+      }
+      sorted_sections = sort_by_book_name(sections).
+                           map.with_index(1){|section,i| i.to_s + " " + section}
+      str=sorted_sections.join("\n")
+      return {'title_list'=>[str,found_num_ary.size]}
+    else
+      if priority=='priority'
+        return {'err_message'=>"聖歌(総合版)に該当の番号の聖歌はありません。"}
+      else
+        return {'err_message'=>"該当の番号の聖歌はありません。"}
+      end
+    end
+  
+  elsif mode=='TitleSearch'
+    found_title_ary=search_title(request)
+    if found_title_ary.size==1
+      title    = found_title_ary[0]
+      cgi_keys = title_to_cgi_keys(title,priority)
+      if cgi_keys.size==1
+        return {'lyric'=>get_lyric_from_local(cgi_keys[0])}
+      end
+    end
+    if found_title_ary.size > 0
+      lyric_num=0
+      chapter=[]
+      found_title_ary.each_with_index{|title,i| 
+        cgi_keys = title_to_cgi_keys(title,'non_priority')
+        sections=[]
+        cgi_keys.each do |cgi_key|
+          front_part_of_lyric = get_front_part_of_lyric(cgi_key,'indent')
+          sections << front_part_of_lyric.sub(/^.*((総合聖歌|聖歌|新聖歌).+)『.+$\n/, '\1　'+select_button(cgi_key))
+          lyric_num+=1
+        end
+        sorted_sections = sort_by_book_name(sections).
+                         map.with_index(1){|s,i| s.sub(/総合聖歌|聖歌|新聖歌/, '&nbsp('+i.to_s+')　\0')}.
+                         map{|s| "<p class='section'>"+s+"</p>"}
+        chapter << "<p class='chapter'>"+(i+1).to_s+" "+title +"</p>"+ sorted_sections.join() 
+      }
+      title_num = found_title_ary.size      
+      return {'title_and_part_of_liric_list'=>[ chapter.join().gsub(/\n{2,}/,"\n"),title_num,lyric_num]}
+    else
+      return {'err_message'=>"該当するタイトルはありません。"}
+    end
+  
+  elsif mode=='LyricSearch'
+    found_hash = search_lyric(request)
+    if found_hash.size==1
+      cgi_key = found_hash.values[0][1]
+      return {'lyric'=>get_lyric_from_local(cgi_key)}
+    elsif found_hash.size>1
+      sections=[]
+      sorted_title_array = sort_by_book_name(found_hash.keys)
+      sorted_title_array.each_with_index{|title,i| 
+         matched_range = found_hash[title][0]
+         cgi_key       = found_hash[title][1]
+         sections << (i+1).to_s + " " + title + select_button(cgi_key) + "\n" + matched_range
+      }
+      str= sections.map{|str| "<p class='section'>"+str+"</p>"}.join()
+      return {'matched_range_list'=>[str,found_hash.size]}
+    else
+      return {'err_message'=>"該当するタイトルはありません。"}
+    end
+  end
+end
+
+#******* メソッド ********
+def title_to_cgi_keys(title,priority)
+  cgi_keys=SEIKA_TITLE_HASH[title]
+  cgi_key=cgi_keys.find{|k| k.match(/SOUGOU/)}
+  if priority == "priority" and cgi_key
+    return [cgi_key]
+  else
+    return cgi_keys
+  end
+end
+def get_expand_reg(search_key_word)
+  reg = search_key_word
+  HYOKIYURE.each_line do |item|
+    reg.gsub!(/#{item.chomp}/,"(#{item.chomp})")
+  end
+  reg
+end
+def get_lyric_from_local(cgi_key)
+  path = "#{__dir__}/lyric_files/#{cgi_key.sub(/:\d+/,"")}.txt"
+  File.read(path)  
+end
+def get_front_part_of_lyric(cgi_key,indent)
+  lyric      = get_lyric_from_local(cgi_key)
+  front_part = lyric.match(/(^.*$\n?){,6}/)[0]
+  p :front_part
+  puts front_part
+  puts
+  if indent=='indent'
+    front_part.gsub!(/^./, '　\0')
+  end
+  front_part
+end
+def sort_by_book_name(lyric_array)
+  lyric_array.sort_by do |str|
+    title = str.match(/聖歌総合版|聖歌\(総合版\)|聖歌|新聖歌/)[0]
+    num1 = ["聖歌総合版","聖歌(総合版)","聖歌","新聖歌"].index(title).to_s
+    num2 = ("000"+str.match(/\d+/)[0])[-4,4]
+    num1+num2
+  end
+end
+def select_button(cgi_key)
+  "　<input type='button' name='#{cgi_key}' value='選択' onClick='disp_lyric(this)'>" 
+end
+
+#**********  lifebread.infoサイトから全データを一括取得してローカルに保存する  ***********
+def save_all_lyric
+  cgi_keys=SEIKA_TITLE_HASH.values.flatten.sort.each do |cgi_key|
+    title=search_title_by_cgi_key(cgi_key)
+    lyric=get_lyric_from_web(cgi_key,title)
+    file_name=cgi_key.sub(/:\d+/,"")+".txt"
+    File.write("#{__dir__}/lyric_files/#{file_name}" , lyric)
+    puts file_name
+  end
+end
+#save_all_lyric
+
+#**********  lifebread.infoサイトにアクセスして処理するためのメソッド（今は不使用） ************
+def get_lyric_from_web(cgi_key,title)
+  url=get_url(cgi_key)
+  str=get_html(url)
+  lyric=get_lyric_from_html(str).sub(/.*『#{title}』.*/){|w| w+"\n"}
+  url_ary=get_url_after_no2(str)
+  if url_ary.size>0
+    lyric_after_no2_ary=get_lyric_array(url_ary,title)
+    lyric=lyric+lyric_after_no2_ary.join
+  end
+  return lyric
+end
 
 def get_url(cgi_key)
   "http://lifebread.info/cgi-bin/hymn22.cgi?BOOKNO=" + cgi_key + "&TS=7&BS=7&FS=5"
@@ -166,6 +319,30 @@ def get_lyric_array(url_ary,title)
   end
   lyric_ary
 end
+
+
+#**********   ターミナル実行用（lifebread.infoサイトにアクセスして処理）  ************
+def display_lyric_on_terminal
+  res=get_title_on_terminal
+  if res.class==Array
+    title,cgi_key = res
+  else
+    title=res
+    cgi_key=get_cgi_key_on_terminal(title)
+  end
+  url=get_url(cgi_key)
+  str=get_html(url)
+  lyric_no1=get_lyric_from_html(str).sub(/.*『#{title}』.*/){|w| w+"\n"}
+  lyric=lyric_no1
+  
+  url_ary=get_url_after_no2(str)
+  if url_ary.size>0
+    lyric_after_no2_ary=get_lyric_array(url_ary,title)
+    lyric=lyric+lyric_after_no2_ary.join
+  end
+  puts lyric
+end
+#display_lyric_on_terminal
 
 def get_title_on_terminal
   #番号で検索したときの戻り値は、[該当タイトル,cgi検索キー]の配列
@@ -232,150 +409,7 @@ def get_cgi_key_on_terminal(title)
   res
 end
 
-def display_lyric_on_terminal
-  res=get_title_on_terminal
-  if res.class==Array
-    title,cgi_key = res
-  else
-    title=res
-    cgi_key=get_cgi_key_on_terminal(title)
-  end
-  url=get_url(cgi_key)
-  str=get_html(url)
-  lyric_no1=get_lyric_from_html(str).sub(/.*『#{title}』.*/){|w| w+"\n"}
-  lyric=lyric_no1
-  
-  url_ary=get_url_after_no2(str)
-  if url_ary.size>0
-    lyric_after_no2_ary=get_lyric_array(url_ary,title)
-    lyric=lyric+lyric_after_no2_ary.join
-  end
-  puts lyric
-end
-#display_lyric_on_terminal
-
-def title_to_cgi_keys(title,priority)
-  cgi_keys=SEIKA_TITLE_HASH[title]
-  cgi_key=cgi_keys.find{|k| k.match(/SOUGOU/)}
-  if priority == "priority" and cgi_key
-    return [cgi_key]
-  else
-    return cgi_keys
-  end
+def num_search?(key_word)
+  key_word.match(/^[0-9０-９]+$/)
 end
 
-def get_lyric_from_web(cgi_key,title)
-  url=get_url(cgi_key)
-  str=get_html(url)
-  lyric=get_lyric_from_html(str).sub(/.*『#{title}』.*/){|w| w+"\n"}
-  url_ary=get_url_after_no2(str)
-  if url_ary.size>0
-    lyric_after_no2_ary=get_lyric_array(url_ary,title)
-    lyric=lyric+lyric_after_no2_ary.join
-  end
-  return lyric
-end
-
-def get_lyric_from_local(cgi_key)
-  path = "#{__dir__}/lyric_files/#{cgi_key.sub(/:\d+/,"")}.txt"
-  File.read(path)  
-end
-
-#config.ruからここに来る。
-def get_lyric_by_ajax(param)
-  request=param.values[0]
-  mode=param.keys[0]
-  priority=param['priority'] #聖歌(総合版)を優先するか.優先がデフォルト.
-
-  if mode=='cgi_key'
-    cgi_key=request
-    title=search_title_by_cgi_key(cgi_key)
-  
-  elsif mode=='NumSearch'
-    def add_book_name(num,title,cgi_key)
-      return "聖歌(総合版)#{num}番 #{title}" if cgi_key.include? 'SOUGOU'
-      return "新聖歌#{num}番 #{title}" if cgi_key.include? 'SHIN'
-      "聖歌#{num}番 #{title}"
-    end
-    num=request
-    found_num_ary=search_title_and_cgi_key(num,priority)
-    if found_num_ary.size==1
-      title,cgi_key = found_num_ary[0]
-    elsif found_num_ary.size>1
-      res=[]
-      key_index={}
-      found_num_ary.each_with_index{|a,i|
-         title, cgi_key = a
-         res << (i+1).to_s+" "+ add_book_name(num,title,cgi_key)
-         key_index[i] = cgi_key
-      }
-      return {'title_list_and_index'=>[res.join("\n"),key_index]}
-    else
-      if priority=='priority'
-        return {'err_message'=>"聖歌（総合版）に該当の番号の聖歌はありません。"}
-      else
-        return {'err_message'=>"該当の番号の聖歌はありません。"}
-      end
-    end
-  
-  elsif mode=='TitleSearch'
-    found_title_ary=search_title(request)
-    if found_title_ary.size==1
-      title    = found_title_ary[0]
-      cgi_keys = title_to_cgi_keys(title,priority)
-      if cgi_keys.size==1
-        return {'lyric'=>get_lyric_from_local(cgi_keys[0])}
-      else
-        res=[]
-        cgi_keys.each_with_index do |cgi_key,i|
-          lyric = get_lyric_from_local(cgi_key)
-          former_part = lyric.match(/(^.*$\n?){,6}/)[0]
-          button = "』　<input type='button' name='#{cgi_key}' value='選択' onClick='disp_lyric(this)'>" 
-          res << former_part.sub(/^(.*『)/,(i+1).to_s+'　\1').sub(/』/,button)
-        end
-        str = res.join("\n\n")
-        return {'former_lyric_list'=>[str,cgi_keys.size]}
-      end
-    elsif found_title_ary.size>1
-      res=[]
-      found_title_ary.each_with_index{|title,i| 
-         res << (i+1).to_s+" "+title
-      }
-      return {'title_list'=>res.join("\n")}
-    else
-      return {'err_message'=>"該当するタイトルはありません。"}
-    end
-  
-  elsif mode=='LyricSearch'
-    found_hash = search_lyric(request)
-    if found_hash.size==1
-      title   = found_hash.keys[0]
-      cgi_key = found_hash.values[0][1]
-    elsif found_hash.size>1
-      res=[]
-      found_hash.keys.each_with_index{|title,i| 
-         matched_range = found_hash[title][0]
-         cgi_key       = found_hash[title][1]
-         button = "　<input type='button' name='#{cgi_key}' value='選択' onClick='disp_lyric(this)'><br>"
-         res << (i+1).to_s + " " + title + button + matched_range
-      }
-      str= res.join("\n").gsub(/\n{3,}/,"\n\n")
-      return {'matched_range_list'=>[str,found_hash.size]}
-    else
-      return {'err_message'=>"該当するタイトルはありません。"}
-    end
-  end
-  #return {'lyric'=>get_lyric_from_web(cgi_key,title)}
-  return {'lyric'=>get_lyric_from_local(cgi_key)}
-end
-
-def save_all_lyric
-  cgi_keys=SEIKA_TITLE_HASH.values.flatten.sort.each do |cgi_key|
-    title=search_title_by_cgi_key(cgi_key)
-    lyric=get_lyric_from_web(cgi_key,title)
-    file_name=cgi_key.sub(/:\d+/,"")+".txt"
-    File.write("#{__dir__}/lyric_files/#{file_name}" , lyric)
-    puts file_name
-  end
-end
-#save_all_lyric
