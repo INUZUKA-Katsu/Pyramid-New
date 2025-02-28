@@ -3,6 +3,7 @@ require 'json'
 require 'open-uri'
 require 'zlib'
 require 'stringio'
+require 'fileutils'
 
 Encoding.default_external = "utf-8"
 
@@ -14,34 +15,9 @@ TITLE_LIST       =SEIKA_TITLE_HASH.keys
 NUM_LIST         =SEIKA_NUM_HASH.keys
 NUM_LIST2        =SEIKA_NUM_HASH2.keys
 NUM_LIST3        =SEIKA_NUM_HASH3.keys
-HYOKIYURE =<<EOS
-救い|すくい
-馬小屋|うまごや
-生まれ|うまれ
-聖|せい|きよ
-霊|たま|れい
-イエス|イェス
-神|かみ
-君|きみ
-愛|あい
-歌|うた
-今|いま
-主|ぬし|しゅ
-憂い|うれい
-祈り|いのり
-祈れ|いのれ
-静か|しずか
-立ち|たち
-待て|まて
-心|こころ
-潮|しお
-我|われ
-罪|つみ
-上|うえ
-安|やす
-御|み
-血|ち
-EOS
+HYOKIYURE_FILE   =__dir__+'/表記揺れ語句リスト.txt'
+HYOKIYURE_TMP    =Dir.pwd+'/tmp/mcc/表記揺れ語句リスト.txt'
+FileUtils.cp(HYOKIYURE_FILE,HYOKIYURE_TMP)
 
 #***** NumSearch　聖歌番号による検索 *****
 #戻り値は [[title1、cgi_key1],[title2、cgi_key2]・・・]
@@ -225,11 +201,14 @@ def title_to_cgi_keys(title,priority)
   end
 end
 def get_expand_reg(search_key_word)
-  reg = search_key_word
-  HYOKIYURE.each_line do |item|
-    reg.gsub!(/#{item.chomp}/,"(#{item.chomp})")
+  reg_str=search_key_word
+  hyokiyure_array = File.read(HYOKIYURE_TMP).sub(/\n[\n\s　]*$/m,"").split("\n")
+  p hyokiyure_array
+  hyokiyure_array.each do |item|
+    reg_str.gsub!(/#{item}/,"(#{item})")
   end
-  reg
+  p "reg_str => " + reg_str
+  reg_str
 end
 def get_lyric_from_local(cgi_key)
   path = "#{__dir__}/lyric_files/#{cgi_key.sub(/:\d+/,"")}.txt"
@@ -257,6 +236,13 @@ end
 def select_button(cgi_key)
   "　<input type='button' name='#{cgi_key}' value='選択' onClick='disp_lyric(this)'>" 
 end
+
+
+#***********************************************************************************
+__END__
+以下は、現在の経常動作には不要なので凍結する。
+#***********************************************************************************
+
 
 #**********  lifebread.infoサイトから全データを一括取得してローカルに保存する  ***********
 def save_all_lyric
