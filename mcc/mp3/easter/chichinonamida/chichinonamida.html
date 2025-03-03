@@ -29,13 +29,30 @@
           };
           return part_HMT[seibu];
         }
+        document.addEventListener("DOMContentLoaded", function () {
+            // オーディオタグをすべて取得
+            document.querySelectorAll("audio").forEach(audio => {
+                // `name`属性を取得（存在しない場合はスキップ）
+                let soundName = audio.getAttribute("name");
+                if (soundName) {
+                    // 音源ファイルのパスを設定（例: "sounds/" フォルダ内に格納されている）
+                    let sourcePath = get_src(soundName);
+                    audio.src = sourcePath;
+                }
+            });
+            document.querySelectorAll("button").forEach(button => {
+              button.style.display="none"
+            });             
+        });
 		</script>
 		<style type="text/css">
-			div.h4   {font-size:1.2em;font-style:oblique;}
-			div.nen  {margin-top:1em;}
+			      div.h4   {font-size:1.2em;font-style:oblique;}
+			      div.nen  {margin-top:1em;}
       			h4       {margin:1em 0 1em 1em;font-size:150%;font-style:oblique;}
             li       {margin-left:0;}
       			audio    {height:24px;}
+            div.youtbe{display:block;}  
+            div.part {font-size:80%;font-weight:normal;margin:15px 0 0 10px;}
             div.words {width:250px;
                        margin-top : 2.5em; 
                        margin-left: auto; margin-right: auto;
@@ -51,12 +68,20 @@
             .input {display:flex;}
       			@media screen and (min-width: 700px){
               h4       {margin-bottom: 1em;}
-              li       {margin-left:1em;margin-bottom:2em;}
-              li div   {display:inline-block;vertical-align:middle;width:6em;}
+              li       {margin-left:20px;margin-bottom:2em;}
+              li div   {display:inline-block;vertical-align:bottom;
+                        width:115px;}
+              audio.part{margin:15px 0 0 0;}
+              div.part {display:inline-block;vertical-align:bottom;
+                        width:120px;font-size:80%;font-weight:normal;
+                        margin:0 0 0 0;}
+              .apendix  {vertical-align:top;}
+              .textarea1{margin-left:0;}  
               div.words {position: absolute;
                          top:1em;
                          right:1em; 
               　　　　　　}
+              
       			}
             @media screen and (min-width: 830px){
               h4        {margin-bottom: 2em;}
@@ -81,48 +106,62 @@
   <ul>
     <li>
       <div>ソプラノ</div>
-      <audio src='/tmp/mcc/mp3/easter/chichinonamida/01 chichinonamida(soprano).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/chichinonamida/01 chichinonamida(soprano).mp3' controls preload="metadata" loop></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/01 chichinonamida(soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('soprano','',this)">愛するひとり子を十字架につけた</button>
       <button onclick="play_repeat('vcl_soprano','',this)">十字架につけた(２番の3連符以降、ボカロ)</button>
       <button onclick="stop_audio()">stop</button>
+      <div class="part">愛するひとり子を十字架につけた</div><audio controls class="part" name="soprano" loop></audio>
+      <br>
+      <div class="part">十字架からの３連符部分(ボカロ)</div><audio controls class="part" name="vcl_soprano" loop></audio>      
     </li>
     <li>
       <div>アルト</div>
-      <audio src='/tmp/mcc/mp3/easter/chichinonamida/02 chichinonamida(alto).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/chichinonamida/02 chichinonamida(alto).mp3' controls preload="metadata" loop></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/02 chichinonamida(alto).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('alto','',this)">愛するひとり子を十字架につけた</button>
       <button onclick="play_repeat('vcl_alto','',this)">十字架につけた(２番の3連符以降、ボカロ)</button>
       <button onclick="stop_audio()">stop</button>
+      <div class="part">愛するひとり子を十字架につけた</div><audio controls class="part" name="alto" loop></audio>
+      <br>
+      <div class="part">十字架からの３連符部分(ボカロ)</div><audio controls class="part" name="vcl_alto" loop></audio>
     </li>
     <li>
       <div>テノール</div>
-      <audio src='/tmp/mcc/mp3/easter/chichinonamida/03 chichinonamida(tenor).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/chichinonamida/03 chichinonamida(tenor).mp3' controls preload="metadata" loop></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/03 chichinonamida(tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('tenor','',this)">愛するひとり子を十字架につけた</button>
       <button onclick="play_repeat('vcl_tenor','',this)">十字架につけた(２番の3連符以降、ボカロ)</button>
       <button onclick="stop_audio()">stop</button>
+      <div class="part">愛するひとり子を十字架につけた</div><audio controls class="part" name="tenor" loop></audio>
+      <br>
+      <div class="part">十字架からの３連符部分(ボカロ)</div><audio controls class="part" name="vcl_tenor" loop></audio>
     </li>
     <li>
       <div>バス</div>
-      <audio src='/tmp/mcc/mp3/easter/chichinonamida/04 chichinonamida(bass).mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/chichinonamida/04 chichinonamida(bass).mp3' controls preload="metadata" loop></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida/04 chichinonamida(bass).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('bass','',this)">愛するひとり子を十字架につけた</button>
       <button onclick="play_repeat('vcl_bass','',this)">十字架につけた(２番の3連符以降、ボカロ)</button>
       <button onclick="stop_audio()">stop</button>
-    </li>
+      <div class="part">愛するひとり子を十字架につけた</div><audio controls class="part" name="bass" loop></audio>
+      <br>
+      <div class="part">十字架からの３連符部分(ボカロ)</div><audio controls class="part" name="vcl_bass" loop></audio>    </li>
     <li>
       <div>コーラス</div>
-      <audio src='/tmp/mcc/mp3/easter/chichinonamida.mp3' controls preload="metadata"></audio>
+      <audio src='/tmp/mcc/mp3/easter/chichinonamida.mp3' controls preload="metadata" loop></audio>
       &nbsp;&nbsp;<a href='/tmp/mcc/mp3/easter/chichinonamida.mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('full','',this)">愛するひとり子を十字架につけた</button>
-      <button onclick="play_repeat('vcl_full','',this)">十字架につけた(２番の3連符以降、ボカロ)</button>
+      <button onclick="play_repeat('vcl_full','',this)">十字架の3連符(ボカロ)</button>
       <button onclick="stop_audio()">stop</button>
+      <div class="part">愛するひとり子を十字架につけた</div><audio controls class="part" name="full" loop></audio>
+      <br>
+      <div class="part">十字架からの３連符部分(ボカロ)</div><audio controls class="part" name="vcl_full" loop></audio>
     </li>
   </ul>
 </div>
@@ -147,34 +186,31 @@
   十字架から　あふれながれる泉<br>
   それは　イェスの愛
 </div>
+<br>
 <div class="nen">
-  <ul style="list-style: none;">
-    <li>
-      <div class="part"><a href='#' onclick="plus_password('./父の涙.pdf')">楽　譜</a></div>
-    </li>
-    <li><div class="part">連　絡</div>
-      <div class="textarea">
-        <textarea id="comuBoard" readonly cols="32" rows="10"><!--連絡事項--></textarea>
+    <div class="apendix"><a href='#' onclick="plus_password('./父の涙.pdf')">楽　譜</a></div>
+    <br>
+    <div class="apendix">連　絡</div>
+    <div class="textarea1">
+      <textarea id="comuBoard" readonly cols="32" rows="10"><!--連絡事項--></textarea>
+    </div>
+    <br>
+    <div class="textarea2">
+      <label for="returnText">連絡事項の先頭に追記する</label>
+      <textarea id="returnText" cols="32" rows="5"></textarea>
+      <div class="input">
+        <input type="button" name="return" value="実行" onclick="addText()">
+        <input type="button" name="cancel" value="キャンセル" onclick="cancelText()" style="margin-left:5px;">
       </div>
-    </li>
-    <li>
-      <div class="textarea">
-        <label for="returnText">連絡事項の先頭に追記する</label>
-        <textarea id="returnText" cols="32" rows="5"></textarea>
-        <div class="input">
-          <input type="button" name="return" value="実行" onclick="addText()">
-          <input type="button" name="cancel" value="キャンセル" onclick="cancelText()" style="margin-left:5px;">
-        </div>
-      </div>
-    </li>
-    <li>
-      <div class="part">
-        <iframe width="320" height="180" src="https://www.youtube.com/embed/6RcuABlF1NE?si=Z-vuq8tTXA8M_5MK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-      </div>
-      <div class="part">
-        <iframe width="320" height="180" src="https://www.youtube.com/embed/QeNmxDwpFFc?si=xIkea-0ewjLRRhar" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-      </div>
-    </li>
+    </div>
+    <br>
+    <div class="youtube">
+      <iframe width="320" height="180" src="https://www.youtube.com/embed/6RcuABlF1NE?si=Z-vuq8tTXA8M_5MK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <div class="youtube">
+      <iframe width="320" height="180" src="https://www.youtube.com/embed/QeNmxDwpFFc?si=xIkea-0ewjLRRhar" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
   </ul>
 </div>
 

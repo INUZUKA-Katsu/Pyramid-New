@@ -34,6 +34,10 @@ def search_title_and_cgi_key(key_num,priority)
   end
   res
 end
+def search_other_cgi_keys(cgi_key)
+  same_title_cgi_key_array = SEIKA_TITLE_HASH.values.find{|a| a.include?(cgi_key)}
+  same_title_cgi_key_array-[cgi_key]
+end
 
 #***** TitleSearch　聖歌のタイトルによる検索 *****
 def search_title(key_word)
@@ -124,7 +128,18 @@ def get_lyric_by_ajax(param)
       found_num_ary.each{|ary|
          title, cgi_key = ary
          front_part_of_lyric = get_front_part_of_lyric(cgi_key,'indent')
-         sections << front_part_of_lyric.sub(/『.*』/, '\0　'+select_button(cgi_key)).gsub(/\n{2,}/,"\n")
+         section = front_part_of_lyric.sub(/『.*』/, '\0　'+select_button(cgi_key)).gsub(/\n{2,}/,"\n")
+         other_key_array = search_other_cgi_keys(cgi_key)
+         if other_key_array.size>0
+          sub_sections=[]
+          other_key_array.select{|key| key!=cgi_key}.each do |key|
+            front_part_of_lyric2 = get_front_part_of_lyric(key,'indent2')
+            sub_section = front_part_of_lyric2.sub(/『.*』/, '\0　'+select_button(cgi_key)).gsub(/\n{2,}/,"\n")
+            sub_sections << sub_section
+          end
+          section = section + "\n　【他の聖歌集の同タイトル】\n" + sub_sections.join("\n")
+         end
+         sections << section
       }
       sorted_sections = sort_by_book_name(sections).
                            map.with_index(1){|section,i| i.to_s + " " + section}
@@ -222,6 +237,8 @@ def get_front_part_of_lyric(cgi_key,indent)
   puts
   if indent=='indent'
     front_part.gsub!(/^./, '　\0')
+  elsif num=indent.match(/\d$/)
+    front_part.gsub!(/^./, '　'*num[0].to_i + '\0')
   end
   front_part
 end
