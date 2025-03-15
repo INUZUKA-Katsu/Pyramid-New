@@ -8,3 +8,6 @@ if (8..22)===jst
   #`curl http://toshin-kensaku.herokuapp.com/`
   p Net::HTTP.get(URI.parse('http://pyramid-yokohama.herokuapp.com/'))
 end
+
+#10分おきにCloud Runの答申検索システムをリクエストしてスリープに入るのを防止する。
+  p Net::HTTP.get(URI.parse('https://rack-app-806339164409.asia-northeast1.run.app/ping'))
