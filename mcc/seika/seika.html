@@ -18,7 +18,32 @@
           div.checkbox {margin:0 auto;width: max-content;}
           #lyric,#select_list {margin:1em auto;width: max-content;}
           #select_message {margin:1em;padding:0.5em;border:solid 1px red;width: max-content}
-          #lyric   {font-size:110%;}
+          #lyric   {
+            position: relative; /* これが重要 */
+            font-size:110%;
+            background-color:blanchedalmond;
+            padding-top: 1em;
+            padding-right:1em;
+            padding-bottom:3em;
+            padding-left:1em;
+            display:none;
+          }
+          #top-link {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            /* 標準のボタンのカラーに合わせる場合
+            /* color: buttontext;      /* テキスト色 */
+            /* background-color: buttonface;  /* 背景色 */
+            /* border: 1px solid buttonborder;  /* 境界線色 */
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 12px;
+          }
+          #top-link:hover { background-color: rgba(0, 0, 0, 0.9);}          
           #lyric_bottom {margin-bottom:4em;}
           p.chapter {font-weight:bold;}
           div#drop_area {display:none;
@@ -71,6 +96,9 @@
             clear_lyric();
             clear_select_list();
             clear_hr();
+            document.querySelectorAll(`input[type="text"]:not(#${key})`).forEach(input => {
+              input.value = "";
+            });
             let elm=document.getElementById(key);
             if(elm.value!=''){
               if (elm.id=='NumSearch' && elm.value=='update_0423'){
@@ -86,10 +114,14 @@
           function clear_search_word(key){
             let elm=document.getElementById(key);
             elm.value='';
+            document.querySelectorAll(`input[type="text"]:not(#${key})`).forEach(input => {
+              input.value = "";
+            });
           }
           function clear_lyric(){
             let elm=document.getElementById('lyric');
-            elm.innerHTML=''
+            elm.innerHTML='';
+            elm.style.display='none';
           }
           function clear_select_list(){
             let elm=document.getElementById('select_list');
@@ -106,8 +138,25 @@
 
             if(key=='lyric'){
               let elm=document.getElementById('lyric');
-              elm.innerHTML=val.replace(/\n/g,"<br>")
+              elm.innerHTML=val.replace(/\n/g,"<br>");
               elm.scrollIntoView();
+
+// トップへ戻るリンクを作成
+const topLink = document.createElement("a");
+              topLink.id = "top-link";
+              topLink.href = "#";
+              topLink.textContent = "トップへ戻る";
+          
+              // クリック時にスムーズスクロールでトップへ移動
+              topLink.addEventListener("click", (event) => {
+                  event.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+              });
+          
+              // lyric-container にリンクを追加
+              document.getElementById("lyric").appendChild(topLink);
+
+              document.getElementById("separater").scrollIntoView({behavior: "smooth", block: "nearest", inline: "nearest"});
 
             }else if(key=='err_message'){
               alert(val);
@@ -134,7 +183,6 @@
             cgi_key=elm.name
             ajax('cgi_key', cgi_key);
             add_hr();
-            document.getElementById("separater").scrollIntoView();
           }
           function add_hr(){
             if(!document.getElementById('lyric_bottom')){;
