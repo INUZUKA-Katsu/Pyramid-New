@@ -20,6 +20,11 @@
                     font-size:90%;
                     font-family: "游明朝", YuMincho, "Hiragino Mincho ProN W3", "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif;
                   }
+          label {
+                    display: block;
+                    width: 15em;
+                    font-size: 80%;
+                }
       		@media screen and (min-width: 700px){
               h4       {margin-bottom: 1em;}
               li       {margin-left:1em;margin-bottom:2em;}
