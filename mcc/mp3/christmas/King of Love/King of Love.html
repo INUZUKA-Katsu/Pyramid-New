@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" type="image/png" sizes="16x16" href="/mcc/img/favicon.ico">
+    <link rel="stylesheet" href="/css/choir.css">
+    <script type="text/javascript" src="/js/get_mp3.js"></script>
+	<script type='text/javascript'>
+	    function get_src(seibu){
+          var part_HMT = {
+            "soprano" : "https://dl.dropboxusercontent.com/scl/fi/9b0sll3jtlozpypy69fnh/King-of-Love-soprano.mp3?rlkey=rl62vmvigslo4y5x8m598xd92",
+            "alto"    : "https://dl.dropboxusercontent.com/scl/fi/pilm08yptp7zlav32lb28/King-of-Love-alto.mp3?rlkey=lqrbtld9zk80hzgm9teho9qoj",
+            "tenor"   : "https://dl.dropboxusercontent.com/scl/fi/p2zn9dvu1k9vdf747alcm/King-of-Love-tenor.mp3?rlkey=pdmgych2ezmtlpptcg600dig9",
+            "bass"    : "https://dl.dropboxusercontent.com/scl/fi/how4yv7974uwzhf9x8g3p/King-of-Love-bass.mp3?rlkey=ulygfybu50q65aft0f8ed0584",
+            "full"    : "https://dl.dropboxusercontent.com/scl/fi/jgi5y97ac7l7br4piqxdm/King-of-Love-full.mp3?rlkey=xzny43jtg7026vvvhhdlr7ilz",
+            "vcl_soprano" : "https://dl.dropboxusercontent.com/scl/fi/9fohido2nphcs05yhac6g/King-of-Love-vcl_soprano.mp3?rlkey=2amte3q2zq52lqefe32gpyusn",
+            "vcl_alto"    : "https://dl.dropboxusercontent.com/scl/fi/63d2ax08rhpbjz5y2wj42/King-of-Love-vcl_alto.mp3?rlkey=k1eg46fwkpfhyx3c8e0y91syd",
+            "vcl_tenor"   : "https://dl.dropboxusercontent.com/scl/fi/tfnl4la8g6dmd7bzagtse/King-of-Love-vcl_tenor.mp3?rlkey=7ikt16igt5rw4rcc9wugvc4kq",
+            "vcl_bass"    : "https://dl.dropboxusercontent.com/scl/fi/ya9py63rqplp033r1ww40/King-of-Love-vcl_bass.mp3?rlkey=fund3lw1cotk1mcv0l4qbaexv",
+            "vcl_full"    : "https://dl.dropboxusercontent.com/scl/fi/rfhyzqxwfixrmnr3eh191/King-of-Love-vcl_full.mp3?rlkey=p15rwagcwjc0jylwpfkgrx0ex"
+          };
+          return part_HMT[seibu];
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+          src_set(108);
+        });
+        function src_set(bpm){
+            // オーディオタグをすべて取得
+            document.querySelectorAll("audio").forEach(audio => {
+                // `name`属性を取得（存在しない場合はスキップ）
+                let soundName = audio.getAttribute("name");
+                if (soundName) {
+                    // 音源ファイルのパスを設定
+                    let sourcePath = get_src(soundName);
+                    audio.src = sourcePath;
+                }
+            });
+        }
+	</script>
+	<style type="text/css">
+	</style>
+    <title>'King of Love'パート別練習用音源</title>
+	</head>
+	<body>
+<div class='body'>
+<h1>パート別練習用音源</h1>
+
+<div class='nen'>
+  <h4>King of Love</h4>
+  <ul style="list-style: none;">
+    <li>
+      <div class="part">ソプラノ</div>
+      <audio name="soprano" controls preload="metadata" loop></audio>
+      <br>
+      <div class="vcl">AI Vocal</div>
+      <audio name="vcl_soprano" controls preload="metadata" loop></audio>
+    </li>
+    <li>
+      <div class="part">アルト</div>
+      <audio name="alto" controls preload="metadata" loop></audio>
+      <br>
+      <div class="vcl">AI Vocal</div>
+      <audio name="vcl_alto" controls preload="metadata" loop></audio>
+    </li>
+    <li>
+      <div class="part">テノール</div>
+      <audio name="tenor" controls preload="metadata" loop></audio>
+      <br>
+      <div class="vcl">AI Vocal</div>
+      <audio name="vcl_tenor" controls preload="metadata" loop></audio>
+    </li>
+    <li>
+      <div class="part">バス</div>
+      <audio name="bass" controls preload="metadata" loop></audio>
+      <br>
+      <div class="vcl">AI Vocal</div>
+      <audio name="vcl_bass" controls preload="metadata" loop></audio>
+    <li>
+      <div class="part">コーラス</div>
+      <audio name="full" controls preload="metadata" loop></audio>
+      <br>
+      <div class="vcl">AI Vocal</div>
+      <audio name="vcl_full" controls preload="metadata" loop></audio>
+    </li>
+  </ul>
+</div>
+<div class="words">
+</div>
+<br>
+<div class="nen">
+    <div class="apendix"><a href='#' onclick="plus_password('./King of Love(楽譜).pdf')">楽　譜</a></div>
+    <br>
+    <div class="apendix">連　絡</div>
+    <div class="textarea1">
+      <textarea id="comuBoard" readonly cols="32" rows="10"><!--連絡事項--></textarea>
+    </div>
+    <br>
+    <div class="textarea2">
+      <label for="returnText">連絡事項の先頭に追記する</label>
+      <textarea id="returnText" cols="32" rows="5"></textarea>
+      <div class="input">
+        <input type="button" name="return" value="実行" onclick="addText()">
+        <input type="button" name="cancel" value="キャンセル" onclick="cancelText()" style="margin-left:5px;">
+      </div>
+    </div>
+</div>
+<div class='link'>< class='link'>
+  <a href='../あめにはさかえ/あめにはさかえ.html'>⇒ "あめにはさかえ"のページへ.</a><br>
+  <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a>
+</div>
+</div>
+	</body>
+</html>
