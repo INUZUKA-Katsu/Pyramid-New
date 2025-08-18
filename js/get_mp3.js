@@ -15,9 +15,9 @@ window.onload = function(){
   });
   if(targetElmsArray.length>0){
     
-    const sendData = getSendData(targetElmsArray);
-    console.log(sendData);
-    ajax("missingMp3="+sendData,targetElmsArray); 
+    //const sendData = getSendData(targetElmsArray);
+    //console.log(sendData);
+    //ajax("missingMp3="+sendData,targetElmsArray); 
   
   }else{
     //alert("All mp3 are ready.");

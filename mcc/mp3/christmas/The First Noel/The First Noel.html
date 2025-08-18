@@ -104,20 +104,20 @@
       function get_src_of_specified_tempo(seibu,tempo){
         let vcl_src={
           120 : {
-            'vcl_soprano'   : 'https://dl.dropboxusercontent.com/scl/fi/av5l6tm0ewz9bxd6alkcx/01-The-First-Noel-vcl_soprano.mp3?rlkey=dblm1ito9dhqg87uctoffxlb6',
-            'vcl_alto'      : 'https://dl.dropboxusercontent.com/scl/fi/z501g41h3nb1po2c2qeed/02-The-First-Noel-vcl_alto.mp3?rlkey=mtf9xz26py8n4rkw88ggchssu' ,
-            'vcl_tenor'     : 'https://dl.dropboxusercontent.com/scl/fi/j7aw9po2nfcz81k5jpkmh/03-The-First-Noel-vcl_tenor.mp3?rlkey=0hfkqjawgxgtiyks131wk0h86' ,
-            'vcl_all_tenor' : 'https://dl.dropboxusercontent.com/scl/fi/zbd9zcqk6gf3w6hnhkapl/03-The-First-Noel-vcl_all_tenor.mp3?rlkey=k4gaqsrkb333ax2ynae331z9j' ,
-            'vcl_bass'      : 'https://dl.dropboxusercontent.com/scl/fi/4jqv1hx2s54wp738fgnrm/04-The-First-Noel-vcl_bass.mp3?rlkey=tmd0cdc83u4c9qr71e20ayteo' ,
-            'vcl_full'      : 'https://dl.dropboxusercontent.com/scl/fi/pvrezs0qbsalbcolbfgo0/05-The-First-Noel-vcl_full.mp3?rlkey=q9bp7kghugir8qr52o254'
+            'vcl_soprano'   : '/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (vcl_soprano).mp3',
+            'vcl_alto'      : '/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (vcl_alto).mp3',
+            'vcl_tenor'     : '/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_tenor).mp3',
+            'vcl_all_tenor' : '/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_all_tenor).mp3',
+            'vcl_bass'      : '/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass).mp3',
+            'vcl_full'      : '/tmp/mcc/mp3/christmas/The First Noel/05 The First Noel (vcl_full).mp3'
           },
           98 : {
-            'vcl_soprano'   : 'https://dl.dropboxusercontent.com/scl/fi/hoe8e19egi635ck8186e2/01-The-First-Noel-vcl_soprano_tmp98.mp3?rlkey=t562ux8hzssd0hoz2hd7ctu9z',
-            'vcl_alto'      : 'https://dl.dropboxusercontent.com/scl/fi/ztrtbx0mffvb734dw7qbf/02-The-First-Noel-vcl_alto_tmp98.mp3?rlkey=mwo3ct2q2n4q70x9rrlfeqy4v',
-            'vcl_tenor'     : 'https://dl.dropboxusercontent.com/scl/fi/v24bqxwgdjov8voz63s62/03-The-First-Noel-vcl_tenor_tmp98.mp3?rlkey=smqcui8tsrtrxrhamb1mtnvv5',
-            'vcl_all_tenor' : 'https://dl.dropboxusercontent.com/scl/fi/3uyi420qsh9hfdcit4xxh/03-The-First-Noel-vcl_all_tenor_tmp98.mp3?rlkey=b4lvbkfa31m8b617ikpy333wm',
-            'vcl_bass'      : 'https://dl.dropboxusercontent.com/scl/fi/lw3y60jw9an7lmqt91xgg/04-The-First-Noel-vcl_bass_tmp98.mp3?rlkey=9f17f79c7mz62i21ap8rd40ck',
-            'vcl_full'      : 'https://dl.dropboxusercontent.com/scl/fi/un7ly5y2b3a5i421ae2mt/05-The-First-Noel-vcl_full_tmp98.mp3?rlkey=so8mnbd9fdtq3nlf1m6d3t1pt' 
+            'vcl_soprano'   : '/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (vcl_soprano_tmp98).mp3',
+            'vcl_alto'      : '/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (vcl_alto_tmp98).mp3',
+            'vcl_tenor'     : '/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_tenor_tmp98).mp3',
+            'vcl_all_tenor' : '/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_all_tenor_tmp98).mp3',
+            'vcl_bass'      : '/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass_tmp98).mp3',
+            'vcl_full'      : '/tmp/mcc/mp3/christmas/The First Noel/05 The First Noel (vcl_full_tmp98).mp3'
           }
         }
         let this_tempo=tempo[seibu];
@@ -185,8 +185,8 @@
   <ul style="list-style: none;">
     <li>
       <div class="part">ソプラノ</div>
-      <audio id="soprano" src='https://dl.dropboxusercontent.com/scl/fi/l105h317hiskiao045go4/01-The-First-Noel-soprano.mp3?rlkey=aw2r4bpgipbsbw06ihdfgjhu3' controls loop preload="metadata" onclick="stop_other(this)"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/l105h317hiskiao045go4/01-The-First-Noel-soprano.mp3?rlkey=aw2r4bpgipbsbw06ihdfgjhu3' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="soprano" src='/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (soprano).mp3' controls loop preload="none" onclick="stop_other(this)"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('soprano','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('soprano','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -199,8 +199,8 @@
         &nbsp;&nbsp;&#9833;<span>=120</span>
         &nbsp;&nbsp;<button onclick="change_tempo('vcl_soprano')">テンポ切替</button>
       </div> 
-      <audio id="vcl_soprano" src='https://dl.dropboxusercontent.com/scl/fi/av5l6tm0ewz9bxd6alkcx/01-The-First-Noel-vcl_soprano.mp3?rlkey=dblm1ito9dhqg87uctoffxlb6' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/av5l6tm0ewz9bxd6alkcx/01-The-First-Noel-vcl_soprano.mp3?rlkey=dblm1ito9dhqg87uctoffxlb6' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="vcl_soprano" src='/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (vcl_soprano).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (vcl_soprano).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('vcl_soprano','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('vcl_soprano','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -210,8 +210,8 @@
     </li>
     <li>
       <div class="part">アルト</div>
-      <audio id="alto" src='https://dl.dropboxusercontent.com/scl/fi/xakejn2s4kt8s3s0gdz1l/02-The-First-Noel-alto.mp3?rlkey=8yr6gq6qg278bsp8na2nn22nx' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/xakejn2s4kt8s3s0gdz1l/02-The-First-Noel-alto.mp3?rlkey=8yr6gq6qg278bsp8na2nn22nx' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="alto" src='/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (alto).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (alto).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('alto','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('alto','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -224,8 +224,8 @@
         &nbsp;&nbsp;&#9833;<span>=120</span>
         &nbsp;&nbsp;<button onclick="change_tempo('vcl_alto')">テンポ切替</button>
       </div>
-      <audio id="vcl_alto" src='https://dl.dropboxusercontent.com/scl/fi/z501g41h3nb1po2c2qeed/02-The-First-Noel-vcl_alto.mp3?rlkey=mtf9xz26py8n4rkw88ggchssu' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/z501g41h3nb1po2c2qeed/02-The-First-Noel-vcl_alto.mp3?rlkey=mtf9xz26py8n4rkw88ggchssu' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="vcl_alto" src='/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (vcl_alto).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (vcl_alto).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('vcl_alto','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('vcl_alto','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -235,8 +235,8 @@
     </li>
     <li>
       <div class="part">テノール</div>
-      <audio id="tenor" src='https://dl.dropboxusercontent.com/scl/fi/k7536oo9c9qesdiu2jqvj/03-The-First-Noel-tenor.mp3?rlkey=8cmmcydl4mnmz7jbmlj7x11v6' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/k7536oo9c9qesdiu2jqvj/03-The-First-Noel-tenor.mp3?rlkey=8cmmcydl4mnmz7jbmlj7x11v6' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="tenor" src='/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (tenor).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('tenor','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('tenor','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -249,8 +249,8 @@
         &nbsp;&nbsp;&#9833;<span>=120</span>
         &nbsp;&nbsp;<button onclick="change_tempo('vcl_all_tenor')">テンポ切替</button><span style="font-size:70%;font-weight:normal;">  ※8ページ上段を主旋律からテノールの旋律に変更しました。</span>
       </div>
-      <audio id="vcl_all_tenor" src='https://dl.dropboxusercontent.com/scl/fi/zbd9zcqk6gf3w6hnhkapl/03-The-First-Noel-vcl_all_tenor.mp3?rlkey=k4gaqsrkb333ax2ynae331z9j' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/zbd9zcqk6gf3w6hnhkapl/03-The-First-Noel-vcl_all_tenor.mp3?rlkey=k4gaqsrkb333ax2ynae331z9j' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="vcl_all_tenor" src='/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_all_tenor).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_all_tenor).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('vcl_all_tenor','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('vcl_all_tenor','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -260,8 +260,8 @@
     </li>
     <li>
       <div class="part">バス</div>
-      <audio id="bass" src='https://dl.dropboxusercontent.com/scl/fi/mng8on6w841jo783adxig/04-The-First-Noel-bass.mp3?rlkey=b3q15u9nvx9m1wul21rhczvjn' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/mng8on6w841jo783adxig/04-The-First-Noel-bass.mp3?rlkey=b3q15u9nvx9m1wul21rhczvjn' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="bass" src='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (bass).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (bass).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('bass','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('bass','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -274,8 +274,8 @@
         &nbsp;&nbsp;&#9833;<span>=120</span>
         &nbsp;&nbsp;<button onclick="change_tempo('vcl_bass')">テンポ切替</button>
       </div>
-      <audio id="vcl_bass" src='https://dl.dropboxusercontent.com/scl/fi/4jqv1hx2s54wp738fgnrm/04-The-First-Noel-vcl_bass.mp3?rlkey=tmd0cdc83u4c9qr71e20ayteo' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/4jqv1hx2s54wp738fgnrm/04-The-First-Noel-vcl_bass.mp3?rlkey=tmd0cdc83u4c9qr71e20ayteo' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="vcl_bass" src='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('vcl_bass','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('vcl_bass','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -285,8 +285,8 @@
     </li>
     <li>
       <div class="part">コーラス</div>
-      <audio id="full" src='https://dl.dropboxusercontent.com/scl/fi/r3dr6nrwy3liaq0shif1s/The-First-Noel.mp3?rlkey=06hgsg13e2yty2ns9q8b7cjmd' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/r3dr6nrwy3liaq0shif1s/The-First-Noel.mp3?rlkey=06hgsg13e2yty2ns9q8b7cjmd' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="full" src='/tmp/mcc/mp3/christmas/The First Noel/The First Noel.mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/The First Noel.mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('full','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('full','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -299,8 +299,8 @@
         &nbsp;&nbsp;&#9833;<span>=120</span>
         &nbsp;&nbsp;<button onclick="change_tempo('vcl_full')">テンポ切替</button>
       </div>
-      <audio id="vcl_full" src='https://dl.dropboxusercontent.com/scl/fi/pvrezs0qbsalbcolbfgo0/05-The-First-Noel-vcl_full.mp3?rlkey=q9bp7kghugir8qr52o25dv3j4' controls loop preload="metadata"></audio>
-      &nbsp;&nbsp;<a href='https://dl.dropboxusercontent.com/scl/fi/pvrezs0qbsalbcolbfgo0/05-The-First-Noel-vcl_full.mp3?rlkey=q9bp7kghugir8qr52o25dv3j4' download><img src='/mcc/img/download-m.png'></a>
+      <audio id="vcl_full" src='/tmp/mcc/mp3/christmas/The First Noel/05 The First Noel (vcl_full).mp3' controls loop preload="none"></audio>
+      &nbsp;&nbsp;<a href='/tmp/mcc/mp3/christmas/The First Noel/05 The First Noel (vcl_full).mp3' download><img src='/mcc/img/download-m.png'></a>
       <br>
       <button onclick="play_repeat('vcl_full','A',this)">A(･･･あめよりひびきぬ)</button>
       <button onclick="play_repeat('vcl_full','B',this)">B(よろこび･･･生まれぬ)</button>
@@ -326,10 +326,10 @@
   <br>
   <a href='../../../index.html'>⇒ MCCワーシップクワイアーの持ち歌のページに戻る.</a></div>
 </div>
-<!--audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (vcl_soprano_tmp98).mp3' controls preload="metadata"></-audio>
-<audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (vcl_alto_tmp98).mp3' controls preload="metadata"></audio>
-<audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_tenor_tmp98).mp3' controls preload="metadata"></audio>
-<audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass_tmp98).mp3' controls preload="metadata"></audio>
-<audio!-- style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/05 The First Noel (vcl_full_tmp98).mp3' controls preload="metadata"></audio!-->
+<!--audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/01 The First Noel (vcl_soprano_tmp98).mp3' controls preload="none"></-audio>
+<audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/02 The First Noel (vcl_alto_tmp98).mp3' controls preload="none"></audio>
+<audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/03 The First Noel (vcl_tenor_tmp98).mp3' controls preload="none"></audio>
+<audio style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/04 The First Noel (vcl_bass_tmp98).mp3' controls preload="none"></audio>
+<audio!-- style="visibility:hidden;" src='/tmp/mcc/mp3/christmas/The First Noel/05 The First Noel (vcl_full_tmp98).mp3' controls preload="none"></audio!-->
 	</body>
 </html>
