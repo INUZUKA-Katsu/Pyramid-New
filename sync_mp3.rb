@@ -22,7 +22,7 @@ def get_files_path_list(folder,files,kakuchoshi)
     if f[-5,5].match(/\./)
       if not kakuchoshi or kakuchoshi.include? File.extname(f)
         files << f
-        p f
+        puts f.force_encoding("utf-8")
       end
     else
       adds << f
