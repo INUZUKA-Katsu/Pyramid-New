@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<html manifest="/cache.manifest">
+  <head>
+    <title id="title">横浜市の人口ピラミッド（市、区別、町丁別）</title>
+    <meta charset="utf-8">
+    <meta name="description" content="横浜市がWebサイトで公表している人口統計を利用して作成できる全ての人口ピラミッドを自由自在に表示できる。あらゆる年、区、複数の町丁目を含む小地域の人口ピラミッド。将来推計人口による将来予測も。横浜市の公表するオープンデータをリアルタイムで取得するので、公表されたばかりの人口統計をタイムラグなしにすぐに人口ピラミッドで見ることができる。">
+    <meta name="key words" content="オープンデータ,人口ピラミッド,将来推計人口,横浜市,町・丁目,小地域">
+    <meta name="author" content="INUZUKA Katsu">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./js/jquery-ui-1.12.1/jquery-ui.min.css" type="text/css">
+    <link rel="stylesheet" href="./js/tooltip/darktooltip.css" type="text/css">
+    <script type="text/javascript" src="./js/pyramid.js"></script>
+    <script type="text/javascript" src="./js/jquery-3.1.1.js"></script>
+    <script type="text/javascript" src="./js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="./js/tooltip/jquery.darktooltip.js"></script>
+    <script type="text/javascript" src="/js/html2canvas.js"></script>
+    <script type="text/javascript">
+       //  http://rubentd.com/darktooltip/
+       var w;
+       $(function() {
+          w = $(window).width();
+          tooltip_set();
+       });
+       $(window).resize(function(){
+          w = $(window).width();
+          tooltip_reset();
+          tooltip_set();
+       });
+       function tooltip_set(){
+           $('.header').darkTooltip({
+               animation:'none',
+               size:'small',
+               gravity:'north',
+               theme:'light',
+               trigger:'click'
+           });
+           $('.info-icon-left').darkTooltip({
+               animation:'none',
+               size:'small',
+               gravity:device('bottom','bottom'),
+               theme:'light',
+               trigger:'click'
+           });
+           $('.info-icon-right').darkTooltip({
+               animation:'none',
+               size:'small',
+               gravity:device('bottom','left'),
+               theme:'light',
+               trigger:'click'
+           });
+           $('.info-icon-bottom').darkTooltip({
+               animation:'none',
+               size:'small',
+               gravity:device('top','left'),
+               theme:'light',
+               trigger:'click'
+           });
+           $('.info-icon-3kubun').darkTooltip({
+               animation:'none',
+               size:'small',
+               gravity:device('top','left'),
+               theme:'light',
+               trigger:'click'
+           });
+       }
+       function tooltip_reset(){
+           $('ins').remove();
+       }
+       function device(pc,mobile){
+          if(w>1800){
+            return direction(pc);
+          }else{
+            return direction(mobile);
+          }
+       }
+       function direction(nsew){
+          if (nsew=='top'){
+            return 'south';
+          }else if(nsew=='bottom'){
+            return 'north';
+          }else if(nsew=='left'){
+            return 'east';
+          }else{
+            return 'west';
+          }
+       }
+    </script>
+    <!--link type="text/css" href="./css/pyramid.css" rel="stylesheet"-->
+    <style type="text/css">
+      @media print{
+          div.left  {border: 1px solid blue; background-color: blue}
+          div.right {border: 1px solid red;  background-color: red}
+          #form0,div#link,h1,div#option{ display: none !important}
+          h2        { font-size:250%;
+                      margin-top:5px;margin-bottom:2.5em;
+                      text-align:center;}
+          div#male_label,div#female_label
+                    { color:black; border:1px solid black;}
+      }
+      @media screen,print{
+           body {font-family: "Hiragino Kaku Gothic ProN", "Meiryo", "Helvetica Neue", "Helvetica", "Hiragino Sans",  "Arial", "Yu Gothic", sans-serif;}
+
+          a.header {
+              margin: 0 0 0 0.5em;
+              text-decoration: none;
+              color:#3399FF;
+          }
+          img               { vertical-align: -17% ;
+                              width:1em;height:1.2em;
+                              margin-right:0.5em;
+                            }
+          img.small-icon    { vertical-align: -17% ;
+                              width:1em;height:1.1em;
+                            }
+          caption           { text-align:right; }
+          select,input      { font-size:11pt; }
+          button            { font-size:11pt; }
+          h1                { font-size:200%;font-weight:normal;margin-top:5px;text-align:center;}
+          h2                { font-size:150%;font-weight:normal;margin-top:5px;text-align:center;}
+          h2 span.small     { font-size:85%;font-weight:400 }
+          div#header        { text-align:right;
+                              font-size:80%;
+                              color:#0099FF;
+                              width:100%;
+                              margin-right: 1em;
+                            }
+          div#main          { text-align: center;
+                              width:1108px;
+                              margin-left:auto;margin-right:auto;
+                            }
+          div#pyramid       { width:1108px;
+                              display:inline-block;
+                              vertical-align:top;
+                              position:relative;
+                            }
+          div#link          { /*position:absolute;
+                              right:0;
+                              top:2.3em;*/
+                              margin-left: auto;
+                              width:22em;
+                              margin-bottom: 0.5em;
+                            }
+          div#comment       { position:absolute;
+                              left:0;
+                              top:-20px;
+                              color:red;
+                              border:1px solid red;
+                              padding:5px; }
+          div#hitoku        { position:absolute;
+                              left:10px;
+                              top:10px;
+                              color:#0099FF;
+                              font-size:80%;
+                              width: 30%;
+                              text-align:left;
+                              display:block;
+                            }
+          div#male_label    { position:absolute;
+                              left:100px;
+                              top:70px;
+                              color:blue;
+                              border:1px solid blue;
+                              padding:5px;
+                            }
+          div#female_label  { position:absolute;
+                              right:100px;
+                              top:70px;
+                              color:red;
+                              padding:5px;
+                              border:1px solid red;
+                            }
+          div#age75         { position:absolute;left:20px;font-size:10pt; }
+          div#age65         { position:absolute;left:20px;font-size:10pt; }
+          div#age15         { position:absolute;left:20px;font-size:10pt; }
+          /*div#age75 span{ vertical-align:20px; }
+          div#age65 span{ vertical-align:20px; }
+          div#age15 span{ vertical-align:20px; }*/
+          table             { min-width:1108px;
+                              table-layout: fixed;
+                              display:inline-block;
+                              background-color:#f5f5f5;
+                              border-collapse:collapse;
+                              border:none;
+                              padding:0;
+                              margin-top:0;
+                              padding:0;
+                              line-height: 1;
+                            }
+          td                { padding:0;margin:0;border:none;
+                              padding-bottom:0px;
+                              white-space:nowrap;
+                              /*background-color:#f5f5f5; whitesmoke*/
+                              /*height:5px;*/
+                              /*line-height: 1;*/
+                              font-size:4px;
+                            }
+          tr.line td        { border-bottom: 1px solid #b0c4de; /*lightsteelblue*/}
+          td.center         { width: 5em; }
+          td.male           { text-align: right; width: 50%; }
+          td.female         { text-align: left;  width: 50%; }
+          div               { /*line-height: 1;*/
+                              vertical-align: bottom;
+                            }
+          div.nin,
+          td.center div     { font-size:6px;
+                              -webkit-transform:scale(0.5);
+                              -moz-transform:scale(0.5);
+                              -ms-transform:scale(0.5);
+                              -o-transform:scale(0.5);
+                              transform:scale(0.5);
+                              display:inline-block;
+                              margin:0;padding: 0;
+                              vertical-align: bottom;                              
+                            }
+          td.center div     { text-align:center;
+                            }
+          div.bar           { height:5px;
+                              display:inline-block;
+                              margin:0;padding:0;}
+          div.left          { background-color:#3333FF!important;
+                              margin:0;margin-left:4px;
+                              border-bottom: 1px solid #1e90ff;}
+          div.right         { background-color:#FF3366!important;
+                              margin:0;margin-right:4px;
+                              border-bottom: 1px solid #ff69b4;}
+          span#source       { font-size:11pt; }
+          div#button        { text-align: right; }
+          div#cho           { display: block;
+                              width:  1100px;
+                              vertical-align: top;
+                              margin-top    : 1.5em;
+                              padding       : 0.2em 0.5em 0.2em 0.5em ;
+                              background-color:#FFFFF0;
+                            }
+          div#cho_list      { display: block;
+                              margin:0.5em 0 0.5em 0;
+                              vertical-align: top;
+                              text-align:center;
+                              font-size:11pt;
+                            }
+          div.cho           { display       : inline-block;
+                              margin-left   : 0;
+                              margin-top    : 0.5em;
+                              vertical-align: top;
+                              text-align    : left;
+                            }
+          div.footer        { text-align: center; width:1100px;
+                              margin-left:auto;margin-right:auto;
+                              font-size:11pt;
+                            }
+          div#option        { position: absolute;
+                              top:5px;
+                              left:5px;
+                              font-size:11pt;
+                              max-width:20em;
+                            }
+          div#storage_alert { padding:5px 5px 5px 5px;
+                              color:red;
+                              display:none;
+                            }
+          fieldset          { margin:0;padding:0 5px 5px 5px;
+                            }
+          li                { list-style-type:none;
+                              padding-left:0;
+                              text-indent: -0.2em;
+                            }
+          span.inline-block {display:inline-block;}
+          div#basic_data    { position: absolute;
+                              bottom:10px;
+                              right:10px;
+                              font-size:11pt;
+                              text-align:center;
+                            }
+          #jinko_sosu           { display:table;
+                                 margin-left:auto;
+                                 margin-right:2em;
+                                 margin-bottom:1em;
+                               }
+          #jinko_sosu span.tr  { display:table-row; }
+          #jinko_sosu span.td  { display:table-cell;
+                                 line-height:12pt;
+                                 padding:2px 2px 2px 2px;
+                               }
+          div#select                { text-align: right;}
+          #nenrei_3kubun            { display:table;}
+          #nenrei_3kubun span.tr    { display:table-row; }
+          #nenrei_3kubun span.td    { display:table-cell;
+                                      line-height:12pt;
+                                      padding:0px 5px 0px 5px;
+                                      text-align: right;
+                                     }
+          #nenrei_3kubun input      { width:2.5em;height:1em;
+                                      text-align:left;
+                                      border-width:0;
+                                      padding:0;
+                                    }
+          #nenrei_3kubun span.right { text-align:right;}
+          #sosu,#male,#female  { text-align: right; }
+          #red                 { font-weight:normal;font-size:90%;color:red; }
+          #screen_shot_button  { margin-top:0.5em; }
+          #screen_shot_section { text-align:center }
+          img.img_screenshot   { vertical-align:middle;
+                                 width : 400px;
+                                 height: auto;
+                                 border: 2px #336699 solid;
+                               }
+          input.chk_screenshot { margin-left:0;
+                                 margin-right:1em; }
+
+          /*jQueryのダイアログボックスのデザイン*/
+          .ui-dialog{line-height:1.5em;}
+          .ui-dialog-titlebar{margin-bottom:0.5em;}
+          .ui-widget{font-size:1.2em;}
+          .ui-dialog-buttonset{line-height:1em;}
+          .ui-dialog .ui-dialog-buttonpane{padding:0;}
+          span#dialog{display:block;padding:0.5em;text-indent: 1em;}
+          .ui-widget-header{background: #2b80d5;color:white;}
+          .ui-widget.ui-widget-content{border-color:#2b80d5 ;}
+      }
+      @media screen and ( max-width:479px ){
+          div#cho_list      { text-align:left; }
+      }
+    </style>
+  </head>
+  <body onload="on_page_load()">
+    <div id="main">
+      <div id="header" data-html2canvas-ignore="true">
+        <a href="#" class="header" data-tooltip="●横浜市全体の将来推計人口を2024年1月に公表された新たな将来推計人口に差し替えました。区別の将来推計人口は3月に公表される予定です。<br>●スクリーンショットの解像度を上げて文字が読めるようにしました。<br>●人口ピラミッドのスクリーンショットを撮り画像ファイルとして保存することができるようになりました。<br>●年齢3区分区別の人口と構成比を見ることができるようになりました。年齢区分はデフォルトでは通常の年少人口、生産年齢人口、高齢人口の区分で表示しますが、区切りの年齢を自由に変更して見ることができます。例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を確認することができます。<br>●将来推計人口を人口ピラミッドで見ることができるようになりました。また、市区の動画では横軸を固定し、人口の増減を合わせて見ることができるようになりました。">
+        ><span style="color:red;font-size:100%;">New!</span>
+        </a>
+        <a href="#" class="header" data-tooltip="横浜市がWebサイトで公表している人口統計を利用して作成可能な全ての人口ピラミッドを自由自在に表示できるサイトです。統計がある全ての年、区、町丁目、複数の町丁目を含む小地域の人口ピラミッドを表示させることができます。2017年12月に公表された2065年までの将来推計人口による将来予測も人口ピラミッドで表示。横浜市がHPで公表しているオープンデータをリアルタイムで取得するので、新しい統計が公表されたときタイムラグなしにすぐに人口ピラミッドで見ることができます。">
+        >このサイトについて
+        </a>
+        <a href="#" class="header" data-tooltip="このサイトでは、グラフの形から人口の年齢別構成を把握しやすくするため、人口の多い少ないにかかわらずグラフの面積が一定となるように描画することを基本としています。このため、人口の多寡をグラフの大きさから読み取ることはできません。ただし、例外として、市と区の人口ピラミッドの変化を動画で見るときに限っては、横軸の目盛を固定して描画しており、人口の増減を合わせてみることができるようにしています。">
+        >人口ピラミッドと人口の増減について
+        </a>
+        <a href="#" class="header" data-tooltip="PC、Mac、Androidスマホ、iPhone、iPadで動作を確認しています。ブラウザは、Google Chrome、Firefox、Safari、Microsoft Edgeで動作確認しています。インターネットエクスプローラーには対応していません。Windows PCの方は、Edge、Chrome、Firefoxなどでご覧ください">
+        >端末、ブラウザの対応状況について
+        </a>
+        <a href="#" class="header" data-tooltip="このサイトは午後10時から午前8時までの間はスリープ状態になります。その時間帯にこのサイトにアクセスすると、スリープから復帰するまでに10数秒お待ちいただくことになります。一度動き出せば普通に応答します。30分間アクセスがないと再びスリープ状態に移行します。運用経費を節約するためです。ご不便をおかけしますが、ご了承ください。">>利用可能時間について</a>
+
+
+
+      </div>
+      <h1 id="h1" data-html2canvas-ignore="true">横浜市の人口ピラミッド</h1>
+      <h2 id="h2">横浜市(平成28年1月1日現在)</h2>
+      <div id="link" data-html2canvas-ignore="true">
+        <a href="#cho">地域別人口ピラミッドのための町丁名の指定</a>
+        <a href='#' class="info-icon-right" data-tooltip="区のピラミッドを表示するとグラフの下部にその区内の町丁名のチェックボックスが表示されます。町丁名を指定して[町丁別人口ピラミッド]ボタンをクリックすると指定した地域のグラフを表示します。町丁名は複数の指定が可能で、複数の町丁からなる任意の地域の人口ピラミッドを表示することができます。"><img src="./image/info-icon.png" /></a>
+      </div>
+      <div id="pyramid">
+        <div id="comment" data-html2canvas-ignore="true">データを取得中です.</div>
+        <div id="hitoku" data-html2canvas-ignore="true">数字が著しく小さいために秘匿処理(統計表では"X"表記)されたデータがありました。ここでは便宜上"X"を0(ゼロ)として取り扱っています。</div>
+        <table id="table">
+          <caption id ='caption' data-html2canvas-ignore="true">
+            <form name="Form" id="form0">
+                <select onChange="change_shiku()" name="shiku" id="shiku">
+                  <option selected="selected" value="age">横浜市</option>
+                  <option value="tsurumi">鶴見区</option>
+                  <option value="kanagawa">神奈川区</option>
+                  <option value="nishi">西区</option>
+                  <option value="naka">中区</option>
+                  <option value="minami">南区</option>
+                  <option value="konan">港南区</option>
+                  <option value="hodogaya">保土ケ谷区</option>
+                  <option value="asahi">旭区</option>
+                  <option value="isogo">磯子区</option>
+                  <option value="kanazawa">金沢区</option>
+                  <option value="kohoku">港北区</option>
+                  <option value="midori">緑区</option>
+                  <option value="aoba">青葉区</option>
+                  <option value="tsuzuki">都筑区</option>
+                  <option value="totsuka">戸塚区</option>
+                  <option value="sakae">栄区</option>
+                  <option value="izumi">泉区</option>
+                  <option value="seya">瀬谷区</option>
+                </select>
+
+                <select onChange="change_shiku_year()" name="shiku_year" id="shiku_year">
+                  <option value="2065ft">2065年(将来推計)</option>
+                  <option value="2064ft">2064年(将来推計)</option>
+                  <option value="2063ft">2063年(将来推計)</option>
+                  <option value="2062ft">2062年(将来推計)</option>
+                  <option value="2061ft">2061年(将来推計)</option>
+                  <option value="2060ft">2060年(将来推計)</option>
+                  <option value="2059ft">2059年(将来推計)</option>
+                  <option value="2058ft">2058年(将来推計)</option>
+                  <option value="2057ft">2057年(将来推計)</option>
+                  <option value="2056ft">2056年(将来推計)</option>
+                  <option value="2055ft">2055年(将来推計)</option>
+                  <option value="2054ft">2054年(将来推計)</option>
+                  <option value="2053ft">2053年(将来推計)</option>
+                  <option value="2052ft">2052年(将来推計)</option>
+                  <option value="2051ft">2051年(将来推計)</option>
+                  <option value="2050ft">2050年(将来推計)</option>
+                  <option value="2049ft">2049年(将来推計)</option>
+                  <option value="2048ft">2048年(将来推計)</option>
+                  <option value="2047ft">2047年(将来推計)</option>
+                  <option value="2046ft">2046年(将来推計)</option>
+                  <option value="2045ft">2045年(将来推計)</option>
+                  <option value="2044ft">2044年(将来推計)</option>
+                  <option value="2043ft">2043年(将来推計)</option>
+                  <option value="2042ft">2042年(将来推計)</option>
+                  <option value="2041ft">2041年(将来推計)</option>
+                  <option value="2040ft">2040年(将来推計)</option>
+                  <option value="2039ft">2039年(将来推計)</option>
+                  <option value="2038ft">2038年(将来推計)</option>
+                  <option value="2037ft">2037年(将来推計)</option>
+                  <option value="2036ft">2036年(将来推計)</option>
+                  <option value="2035ft">2035年(将来推計)</option>
+                  <option value="2034ft">2034年(将来推計)</option>
+                  <option value="2033ft">2033年(将来推計)</option>
+                  <option value="2032ft">2032年(将来推計)</option>
+                  <option value="2031ft">2031年(将来推計)</option>
+                  <option value="2030ft">2030年(将来推計)</option>
+                  <option value="2029ft">2029年(将来推計)</option>
+                  <option value="2028ft">2028年(将来推計)</option>
+                  <option value="2027ft">2027年(将来推計)</option>
+                  <option value="2026ft">2026年(将来推計)</option>
+                  <option value="2025ft">2025年(将来推計)</option>
+                  <option value="2024ft">2024年(将来推計)</option>
+                  <option value="2023ft">2023年(将来推計)</option>
+                  <option value="new" selected>　　 最新</option>
+                  <option value="202101">令和3年1月1日現在</option>
+                  <option value="202001">令和2年1月1日現在</option>
+                  <option value="201901">平成31年1月1日現在</option>
+                  <option value="201801">平成30年1月1日現在</option>
+                  <option value="201701">平成29年1月1日現在</option>
+                  <option value="201601">平成28年1月1日現在</option>
+                  <option value="201501">平成27年1月1日現在</option>
+                  <option value="201401">平成26年1月1日現在</option>
+                  <option value="201301">平成25年1月1日現在</option>
+                  <option value="201201">平成24年1月1日現在</option>
+                  <option value="201101">平成23年1月1日現在</option>
+                  <option value="201001">平成22年1月1日現在</option>
+                  <option value="200901">平成21年1月1日現在</option>
+                  <option value="200801">平成20年1月1日現在</option>
+                  <option value="200701">平成19年1月1日現在</option>
+                  <option value="200601">平成18年1月1日現在</option>
+                  <option value="200501">平成17年1月1日現在</option>
+                  <option value="200401">平成16年1月1日現在</option>
+                  <option value="200301">平成15年1月1日現在</option>
+                  <option value="200201">平成14年1月1日現在</option>
+                  <option value="200101">平成13年1月1日現在</option>
+                  <option value="200001">平成12年1月1日現在</option>
+                  <option value="199901">平成11年1月1日現在</option>
+                  <option value="199801">平成10年1月1日現在</option>
+                  <option value="199701">平成9年1月1日現在</option>
+                  <option value="199601">平成8年1月1日現在</option>
+                  <option value="199501">平成7年1月1日現在</option>
+                  <option value="199401">平成6年1月1日現在</option>
+                  <option value="199301">平成5年1月1日現在</option>
+                  <option value="199201">平成4年1月1日現在</option>
+                  <option value="199101">平成3年1月1日現在</option>
+                  <option value="199001">平成2年1月1日現在</option>
+                  <option value="198901">昭和64年1月1日現在</option>
+                  <option value="198801">昭和63年1月1日現在</option>
+                  <option value="198701">昭和62年1月1日現在</option>
+                  <option value="198601">昭和61年1月1日現在</option>
+                  <option value="198501">昭和60年1月1日現在</option>
+                  <option value="198401">昭和59年1月1日現在</option>
+                  <option value="198301">昭和58年1月1日現在</option>
+                  <option value="198201">昭和57年1月1日現在</option>
+                  <option value="198101">昭和56年1月1日現在</option>
+                  <option value="198001">昭和55年1月1日現在</option>
+                  <option value="197901">昭和54年1月1日現在</option>
+                  <option value="197801">昭和53年1月1日現在</option>
+                  <option value="197701">昭和52年1月1日現在</option>
+                  <option value="197601">昭和51年1月1日現在</option>
+                  <option value="197510">昭和50年10月1日現在</option>
+                  <option value="197010">昭和45年10月1日現在</option>
+                  <option value="196510">昭和40年10月1日現在</option>
+                  <option value="196010">昭和35年10月1日現在</option>
+                  <option value="195510">昭和30年10月1日現在</option>
+                  <option value="195010">昭和25年10月1日現在</option>
+                  <option value="194710">昭和22年10月1日現在</option>
+                  <option value="193510">昭和10年10月1日現在</option>
+                  <option value="193010">昭和5年10月1日現在</option>
+                  <option value="192510">大正14年10月1日現在</option>
+                  <option value="192010">大正9年10月1日現在</option>
+                </select>
+
+                <select onChange="change_cho_year()" name="cho_year" id="cho_year">
+                  <option value="202109">令和３年9月30日現在</option>
+                  <option value="202009">令和２年9月30日現在</option>
+                  <option value="201909">平成31・令和元年9月30日現在</option>
+                  <option value="201809">平成30年9月30日現在</option>
+                  <option value="201709">平成29年9月30日現在</option>
+                  <option value="201609">平成28年9月30日現在</option>
+                  <option value="201509">平成27年9月30日現在</option>
+                  <option value="201409">平成26年9月30日現在</option>
+                  <option value="201309">平成25年9月30日現在</option>
+                  <option value="201209">平成24年9月30日現在</option>
+                  <option value="201109">平成23年9月30日現在</option>
+                  <option value="201009">平成22年9月30日現在</option>
+                  <option value="200909">平成21年9月30日現在</option>
+                  <option value="200809">平成20年9月30日現在</option>
+                  <option value="200709">平成19年9月30日現在</option>
+                  <option value="200609">平成18年9月30日現在</option>
+                  <option value="200509">平成17年9月30日現在</option>
+                  <option value="200409">平成16年9月30日現在</option>
+                  <option value="200309">平成15年9月30日現在</option>
+                  <option value="200209">平成14年9月30日現在</option>
+                  <option value="200109">平成13年9月30日現在</option>
+                  <option value="200009">平成12年9月30日現在</option>
+                  <option value="199909">平成11年9月30日現在</option>
+                  <option value="199809">平成10年9月30日現在</option>
+                </select>
+
+                <button onClick="ani_mation()" name="animation" type="button" id="doga">動画</button>
+                <input id="unit_size" value="undefined" type="hidden">
+                <a href='#' class="info-icon-right" data-tooltip="動画をクリックすると一番古いものから最新のものまで、年を自動的に切り替えて移り変わりを動画のように表示します。"><img src="./image/info-icon.png" /></a>
+
+            </form>
+          </caption>
+          <tbody>
+            <tr><td class="male"></td><td style="width:8;">　</td><td class="female"></td></tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn100"></div><div class="bar left" id="mb100"></div>
+              </td>
+              <td class="center">
+                <div>100歳以上</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb100"></div><div class="nin" id="fn100"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn99"></div><div class="bar left" id="mb99"></div>
+              </td>
+              <td class="center">
+                <div>99</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb99"></div><div class="nin" id="fn99"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn98"></div><div class="bar left" id="mb98"></div>
+              </td>
+              <td class="center">
+                <div>98</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb98"></div><div class="nin" id="fn98"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn97"></div><div class="bar left" id="mb97"></div>
+              </td>
+              <td class="center">
+                <div>97</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb97"></div><div class="nin" id="fn97"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn96"></div><div class="bar left" id="mb96"></div>
+              </td>
+              <td class="center">
+                <div>96</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb96"></div><div class="nin" id="fn96"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn95"></div><div class="bar left" id="mb95"></div>
+              </td>
+              <td class="center">
+                <div>95</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb95"></div><div class="nin" id="fn95"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn94"></div><div class="bar left" id="mb94"></div>
+              </td>
+              <td class="center">
+                <div>94</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb94"></div><div class="nin" id="fn94"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn93"></div><div class="bar left" id="mb93"></div>
+              </td>
+              <td class="center">
+                <div>93</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb93"></div><div class="nin" id="fn93"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn92"></div><div class="bar left" id="mb92"></div>
+              </td>
+              <td class="center">
+                <div>92</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb92"></div><div class="nin" id="fn92"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn91"></div><div class="bar left" id="mb91"></div>
+              </td>
+              <td class="center">
+                <div>91</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb91"></div><div class="nin" id="fn91"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn90"></div><div class="bar left" id="mb90"></div>
+              </td>
+              <td class="center">
+                <div>90</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb90"></div><div class="nin" id="fn90"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn89"></div><div class="bar left" id="mb89"></div>
+              </td>
+              <td class="center">
+                <div>89</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb89"></div><div class="nin" id="fn89"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn88"></div><div class="bar left" id="mb88"></div>
+              </td>
+              <td class="center">
+                <div>88</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb88"></div><div class="nin" id="fn88"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn87"></div><div class="bar left" id="mb87"></div>
+              </td>
+              <td class="center">
+                <div>87</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb87"></div><div class="nin" id="fn87"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn86"></div><div class="bar left" id="mb86"></div>
+              </td>
+              <td class="center">
+                <div>86</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb86"></div><div class="nin" id="fn86"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn85"></div><div class="bar left" id="mb85"></div>
+              </td>
+              <td class="center">
+                <div>85</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb85"></div><div class="nin" id="fn85"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn84"></div><div class="bar left" id="mb84"></div>
+              </td>
+              <td class="center">
+                <div>84</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb84"></div><div class="nin" id="fn84"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn83"></div><div class="bar left" id="mb83"></div>
+              </td>
+              <td class="center">
+                <div>83</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb83"></div><div class="nin" id="fn83"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn82"></div><div class="bar left" id="mb82"></div>
+              </td>
+              <td class="center">
+                <div>82</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb82"></div><div class="nin" id="fn82"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn81"></div><div class="bar left" id="mb81"></div>
+              </td>
+              <td class="center">
+                <div>81</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb81"></div><div class="nin" id="fn81"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn80"></div><div class="bar left" id="mb80"></div>
+              </td>
+              <td class="center">
+                <div>80</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb80"></div><div class="nin" id="fn80"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn79"></div><div class="bar left" id="mb79"></div>
+              </td>
+              <td class="center">
+                <div>79</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb79"></div><div class="nin" id="fn79"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn78"></div><div class="bar left" id="mb78"></div>
+              </td>
+              <td class="center">
+                <div>78</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb78"></div><div class="nin" id="fn78"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn77"></div><div class="bar left" id="mb77"></div>
+              </td>
+              <td class="center">
+                <div>77</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb77"></div><div class="nin" id="fn77"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male"><div id="age75"><span>75歳</span></div>
+                <div class="nin" id="mn76"></div><div class="bar left" id="mb76"></div>
+              </td>
+              <td class="center">
+                <div>76</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb76"></div><div class="nin" id="fn76"></div>
+              </td>
+            </tr>
+            <tr class="line">
+              <td class="male">
+                <div class="nin" id="mn75"></div><div class="bar left" id="mb75"></div>
+              </td>
+              <td class="center">
+                <div>75</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb75"></div><div class="nin" id="fn75"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn74"></div><div class="bar left" id="mb74"></div>
+              </td>
+              <td class="center">
+                <div>74</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb74"></div><div class="nin" id="fn74"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn73"></div><div class="bar left" id="mb73"></div>
+              </td>
+              <td class="center">
+                <div>73</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb73"></div><div class="nin" id="fn73"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn72"></div><div class="bar left" id="mb72"></div>
+              </td>
+              <td class="center">
+                <div>72</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb72"></div><div class="nin" id="fn72"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn71"></div><div class="bar left" id="mb71"></div>
+              </td>
+              <td class="center">
+                <div>71</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb71"></div><div class="nin" id="fn71"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn70"></div><div class="bar left" id="mb70"></div>
+              </td>
+              <td class="center">
+                <div>70</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb70"></div><div class="nin" id="fn70"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn69"></div><div class="bar left" id="mb69"></div>
+              </td>
+              <td class="center">
+                <div>69</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb69"></div><div class="nin" id="fn69"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn68"></div><div class="bar left" id="mb68"></div>
+              </td>
+              <td class="center">
+                <div>68</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb68"></div><div class="nin" id="fn68"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn67"></div><div class="bar left" id="mb67"></div>
+              </td>
+              <td class="center">
+                <div>67</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb67"></div><div class="nin" id="fn67"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male"><div id="age65"><span>65歳</span></div>
+                <div class="nin" id="mn66"></div><div class="bar left" id="mb66"></div>
+              </td>
+              <td class="center">
+                <div>66</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb66"></div><div class="nin" id="fn66"></div>
+              </td>
+            </tr>
+            <tr class="line">
+              <td class="male">
+                <div class="nin" id="mn65"></div><div class="bar left" id="mb65"></div>
+              </td>
+              <td class="center">
+                <div>65</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb65"></div><div class="nin" id="fn65"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn64"></div><div class="bar left" id="mb64"></div>
+              </td>
+              <td class="center">
+                <div>64</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb64"></div><div class="nin" id="fn64"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn63"></div><div class="bar left" id="mb63"></div>
+              </td>
+              <td class="center">
+                <div>63</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb63"></div><div class="nin" id="fn63"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn62"></div><div class="bar left" id="mb62"></div>
+              </td>
+              <td class="center">
+                <div>62</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb62"></div><div class="nin" id="fn62"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn61"></div><div class="bar left" id="mb61"></div>
+              </td>
+              <td class="center">
+                <div>61</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb61"></div><div class="nin" id="fn61"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn60"></div><div class="bar left" id="mb60"></div>
+              </td>
+              <td class="center">
+                <div>60</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb60"></div><div class="nin" id="fn60"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn59"></div><div class="bar left" id="mb59"></div>
+              </td>
+              <td class="center">
+                <div>59</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb59"></div><div class="nin" id="fn59"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn58"></div><div class="bar left" id="mb58"></div>
+              </td>
+              <td class="center">
+                <div>58</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb58"></div><div class="nin" id="fn58"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn57"></div><div class="bar left" id="mb57"></div>
+              </td>
+              <td class="center">
+                <div>57</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb57"></div><div class="nin" id="fn57"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn56"></div><div class="bar left" id="mb56"></div>
+              </td>
+              <td class="center">
+                <div>56</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb56"></div><div class="nin" id="fn56"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn55"></div><div class="bar left" id="mb55"></div>
+              </td>
+              <td class="center">
+                <div>55</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb55"></div><div class="nin" id="fn55"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn54"></div><div class="bar left" id="mb54"></div>
+              </td>
+              <td class="center">
+                <div>54</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb54"></div><div class="nin" id="fn54"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn53"></div><div class="bar left" id="mb53"></div>
+              </td>
+              <td class="center">
+                <div>53</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb53"></div><div class="nin" id="fn53"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn52"></div><div class="bar left" id="mb52"></div>
+              </td>
+              <td class="center">
+                <div>52</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb52"></div><div class="nin" id="fn52"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn51"></div><div class="bar left" id="mb51"></div>
+              </td>
+              <td class="center">
+                <div>51</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb51"></div><div class="nin" id="fn51"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn50"></div><div class="bar left" id="mb50"></div>
+              </td>
+              <td class="center">
+                <div>50</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb50"></div><div class="nin" id="fn50"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn49"></div><div class="bar left" id="mb49"></div>
+              </td>
+              <td class="center">
+                <div>49</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb49"></div><div class="nin" id="fn49"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn48"></div><div class="bar left" id="mb48"></div>
+              </td>
+              <td class="center">
+                <div>48</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb48"></div><div class="nin" id="fn48"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn47"></div><div class="bar left" id="mb47"></div>
+              </td>
+              <td class="center">
+                <div>47</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb47"></div><div class="nin" id="fn47"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn46"></div><div class="bar left" id="mb46"></div>
+              </td>
+              <td class="center">
+                <div>46</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb46"></div><div class="nin" id="fn46"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn45"></div><div class="bar left" id="mb45"></div>
+              </td>
+              <td class="center">
+                <div>45</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb45"></div><div class="nin" id="fn45"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn44"></div><div class="bar left" id="mb44"></div>
+              </td>
+              <td class="center">
+                <div>44</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb44"></div><div class="nin" id="fn44"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn43"></div><div class="bar left" id="mb43"></div>
+              </td>
+              <td class="center">
+                <div>43</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb43"></div><div class="nin" id="fn43"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn42"></div><div class="bar left" id="mb42"></div>
+              </td>
+              <td class="center">
+                <div>42</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb42"></div><div class="nin" id="fn42"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn41"></div><div class="bar left" id="mb41"></div>
+              </td>
+              <td class="center">
+                <div>41</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb41"></div><div class="nin" id="fn41"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn40"></div><div class="bar left" id="mb40"></div>
+              </td>
+              <td class="center">
+                <div>40</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb40"></div><div class="nin" id="fn40"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn39"></div><div class="bar left" id="mb39"></div>
+              </td>
+              <td class="center">
+                <div>39</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb39"></div><div class="nin" id="fn39"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn38"></div><div class="bar left" id="mb38"></div>
+              </td>
+              <td class="center">
+                <div>38</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb38"></div><div class="nin" id="fn38"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn37"></div><div class="bar left" id="mb37"></div>
+              </td>
+              <td class="center">
+                <div>37</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb37"></div><div class="nin" id="fn37"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn36"></div><div class="bar left" id="mb36"></div>
+              </td>
+              <td class="center">
+                <div>36</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb36"></div><div class="nin" id="fn36"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn35"></div><div class="bar left" id="mb35"></div>
+              </td>
+              <td class="center">
+                <div>35</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb35"></div><div class="nin" id="fn35"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn34"></div><div class="bar left" id="mb34"></div>
+              </td>
+              <td class="center">
+                <div>34</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb34"></div><div class="nin" id="fn34"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn33"></div><div class="bar left" id="mb33"></div>
+              </td>
+              <td class="center">
+                <div>33</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb33"></div><div class="nin" id="fn33"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn32"></div><div class="bar left" id="mb32"></div>
+              </td>
+              <td class="center">
+                <div>32</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb32"></div><div class="nin" id="fn32"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn31"></div><div class="bar left" id="mb31"></div>
+              </td>
+              <td class="center">
+                <div>31</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb31"></div><div class="nin" id="fn31"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn30"></div><div class="bar left" id="mb30"></div>
+              </td>
+              <td class="center">
+                <div>30</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb30"></div><div class="nin" id="fn30"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn29"></div><div class="bar left" id="mb29"></div>
+              </td>
+              <td class="center">
+                <div>29</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb29"></div><div class="nin" id="fn29"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn28"></div><div class="bar left" id="mb28"></div>
+              </td>
+              <td class="center">
+                <div>28</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb28"></div><div class="nin" id="fn28"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn27"></div><div class="bar left" id="mb27"></div>
+              </td>
+              <td class="center">
+                <div>27</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb27"></div><div class="nin" id="fn27"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn26"></div><div class="bar left" id="mb26"></div>
+              </td>
+              <td class="center">
+                <div>26</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb26"></div><div class="nin" id="fn26"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn25"></div><div class="bar left" id="mb25"></div>
+              </td>
+              <td class="center">
+                <div>25</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb25"></div><div class="nin" id="fn25"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn24"></div><div class="bar left" id="mb24"></div>
+              </td>
+              <td class="center">
+                <div>24</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb24"></div><div class="nin" id="fn24"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn23"></div><div class="bar left" id="mb23"></div>
+              </td>
+              <td class="center">
+                <div>23</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb23"></div><div class="nin" id="fn23"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn22"></div><div class="bar left" id="mb22"></div>
+              </td>
+              <td class="center">
+                <div>22</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb22"></div><div class="nin" id="fn22"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn21"></div><div class="bar left" id="mb21"></div>
+              </td>
+              <td class="center">
+                <div>21</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb21"></div><div class="nin" id="fn21"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn20"></div><div class="bar left" id="mb20"></div>
+              </td>
+              <td class="center">
+                <div>20</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb20"></div><div class="nin" id="fn20"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn19"></div><div class="bar left" id="mb19"></div>
+              </td>
+              <td class="center">
+                <div>19</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb19"></div><div class="nin" id="fn19"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn18"></div><div class="bar left" id="mb18"></div>
+              </td>
+              <td class="center">
+                <div>18</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb18"></div><div class="nin" id="fn18"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn17"></div><div class="bar left" id="mb17"></div>
+              </td>
+              <td class="center">
+                <div>17</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb17"></div><div class="nin" id="fn17"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male"><div id="age15"><span>15歳</span></div>
+                <div class="nin" id="mn16"></div><div class="bar left" id="mb16"></div>
+              </td>
+              <td class="center">
+                <div>16</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb16"></div><div class="nin" id="fn16"></div>
+              </td>
+            </tr>
+            <tr class="line">
+              <td class="male">
+                <div class="nin" id="mn15"></div><div class="bar left" id="mb15"></div>
+              </td>
+              <td class="center">
+                <div>15</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb15"></div><div class="nin" id="fn15"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn14"></div><div class="bar left" id="mb14"></div>
+              </td>
+              <td class="center">
+                <div>14</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb14"></div><div class="nin" id="fn14"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn13"></div><div class="bar left" id="mb13"></div>
+              </td>
+              <td class="center">
+                <div>13</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb13"></div><div class="nin" id="fn13"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn12"></div><div class="bar left" id="mb12"></div>
+              </td>
+              <td class="center">
+                <div>12</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb12"></div><div class="nin" id="fn12"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn11"></div><div class="bar left" id="mb11"></div>
+              </td>
+              <td class="center">
+                <div>11</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb11"></div><div class="nin" id="fn11"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn10"></div><div class="bar left" id="mb10"></div>
+              </td>
+              <td class="center">
+                <div>10</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb10"></div><div class="nin" id="fn10"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn9"></div><div class="bar left" id="mb9"></div>
+              </td>
+              <td class="center">
+                <div>9</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb9"></div><div class="nin" id="fn9"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn8"></div><div class="bar left" id="mb8"></div>
+              </td>
+              <td class="center">
+                <div>8</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb8"></div><div class="nin" id="fn8"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn7"></div><div class="bar left" id="mb7"></div>
+              </td>
+              <td class="center">
+                <div>7</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb7"></div><div class="nin" id="fn7"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn6"></div><div class="bar left" id="mb6"></div>
+              </td>
+              <td class="center">
+                <div>6</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb6"></div><div class="nin" id="fn6"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn5"></div><div class="bar left" id="mb5"></div>
+              </td>
+              <td class="center">
+                <div>5</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb5"></div><div class="nin" id="fn5"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn4"></div><div class="bar left" id="mb4"></div>
+              </td>
+              <td class="center">
+                <div>4</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb4"></div><div class="nin" id="fn4"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn3"></div><div class="bar left" id="mb3"></div>
+              </td>
+              <td class="center">
+                <div>3</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb3"></div><div class="nin" id="fn3"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn2"></div><div class="bar left" id="mb2"></div>
+              </td>
+              <td class="center">
+                <div>2</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb2"></div><div class="nin" id="fn2"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="male">
+                <div class="nin" id="mn1"></div><div class="bar left" id="mb1"></div>
+              </td>
+              <td class="center">
+                <div>1</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb1"></div><div class="nin" id="fn1"></div>
+              </td>
+            </tr>
+            <tr class="line">
+              <td class="male">
+                <div class="nin" id="mn0"></div><div class="bar left" id="mb0"></div>
+              </td>
+              <td class="center">
+                <div>0</div>
+              </td>
+              <td class="female">
+                <div class="bar right" id="fb0"></div><div class="nin" id="fn0"></div>
+              </td>
+            </tr>
+            <tr><td colspan="3">
+              <div id="basic_data">
+                <div id='jinko_sosu'>
+                  <span class="tr">
+                    <span class="td"></span>
+                    <span class="td">人口</span>
+                    <span class="td" id="sosu">xxx,xxx人</span>
+                    <span class="td"></span>
+                  </span>
+                  <span class="tr">
+                    <span class="td"></span>
+                    <span class="td">男</span>
+                     <span class="td" id="male">xxx,xxx人</span>
+                    <span class="td"></span>
+                  </span>
+                  <span class="tr">
+                    <span class="td"></span>
+                    <span class="td">女</span>
+                    <span class="td" id="female">xxx,xxx人</span>
+                    <span class="td"></span>
+                  </span>
+                </div>  <!--jinko_sosu ここまで-->
+                <div id="select" data-html2canvas-ignore="true">
+                  <select id="kubun_unit" onchange="kubunDisplay()" style="width:11em;">
+                    <option value="構成比"selected="selected">年齢3区分別構成比</option>
+                    <option value="人口">年齢3区分別人口</option>
+                    <option value="非表示">年齢3区分別人口/構成比非表示</option>
+                  </select>
+                  <a href='#' id="info_3kubun" class="info-icon-3kubun" data-tooltip="年齢3区分の中位の年齢を自由に変更することができます。例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を見ることができます。"><img src="./image/info-icon.png" /></a>
+                  <input id="kubun_button" type="submit" value="3区分表示" onclick="kubunSelectDisp()">
+                  <input id="kubun_selected" type="hidden" value="">
+                </div>
+                <div id='nenrei_3kubun'>
+                  <span class="tr">
+                    <span class="td">年 齢 区 分</span>
+                    <span class="td">総数</span>
+                    <span class="td">男</span>
+                    <span class="td">女</span>
+                  </span>
+                  <span class="tr">
+                    <span class="td">
+                    <span id='heigher'>75</span>
+                    歳以上
+                    </span>
+                    <span class="td" id="ku3_sosu">xxx,xxx人</span>
+                    <span class="td" id="ku3_male">xxx,xxx人</span>
+                    <span class="td" id="ku3_female">xxx,xxx人</span>
+                  </span>
+                  <span class="tr">
+                    <span class="td" id="kubun2_title">
+                      <input type="number" id='smiddle' value='15' onchange="kubunChange()">
+                       〜
+                      <input type="number" id='emiddle'value='64' onchange="kubunChange()">
+                      歳
+                    </span>
+                    <span class="td" id="ku2_sosu">xx,xxx人</span>
+                    <span class="td" id="ku2_male">xx,xxx人</span>
+                    <span class="td" id="ku2_female">xx,xxx人</span>
+                  </span>
+                  <span class="tr">
+                    <span class="td">
+                      0〜
+                      <span id='lower'>14</span>
+                      歳
+                    </span>
+                    <span class="td" id="ku1_sosu">xx,xxx人</span>
+                    <span class="td" id="ku1_male">xx,xxx人</span>
+                    <span class="td" id="ku1_female">xx,xxx人</span>
+                  </span>
+                </div>    <!--#nenrei_3kuibun ここまで-->
+              </div>    <!--#basic_data ここまで-->
+            </td></tr>
+          </tbody>
+        </table>
+      　<div id="male_label">男</div><div id="female_label">女</div>
+        <div>
+          <span id="source" data-html2canvas-ignore="true">
+            年齢別人口(<a href="http://www.city.yokohama.lg.jp/ex/stat/jinko/age/new/tsurumi-j.html">http://www.city.yokohama.lg.jp/ex/stat/jinko/age/new/tsurumi-j.html</a>)
+          </span>
+        </div>
+      </div> <!-- pyramid ここまで -->
+      <br>
+      <div id="cho" data-html2canvas-ignore="true"><a href="link"></a>
+        <form name="chobetsu">
+          <div id="button">
+            <input type="button" value="町丁別人口ピラミッド" onClick="cho_pyramid_button()">
+            <input type="button" value="区全体の人口ピラミッド" onClick="ku_pyramid_button()">
+            <input type="button" value="クリア" onClick="checkbox_clear()">
+            <input type="hidden" value="shiku" id="mode">
+            <a href='#here' class="info-icon-bottom" data-tooltip="地域の人口ピラミッドを表示するには、町丁名をチェックしてから[町丁別人口ピラミッド]をクリックしてください。複数選択が可能です。"><img src="./image/info-icon.png" /></a>
+          </div>
+          <div id="cho_list">
+             <!--ここに町丁名リストが入る-->
+          </div>
+        </form>
+      </div>  <!-- id=cho ここまで -->
+    </div>  <!-- id=main ここまで -->
+    <div id="screen_shot_section"></div>
+    <div id="option" data-html2canvas-ignore="true">
+      <input id="localStorage" value="unknown" type="hidden">
+      <fieldset>
+      <legend>データの端末への保存 <a href='#' class="info-icon-left" data-tooltip="[保存する]を選択すると、画面表示したグラフのデータが端末に保存され、インターネット通信環境のないところでもそのグラフを表示することができるようになります。(保存容量には上限があり、全てのデータを保存することはできません。)"><img src="./image/info-icon.png" class="small-icon" /></a></legend>
+
+        <span>
+          <input onClick="localStorage_Setting()" value="Save" name="useLocalStorage" type="radio" checked id="save">
+          <label for="save">この端末にデータを保存する.</label>
+        </span><br>
+        <span>
+          <input onClick="localStorage_Setting()" value="Clear" name="useLocalStorage" type="radio"  id="clear">
+          <label for="clear">端末にデータを保存しない.</label>
+        </span>
+      </fieldset>
+      <div id="storage_alert">
+        保存データが容量いっぱいです。これ以上のデータは保存できません。
+        新たに端末に保存したいデータがあるときは、いったん「端末にデータを保存しない」を選択してから、
+        再び、「この端末にデータを保存する」を選択してください。<br>
+        この操作により、すでに保存されているデータはすべて削除され、新たにデータを保存できるようになります。
+      </div>
+      <fieldset>
+      <legend>人数の表示</legend>
+        <span>
+          <input onClick="showNinzu_Setting()" value="Show" name="showNinzu" type="radio" checked id="show">
+          <label for="show">人数を表示する.</label>
+        </span><br>
+        <span>
+          <input onClick="showNinzu_Setting()" value="Hidden" name="showNinzu" type="radio"  id="hidden">
+          <label for="hidden">人数を表示しない.</label>
+        </span>
+      </fieldset>
+      <input onClick="screen_shot()" value="スクリーンショットを撮る" type="button" id="screen_shot_button">
+      <a href='#here' class="header" data-tooltip="" id="screen_shot_tooltip"><img src="./image/info-icon.png" /></a>
+      <span id="dialog"></span>
+    </div>
+    <div class="footer" id="footer" data-html2canvas-ignore="true">
+    <hr class="margin-top margin-bottom">
+    <!-- ここから著作権情報と連絡先 -->
+      <address>
+      <span style="display:block;">
+        <span class="block">
+        INUZUKA Katsu
+        </span><span>
+          -
+          2016年12月21日
+          作成
+        </span><span>
+          -
+          2024年2月29日
+          更新
+        </span>
+      </span>
+      <span style="display:block;">
+        <span class="block">
+          問い合わせ、連絡先（不具合の報告、改良のアイディアをお寄せください.）
+        </span><span class="block">
+          - <a href="mailto:inuzuka0601&#64;gmail.com">inuzuka0601&#64;gmail.com</a>
+        </span>
+      </span>
+        <span>
+          &copy;2016-2024 INUZUKA Katsu.
+        </span>
+        <span>
+          All rights reserved.
+        </span>
+      </address>
+      <!-- ここまで著作権情報と連絡先 -->
+    </div>
+    <!-- ここまでフッタ部分 -->
+  </body>
+</html>

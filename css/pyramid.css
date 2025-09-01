@@ -1,0 +1,65 @@
+      caption     { text-align:right; }
+      select,input{ font-size:120%; }
+      h1          { font-size:200%;margin-top:20px;text-align:center;}
+      h2          { font-size:150%;margin-top:20px;text-align:center;}
+      div#main    { text-align: center; }
+      div#pyramid { width:1108px;
+                    display:inline-block;
+                    vertical-align:top;}
+      table       { min-width:1108px;
+                    table-layout: fixed;
+                    display:inline-block;
+                    border-collapse:collapse;
+                    border:none;
+                    padding:0;
+                    border-spacing:0px;
+                    margin-top:0;
+                    padding:0;
+                    line-height:80%;
+                  }
+      tr          { height:4;
+                  }
+      td          { padding:0;margin:0;border:none;
+                    white-space:nowrap;
+                    background-color:silver;
+                    height:4;
+                    line-height: 100%;
+                    font-size:4px;
+                  }
+      td.male     { text-align: right; width: 50%; }
+      td.female   { text-align: left;  width: 50%; }
+      div         { line-height: 100%;
+                    vertical-align: bottom;
+                  }
+      div.nin     { display:inline-block;
+                    font-size:6px;
+                    -webkit-transform:scale(0.5);
+                    -moz-transform:scale(0.5);
+                    -ms-transform:scale(0.5);
+                    -o-transform:scale(0.5);
+                    transform:scale(0.5);
+                    vertical-align: bottom;
+                   }
+      div.center  { text-align:center;
+                    font-size:6px;
+                    -webkit-transform:scale(0.5);
+                    -moz-transform:scale(0.5);
+                    -ms-transform:scale(0.5);
+                    -o-transform:scale(0.5);
+                    transform:scale(0.5);
+                    vertical-align: bottom;
+                  }
+      div.bar     { height:5px;
+                    display:inline-block;margin:0;padding:0;}
+      div.left    { background-color:#3333FF; margin:0;margin-left:4px;}
+      div.right   { background-color:#FF3366; margin:0;margin-right:4px;}
+      div#button  { text-align: right; }
+      div#cho     { display:inline-block;
+                    vertical-align: top;
+                    margin-top:3.5em;
+                    background-color:#FFFFF0; }
+      div.cho     { display:inline-block;
+                    margin-left:0;margin-top:2em;
+                    vertical-align:top;text-align:left;}
+      div.footer  { text-align: center; }
+      li          { list-style-type:none}
