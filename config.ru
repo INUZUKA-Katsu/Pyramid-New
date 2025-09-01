@@ -5,7 +5,6 @@ require_relative 'lib/pyramid_app'
 require_relative 'lib/reverse_proxy_middleware'
 
 Encoding.default_external = "utf-8"
-#p ENV["DROPBOX_ACCESS_TOKEN"]
 
 use ReverseProxy, "https://mcc-choir-938712885657.asia-northeast1.run.app"
 
