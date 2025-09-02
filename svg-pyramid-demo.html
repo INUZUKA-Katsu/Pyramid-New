@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人口ピラミッド SVG描画エンジン デモ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .control-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .control-group select,
+        .control-group input,
+        .control-group button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        
+        .control-group button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .control-group button:hover {
+            background: #0056b3;
+        }
+        
+        .control-group button.active {
+            background: #28a745;
+        }
+        
+        #pyramid-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            min-height: 600px;
+            margin-bottom: 20px;
+            overflow: auto;
+        }
+        
+        .info-panel {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .status {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .demo-data {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>人口ピラミッド SVG描画エンジン デモ</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>描画エンジン</label>
+                <button id="toggleRenderer" onclick="toggleRenderer()" class="active">SVG描画</button>
+            </div>
+            
+            <div class="control-group">
+                <label>スケールモード</label>
+                <select id="scaleMode" onchange="changeScaleMode()">
+                    <option value="auto">自動</option>
+                    <option value="fixed">固定</option>
+                    <option value="percentage">比率</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>ピラミッドサイズ</label>
+                <select id="pyramidSize" onchange="changePyramidSize()">
+                    <option value="0.5">小 (50%)</option>
+                    <option value="1" selected>標準 (100%)</option>
+                    <option value="1.5">大 (150%)</option>
+                    <option value="2">特大 (200%)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>デモデータ</label>
+                <select id="demoData" onchange="loadDemoData()">
+                    <option value="real" selected>実データ（横浜市2022年）</option>
+                    <option value="yokohama">横浜市（サンプル）</option>
+                    <option value="aging">高齢化社会</option>
+                    <option value="young">若年人口多</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>オプション</label>
+                <button onclick="toggleNumbers()">人数表示切替</button>
+                <button onclick="toggleGrid()">グリッド切替</button>
+            </div>
+            
+            <div class="control-group">
+                <label>ハイブリッドリサイズ</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="barHeightSlider" min="3" max="12" value="6" step="0.5" style="width: 100px;">
+                    <span id="barHeightValue">6px</span>
+                    <button onclick="applyHybridResize()">適用</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="pyramid-container"></div>
+        
+        <div class="info-panel">
+            <div class="status" id="status">SVG描画エンジンが有効です</div>
+            <p><strong>使用方法:</strong></p>
+            <ul>
+                <li>「描画エンジン」ボタンでSVG描画とHTML描画を切り替えられます</li>
+                <li>「スケールモード」で人口数に応じたバーの長さの計算方法を変更できます</li>
+                <li>「ピラミッドサイズ」で全体のサイズを調整できます</li>
+                <li>「デモデータ」で異なる人口構造のサンプルを表示できます</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- デモ用のサンプルデータ -->
+    <div class="demo-data">
+        <!-- 実データ（横浜市2022年） -->
+        <script id="real-data" type="application/json">
+        {"last_modified":"2022-01-18 15:06:56 +0900","kijunbi":"令和4年1月1日現在","shiku":"横浜市","source_url":"https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/suikei.files/22_hyo22.xlsx","kakusai_betsu":[["総数","3,772,029","1,862,325","1,909,704"],["0","24,988","12,860","12,128"],["1","24,952","12,832","12,120"],["2","25,867","13,195","12,672"],["3","27,072","13,892","13,180"],["4","27,577","14,100","13,477"],["5","28,490","14,517","13,973"],["6","29,554","15,098","14,456"],["7","29,481","15,159","14,322"],["8","29,802","15,354","14,448"],["9","30,601","15,608","14,993"],["10","30,197","15,500","14,697"],["11","31,250","15,985","15,265"],["12","31,268","15,956","15,312"],["13","31,495","16,303","15,192"],["14","31,556","16,292","15,264"],["15","31,804","16,406","15,398"],["16","30,403","15,560","14,843"],["17","32,060","16,428","15,632"],["18","32,871","16,820","16,051"],["19","35,070","17,672","17,398"],["20","37,610","19,290","18,320"],["21","39,749","20,156","19,593"],["22","40,118","20,349","19,769"],["23","42,984","21,773","21,211"],["24","41,257","20,655","20,602"],["25","41,092","20,918","20,174"],["26","40,010","20,382","19,628"],["27","40,856","20,651","20,205"],["28","38,625","19,664","18,961"],["29","38,520","19,631","18,889"],["30","38,845","19,803","19,042"],["31","38,882","19,845","19,037"],["32","38,352","19,472","18,880"],["33","40,999","20,807","20,192"],["34","40,681","20,844","19,837"],["35","41,357","21,018","20,339"],["36","43,387","21,895","21,492"],["37","45,360","23,272","22,088"],["38","46,033","23,425","22,608"],["39","46,089","23,488","22,601"],["40","46,627","23,704","22,923"],["41","47,821","24,080","23,741"],["42","49,657","25,277","24,380"],["43","51,445","26,139","25,306"],["44","53,343","27,199","26,144"],["45","55,558","28,085","27,473"],["46","57,328","29,081","28,247"],["47","61,769","31,152","30,617"],["48","65,019","32,616","32,403"],["49","64,714","32,455","32,259"],["50","64,279","32,149","32,130"],["51","64,267","32,313","31,954"],["52","62,609","31,891","30,718"],["53","62,064","31,757","30,307"],["54","63,678","32,695","30,983"],["55","45,499","23,327","22,172"],["56","58,005","30,070","27,935"],["57","53,097","27,315","25,782"],["58","49,974","25,860","24,114"],["59","47,100","24,077","23,023"],["60","44,242","22,858","21,384"],["61","42,992","21,791","21,201"],["62","41,258","21,209","20,049"],["63","40,281","20,366","19,915"],["64","37,194","18,530","18,664"],["65","37,531","18,849","18,682"],["66","38,123","19,002","19,121"],["67","37,573","18,561","19,012"],["68","38,321","18,604","19,717"],["69","41,315","20,175","21,140"],["70","42,491","20,844","21,647"],["71","45,684","21,941","23,743"],["72","52,446","24,940","27,506"],["73","51,122","23,970","27,152"],["74","51,020","23,969","27,051"],["75","34,532","15,947","18,585"],["76","31,276","14,225","17,051"],["77","37,707","16,814","20,893"],["78","39,516","17,388","22,128"],["79","37,337","16,392","20,945"],["80","36,689","15,774","20,915"],["81","32,916","14,015","18,901"],["82","27,961","11,848","16,113"],["83","25,738","11,075","14,663"],["84","27,106","11,103","16,003"],["85","24,536","9,690","14,846"],["86","23,522","9,187","14,335"],["87","19,165","7,195","11,970"],["88","17,655","6,309","11,346"],["89","15,544","5,370","10,174"],["90","13,113","4,269","8,844"],["91","10,844","3,431","7,413"],["92","8,912","2,572","6,340"],["93","7,485","2,060","5,425"],["94","5,280","1,392","3,888"],["95","4,111","1,037","3,074"],["96","3,208","693","2,515"],["97","2,197","433","1,764"],["98","1,425","248","1,177"],["99","998","164","834"],["100","1,857","248","1,609"],["年齢不詳","98,789","53,720","45,069"]]}
+        </script>
+        
+        <!-- 横浜市サンプルデータ（簡略版） -->
+        <script id="yokohama-data" type="application/json">
+        {
+            "shiku": "横浜市",
+            "kijunbi": "2023年1月1日現在",
+            "source_url": "https://example.com",
+            "kakusai_betsu": [
+                ["総数", "3,777,491", "1,877,844", "1,899,647"],
+                ["0", "28,543", "14,623", "13,920"],
+                ["1", "29,123", "14,912", "14,211"],
+                ["2", "29,876", "15,234", "14,642"],
+                ["3", "30,234", "15,456", "14,778"],
+                ["4", "30,567", "15,623", "14,944"],
+                ["5", "31,234", "15,987", "15,247"],
+                ["10", "32,456", "16,587", "15,869"],
+                ["15", "34,567", "17,654", "16,913"],
+                ["20", "45,678", "23,456", "22,222"],
+                ["25", "52,345", "26,789", "25,556"],
+                ["30", "48,765", "24,987", "23,778"],
+                ["35", "46,543", "23,876", "22,667"],
+                ["40", "54,321", "27,654", "26,667"],
+                ["45", "62,345", "31,456", "30,889"],
+                ["50", "58,765", "29,234", "29,531"],
+                ["55", "52,123", "25,876", "26,247"],
+                ["60", "48,567", "23,987", "24,580"],
+                ["65", "45,234", "22,345", "22,889"],
+                ["70", "42,567", "20,234", "22,333"],
+                ["75", "35,678", "16,234", "19,444"],
+                ["80", "25,432", "10,876", "14,556"],
+                ["85", "18,765", "7,234", "11,531"],
+                ["90", "12,345", "4,123", "8,222"],
+                ["95", "5,678", "1,765", "3,913"],
+                ["100", "1,234", "345", "889"]
+            ]
+        }
+        </script>
+        
+        <!-- 高齢化社会サンプルデータ -->
+        <script id="aging-data" type="application/json">
+        {
+            "shiku": "高齢化地域（サンプル）",
+            "kijunbi": "2023年1月1日現在",
+            "source_url": "https://example.com",
+            "kakusai_betsu": [
+                ["総数", "100,000", "48,000", "52,000"],
+                ["0", "800", "410", "390"],
+                ["5", "850", "435", "415"],
+                ["10", "900", "460", "440"],
+                ["15", "950", "485", "465"],
+                ["20", "1200", "615", "585"],
+                ["25", "1400", "720", "680"],
+                ["30", "1100", "565", "535"],
+                ["35", "1000", "515", "485"],
+                ["40", "1300", "670", "630"],
+                ["45", "1500", "770", "730"],
+                ["50", "1400", "720", "680"],
+                ["55", "1600", "820", "780"],
+                ["60", "1800", "920", "880"],
+                ["65", "2200", "1100", "1100"],
+                ["70", "2800", "1350", "1450"],
+                ["75", "3200", "1450", "1750"],
+                ["80", "2800", "1200", "1600"],
+                ["85", "2200", "900", "1300"],
+                ["90", "1400", "500", "900"],
+                ["95", "600", "200", "400"],
+                ["100", "150", "50", "100"]
+            ]
+        }
+        </script>
+        
+        <!-- 若年人口多サンプルデータ -->
+        <script id="young-data" type="application/json">
+        {
+            "shiku": "若年人口多地域（サンプル）",
+            "kijunbi": "2023年1月1日現在",
+            "source_url": "https://example.com",
+            "kakusai_betsu": [
+                ["総数", "120,000", "60,000", "60,000"],
+                ["0", "2400", "1230", "1170"],
+                ["5", "2500", "1280", "1220"],
+                ["10", "2600", "1330", "1270"],
+                ["15", "2700", "1380", "1320"],
+                ["20", "3200", "1640", "1560"],
+                ["25", "3800", "1950", "1850"],
+                ["30", "3500", "1800", "1700"],
+                ["35", "3200", "1650", "1550"],
+                ["40", "2800", "1440", "1360"],
+                ["45", "2400", "1230", "1170"],
+                ["50", "2000", "1030", "970"],
+                ["55", "1600", "820", "780"],
+                ["60", "1400", "720", "680"],
+                ["65", "1200", "600", "600"],
+                ["70", "1000", "480", "520"],
+                ["75", "800", "360", "440"],
+                ["80", "600", "260", "340"],
+                ["85", "400", "160", "240"],
+                ["90", "200", "70", "130"],
+                ["95", "80", "25", "55"],
+                ["100", "20", "6", "14"]
+            ]
+        }
+        </script>
+    </div>
+
+    <!-- JavaScriptファイルの読み込み -->
+    <script src="js/pyramid-svg.js"></script>
+    
+    <script>
+        let currentRenderer = null;
+        let isSVGMode = true;
+        let currentOptions = {
+            showNumbers: true,
+            showGrid: true
+        };
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDemoData();
+            
+            // バーの高さスライダーのイベントリスナーを設定
+            const barHeightSlider = document.getElementById('barHeightSlider');
+            barHeightSlider.addEventListener('input', updateBarHeightValue);
+        });
+
+        // 描画エンジンの切り替え
+        function toggleRenderer() {
+            isSVGMode = !isSVGMode;
+            const button = document.getElementById('toggleRenderer');
+            
+            if (isSVGMode) {
+                button.textContent = 'SVG描画';
+                button.classList.add('active');
+                document.getElementById('status').textContent = 'SVG描画エンジンが有効です';
+            } else {
+                button.textContent = 'HTML描画';
+                button.classList.remove('active');
+                document.getElementById('status').textContent = 'HTML描画エンジンが有効です（※このデモではSVGのみ対応）';
+            }
+            
+            // 現在のデータで再描画
+            loadDemoData();
+        }
+
+        // スケールモードの変更
+        function changeScaleMode() {
+            const mode = document.getElementById('scaleMode').value;
+            if (currentRenderer) {
+                currentRenderer.updateOptions({ scaleMode: mode });
+            }
+        }
+
+        // ピラミッドサイズの変更
+        function changePyramidSize() {
+            const scale = parseFloat(document.getElementById('pyramidSize').value);
+            if (currentRenderer) {
+                currentRenderer.resize({"scale" : scale});
+            }
+        }
+
+        // 人数表示の切り替え
+        function toggleNumbers() {
+            currentOptions.showNumbers = !currentOptions.showNumbers;
+            if (currentRenderer) {
+                currentRenderer.updateOptions({ showNumbers: currentOptions.showNumbers });
+            }
+        }
+
+        // グリッド表示の切り替え
+        function toggleGrid() {
+            currentOptions.showGrid = !currentOptions.showGrid;
+            if (currentRenderer) {
+                currentRenderer.updateOptions({ showGrid: currentOptions.showGrid });
+            }
+        }
+        
+        // ハイブリッドリサイズの適用
+        function applyHybridResize() {
+            if (!currentRenderer) return;
+            
+            const barHeight = parseFloat(document.getElementById('barHeightSlider').value);
+            const newHeight = Math.floor((101 * barHeight) + 100); // 101年齢 × barHeight + 100pxマージン
+            
+            currentRenderer.resize({ barHeight: barHeight, height: newHeight });
+        }
+        
+        // バーの高さスライダーの値表示更新
+        function updateBarHeightValue() {
+            const value = document.getElementById('barHeightSlider').value;
+            document.getElementById('barHeightValue').textContent = value + 'px';
+        }
+
+        // デモデータの読み込み
+        function loadDemoData() {
+            const selectedData = document.getElementById('demoData').value;
+            const dataScript = document.getElementById(selectedData + '-data');
+            
+            if (!dataScript) {
+                console.error('データが見つかりません:', selectedData);
+                return;
+            }
+
+            try {
+                const data = JSON.parse(dataScript.textContent);
+                renderPyramid(data);
+            } catch (error) {
+                console.error('データの解析に失敗しました:', error);
+            }
+        }
+
+        // ピラミッドの描画
+        function renderPyramid(data) {
+            if (!isSVGMode) {
+                document.getElementById('pyramid-container').innerHTML = 
+                    '<p style="text-align: center; padding: 50px;">このデモではSVG描画のみ対応しています</p>';
+                return;
+            }
+
+            const options = {
+                ...currentOptions,
+                scaleMode: document.getElementById('scaleMode').value
+            };
+
+            try {
+                currentRenderer = new PyramidSVGRenderer('pyramid-container', options);
+                currentRenderer.render(data.kakusai_betsu);
+                
+                document.getElementById('status').textContent = 
+                    `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
+            } catch (error) {
+                console.error('描画に失敗しました:', error);
+                document.getElementById('pyramid-container').innerHTML = 
+                    '<p style="text-align: center; padding: 50px; color: red;">描画エラーが発生しました</p>';
+            }
+        }
+    </script>
+</body>
+</html>
+

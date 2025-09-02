@@ -311,9 +311,9 @@ class PyramidSVGRenderer {
     // barHeightが指定されている場合は使用、そうでなければオプションの値を使用
     const currentBarHeight = barHeight !== null && barHeight !== undefined ? barHeight : this.options.ageHeight;
     
-    // 固定座標（1108x600）を使用
-    const viewBoxWidth = 1108;
-    const viewBoxHeight = 600;
+    // 現在のviewBoxのサイズを使用（動的に計算）
+    const viewBoxWidth = this.options.width;
+    const viewBoxHeight = this.options.height;
     
     // 年齢の位置を計算（0歳が下、100歳が上）
     const agePosition = viewBoxHeight - (age * currentBarHeight) - currentBarHeight;
@@ -359,7 +359,6 @@ class PyramidSVGRenderer {
         maleLabel.setAttribute('font-size', this.options.fontSize - 3);
         maleLabel.setAttribute('class', 'population-label');
         maleLabel.textContent = maleCount.toLocaleString();
-        maleLabel.setAttribute('dominant-baseline', 'middle');
         this.sceneGroup.appendChild(maleLabel);
       }
     }
@@ -405,7 +404,6 @@ class PyramidSVGRenderer {
         femaleLabel.setAttribute('font-size', this.options.fontSize - 3);
         femaleLabel.setAttribute('class', 'population-label');
         femaleLabel.textContent = femaleCount.toLocaleString();
-        femaleLabel.setAttribute('dominant-baseline', 'middle');
         this.sceneGroup.appendChild(femaleLabel);
       }
     }
@@ -469,9 +467,9 @@ class PyramidSVGRenderer {
 
   // ピラミッドのサイズ調整（ハイブリッド方式）
   resize(options = {}) {
-    if (options.width && options.height) {
-      // 方式1: 全体サイズ指定
-      this.resizeByDimensions(options.width, options.height);
+    if (options.scale) {
+      // 方式1: スケール指定
+      this.resizeByScale2(options.scale);
     } else if (options.unitSize || options.barHeight) {
       // 方式2: 個別パラメータ指定
       this.resizeByParameters(options.unitSize, options.barHeight);
@@ -481,34 +479,43 @@ class PyramidSVGRenderer {
     }
   }
 
-  // 方式1: 全体サイズ指定によるリサイズ
-  resizeByDimensions(width, height) {
-    // 新しいサイズを設定
-    this.options.width = width;
-    this.options.height = height;
+  // 方式1: viewBoxを使いズーム倍率を指定してリサイズ
+  resizeByScale1(scale) {
     
-    // SVGのサイズを変更
-    this.svg.setAttribute('width', width);
-    this.svg.setAttribute('height', height);
+    const baseBox = this.sceneGroup.getBBox();
     
-    // viewBoxは固定（1108x600）のまま
-    // transform属性で拡大縮小を行う
-    const scaleX = width / 1108;
-    const scaleY = height / 600;
-    const scale = Math.min(scaleX, scaleY); // 相似形を保つ
+    let w = baseBox.width / scale ;
+    let h = baseBox.height / scale ;
     
-    // 中央を基準とした拡大縮小
-    const translateX = (width - 1108 * scale) / 2;
-    const translateY = (height - 600 * scale) / 2;
-    
+    let cx = baseBox.x + baseBox.width / 2;
+    let cy = baseBox.y + baseBox.height / 2;
+
+    // svgのviewBox属性を更新
+    this.svg.setAttribute('viewBox', `${cx - w/2} ${cy - h/2} ${w} ${h}`);    
+
     // sceneGroupのtransform属性を更新
-    this.sceneGroup.setAttribute('transform', `translate(${translateX},${translateY}) scale(${scale})`);
-    
-    // デバッグ用
-    console.log(`resizeByDimensions: width=${width}, height=${height}, scale=${scale}, translate=(${translateX},${translateY})`);
+    //this.sceneGroup.setAttribute('transform', `translate(${translateX},${translateY}) scale(${scale})`);    
   }
 
-  // 方式2: 個別パラメータ指定によるリサイズ
+  // 方式2: transform属性を使いズーム倍率を指定してリサイズ
+  resizeByScale2(scale) {
+    
+    const baseBox = this.sceneGroup.getBBox();
+    
+    let w = baseBox.width * scale ;
+    let h = baseBox.height * scale ;
+    
+    let cx = baseBox.x + baseBox.width / 2;
+    let cy = baseBox.y + baseBox.height / 2;
+
+    let tx = cx - w / 2 ;
+    let ty = cy - h / 2 ;
+    
+    // sceneGroupのtransform属性を更新
+    this.sceneGroup.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);    
+  }
+
+  // 方式3: 個別パラメータ指定によるリサイズ
   resizeByParameters(unitSize = null, barHeight = null) {
     let needsReinit = false;
     
