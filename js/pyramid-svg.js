@@ -327,9 +327,9 @@ class PyramidSVGRenderer {
     const viewBoxWidth = this.options.width;
     const viewBoxHeight = this.options.height;
     
-    // 固定座標（1108x600）を使用
-    const viewBoxWidth = 1108;
-    const viewBoxHeight = 600;
+    // 現在のviewBoxのサイズを使用（動的に計算）
+    const viewBoxWidth = this.options.width;
+    const viewBoxHeight = this.options.height;
     
     // 年齢の位置を計算（0歳が下、100歳が上）
         const agePosition = viewBoxHeight - (age * barHeight) - barHeight;
@@ -533,6 +533,12 @@ class PyramidSVGRenderer {
     let tx = cx - w / 2 ;
     let ty = cy - h / 2 ;
     
+    let cx = baseBox.x + baseBox.width / 2;
+    let cy = baseBox.y + baseBox.height / 2;
+
+    // svgのviewBox属性を更新
+    this.svg.setAttribute('viewBox', `${cx - w/2} ${cy - h/2} ${w} ${h}`);    
+
     // sceneGroupのtransform属性を更新
     this.sceneGroup.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);    
 
