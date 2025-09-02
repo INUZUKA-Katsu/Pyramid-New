@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SVG複雑描画＋拡大縮小デモ</title>
+  <style>
+    :root {
+      --ui-bg: #0f172a; /* slate-900 */
+      --ui-fg: #e5e7eb; /* gray-200 */
+      --ui-accent: #38bdf8; /* sky-400 */
+    }
+    html, body { height: 100%; margin: 0; background: var(--ui-bg); color: var(--ui-fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+    header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    header h1 { font-size: 18px; margin: 0 8px 0 0; font-weight: 600; }
+    .panel { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,0.05); }
+    .panel label { font-size: 12px; opacity: 0.8; }
+    .panel input[type="range"] { width: 220px; }
+    .btn { appearance: none; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: var(--ui-fg); padding: 6px 10px; border-radius: 10px; cursor: pointer; font-size: 12px; }
+    .btn:hover { background: rgba(255,255,255,0.14); }
+    .wrap { height: calc(100% - 70px); padding: 0 16px 16px; }
+    svg { width: 100%; height: 100%; border-radius: 16px; background: linear-gradient(#0b1023, #0a0e1a); box-shadow: 0 10px 30px rgba(0,0,0,0.4) inset; }
+    .hint { position: absolute; right: 22px; top: 64px; font-size: 12px; opacity: .7; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SVG 複雑描画 + 拡大縮小</h1>
+    <div class="panel">
+      <button id="fit" class="btn">全体表示</button>
+      <button id="zin" class="btn">＋ 拡大</button>
+      <button id="zout" class="btn">－ 縮小</button>
+      <label>倍率 <span id="scaleLabel">100%</span></label>
+      <input id="zoom" type="range" min="0.25" max="4" value="1" step="0.01" />
+      <label><input id="togglePan" type="checkbox" checked> ドラッグで移動</label>
+    </div>
+  </header>
+  <div class="wrap">
+    <!-- 基準座標系を 0 0 1000 600 として描画。viewBox により自然にリサイズ。 -->
+    <svg id="stage" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- グラデーション（空・太陽・ガラス反射） -->
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#133e7c" />
+          <stop offset="60%" stop-color="#0b2452" />
+          <stop offset="100%" stop-color="#071833" />
+        </linearGradient>
+        <radialGradient id="sun" cx="80%" cy="20%" r="20%">
+          <stop offset="0%" stop-color="#fff5a6" stop-opacity="1" />
+          <stop offset="60%" stop-color="#ffd166" stop-opacity="0.8" />
+          <stop offset="100%" stop-color="#ff7b00" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#9be7ff" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#c7f0ff" stop-opacity="0.05"/>
+        </linearGradient>
+
+        <!-- パターン（床の格子） -->
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="#406" stroke-opacity="0.25" />
+        </pattern>
+
+        <!-- マーカー（矢印） -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#7dd3fc" />
+        </marker>
+
+        <!-- フィルタ（光彩・シャドウ） -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="shadow" x="-30%" y="-30%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/>
+        </filter>
+
+        <!-- テキストの円形パス -->
+        <path id="circlePath" d="M 500 300 m -180, 0 a 180,180 0 1,1 360,0 a 180,180 0 1,1 -360,0" />
+      </defs>
+
+      <!-- 背景の空＆太陽ハロー -->
+      <rect x="0" y="0" width="1000" height="600" fill="url(#sky)"/>
+      <circle cx="800" cy="120" r="160" fill="url(#sun)" filter="url(#glow)"/>
+
+      <!-- 地面のグリッド -->
+      <rect x="0" y="400" width="1000" height="200" fill="url(#grid)" opacity="0.65"/>
+
+      <!-- メインのシーンは <g id="scene"> にまとめ、transform で拡大縮小＆パン可能にする -->
+      <g id="scene" transform="translate(0,0) scale(1)">
+        <!-- スカイライン（複数のビルをグループ化） -->
+        <g id="city" fill="#1e293b" stroke="#94a3b8" stroke-opacity="0.15" stroke-width="2">
+          <rect x="70"  y="250" width="80" height="220" rx="4"/>
+          <rect x="160" y="210" width="100" height="260" rx="6"/>
+          <rect x="280" y="300" width="70" height="170" rx="4"/>
+          <rect x="370" y="230" width="120" height="240" rx="8"/>
+          <rect x="510" y="270" width="90" height="200" rx="6"/>
+          <rect x="620" y="200" width="90" height="270" rx="6"/>
+          <rect x="730" y="320" width="110" height="150" rx="8"/>
+
+          <!-- 窓（パターン的に） -->
+          <g fill="url(#glass)">
+            <!-- 左のビル -->
+            <g id="win1">
+              <rect x="85" y="270" width="16" height="20"/>
+              <rect x="105" y="270" width="16" height="20"/>
+              <rect x="125" y="270" width="16" height="20"/>
+              <rect x="85" y="300" width="16" height="20"/>
+              <rect x="105" y="300" width="16" height="20"/>
+              <rect x="125" y="300" width="16" height="20"/>
+            </g>
+            <!-- 高層ビル -->
+            <g id="win2">
+              <rect x="178" y="230" width="24" height="28"/>
+              <rect x="210" y="230" width="24" height="28"/>
+              <rect x="242" y="230" width="24" height="28"/>
+              <rect x="178" y="268" width="24" height="28"/>
+              <rect x="210" y="268" width="24" height="28"/>
+              <rect x="242" y="268" width="24" height="28"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- 歯車（パスと回転アニメーション） -->
+        <g id="gears" transform="translate(210,420)">
+          <g transform="scale(1)" filter="url(#shadow)">
+            <path id="gear1" d="M0,-60 L18,-50 A60,60 0 0,1 50,-18 L60,0 L50,18 A60,60 0 0,1 18,50 L0,60 L-18,50 A60,60 0 0,1 -50,18 L-60,0 L-50,-18 A60,60 0 0,1 -18,-50 Z
+                                 M0,-34 A34,34 0 1,0 0,34 A34,34 0 1,0 0,-34 Z" fill="#94a3b8" opacity="0.9"/>
+          </g>
+          <g transform="translate(110,0) scale(0.7)" filter="url(#shadow)">
+            <use href="#gear1" fill="#cbd5e1"/>
+          </g>
+        </g>
+
+        <!-- ライン＆マーカー（矢印） -->
+        <path d="M120 120 C 220 40, 380 40, 480 120 S 740 200, 840 120" fill="none" stroke="#7dd3fc" stroke-width="4" marker-start="url(#arrow)" marker-mid="url(#arrow)" marker-end="url(#arrow)"/>
+
+        <!-- テキスト（円周に沿って配置） -->
+        <text font-size="16" letter-spacing="1" fill="#a5f3fc">
+          <textPath href="#circlePath">SVG is scalable • Filters • Gradients • Markers • Paths • Groups • Text on a path • Patterns • ViewBox</textPath>
+        </text>
+
+        <!-- 星形（多角形） -->
+        <polygon points="500,110 518,154 565,160 533,192 541,238 500,216 459,238 467,192 435,160 482,154" fill="#facc15" filter="url(#glow)" opacity="0.9"/>
+      </g>
+    </svg>
+    <div class="hint">ヒント: 右上のスライダーで倍率変更、チェックONでドラッグ移動（パン）できます。</div>
+  </div>
+
+  <script>
+    const svg = document.getElementById('stage');
+    const scene = document.getElementById('scene');
+    const zoom = document.getElementById('zoom');
+    const zin = document.getElementById('zin');
+    const zout = document.getElementById('zout');
+    const fit = document.getElementById('fit');
+    const label = document.getElementById('scaleLabel');
+    const togglePan = document.getElementById('togglePan');
+
+    // 現在の拡大率＆平行移動（シーン座標系で管理）
+    let scale = 1;
+    let tx = 0, ty = 0;
+
+    function applyTransform() {
+      scene.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);
+      label.textContent = Math.round(scale * 100) + '%';
+    }
+
+    // ズームスライダー
+    zoom.addEventListener('input', (e) => {
+      const prev = scale;
+      const next = Number(e.target.value);
+      zoomAtCenter(next / prev);
+    });
+
+    // クリックで段階ズーム
+    zin.addEventListener('click', () => zoomAtCenter(1.2));
+    zout.addEventListener('click', () => zoomAtCenter(1/1.2));
+
+    // SVG ビューポート中心を基準に拡大縮小
+    function zoomAtCenter(factor) {
+      const vb = svg.viewBox.baseVal;
+      const cx = vb.x + vb.width / 2;
+      const cy = vb.y + vb.height / 2;
+      // 中心を固定するための平行移動補正
+      tx = cx - (cx - tx) * factor;
+      ty = cy - (cy - ty) * factor;
+      scale *= factor;
+      scale = Math.min(4, Math.max(0.25, scale));
+      zoom.value = scale;
+      applyTransform();
+    }
+
+    // 全体表示（初期配置に戻す）
+    fit.addEventListener('click', () => {
+      scale = 1; tx = 0; ty = 0; zoom.value = scale; applyTransform();
+    });
+
+    // パン（ドラッグ移動）
+    let dragging = false; let ox = 0, oy = 0; // スクリーン座標での開始点
+    svg.addEventListener('mousedown', (e) => {
+      if (!togglePan.checked) return;
+      dragging = true; ox = e.clientX; oy = e.clientY; svg.style.cursor = 'grabbing';
+    });
+    window.addEventListener('mouseup', () => { dragging = false; svg.style.cursor = 'default'; });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const dx = (e.clientX - ox) * (1000 / svg.clientWidth);   // viewBoxスケールに合わせて換算
+      const dy = (e.clientY - oy) * (600 / svg.clientHeight);
+      tx += dx / scale; ty += dy / scale; // 現在の拡大率に合わせて移動量を調整
+      ox = e.clientX; oy = e.clientY;
+      applyTransform();
+    });
+
+    // 初期レンダリング
+    applyTransform();
+  </script>
+</body>
+</html>
