@@ -73,8 +73,10 @@ class PyramidSVGRenderer {
       this.drawAgeLabels();
     }
     
-    // 中央線と男女ラベルを描画
-    this.drawCenterLine();
+    // 特別な年齢の横線とラベルを描画
+    this.drawSpecialAgeLines();
+    
+    // 男女ラベルを描画
     this.drawGenderLabels();
     
     this.container.appendChild(this.svg);
@@ -95,17 +97,24 @@ class PyramidSVGRenderer {
     const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     gridGroup.setAttribute('class', 'grid');
     
-    // 縦線（中央線と左右の境界線）
-    const centerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    centerLine.setAttribute('x1', this.options.width / 2);
-    centerLine.setAttribute('y1', 0);
-    centerLine.setAttribute('x2', this.options.width / 2);
-    centerLine.setAttribute('y2', this.options.height);
-    centerLine.setAttribute('stroke', '#ccc');
-    centerLine.setAttribute('stroke-width', '2');
-    centerLine.setAttribute('stroke-dasharray', '5,5');
+    // 男女の各棒の起点に縦線を引く
+    const leftStartLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    leftStartLine.setAttribute('x1', this.options.width / 2 - 10);
+    leftStartLine.setAttribute('y1', 0);
+    leftStartLine.setAttribute('x2', this.options.width / 2 - 10);
+    leftStartLine.setAttribute('y2', this.options.height);
+    leftStartLine.setAttribute('stroke', '#ccc');
+    leftStartLine.setAttribute('stroke-width', '1');
+    gridGroup.appendChild(leftStartLine);
     
-    gridGroup.appendChild(centerLine);
+    const rightStartLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    rightStartLine.setAttribute('x1', this.options.width / 2 + 10);
+    rightStartLine.setAttribute('y1', 0);
+    rightStartLine.setAttribute('x2', this.options.width / 2 + 10);
+    rightStartLine.setAttribute('y2', this.options.height);
+    rightStartLine.setAttribute('stroke', '#ccc');
+    rightStartLine.setAttribute('stroke-width', '1');
+    gridGroup.appendChild(rightStartLine);
     
     // 横線（各歳の境界線）
     for (let age = 0; age <= 100; age++) {
@@ -114,8 +123,14 @@ class PyramidSVGRenderer {
       line.setAttribute('y1', this.options.height - (age * this.options.ageHeight));
       line.setAttribute('x2', this.options.width);
       line.setAttribute('y2', this.options.height - (age * this.options.ageHeight));
-      line.setAttribute('stroke', '#eee');
-      line.setAttribute('stroke-width', '1');
+      // 5歳ごとに線を少し太くする
+      if (age % 5 === 0) {
+        line.setAttribute('stroke', '#ddd');
+        line.setAttribute('stroke-width', '2');
+      } else {
+        line.setAttribute('stroke', '#eee');
+        line.setAttribute('stroke-width', '1');
+      }
       
       gridGroup.appendChild(line);
     }
@@ -145,17 +160,45 @@ class PyramidSVGRenderer {
     this.svg.appendChild(ageLabelGroup);
   }
 
-  drawCenterLine() {
-    const centerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    centerLine.setAttribute('x1', this.options.width / 2);
-    centerLine.setAttribute('y1', 0);
-    centerLine.setAttribute('x2', this.options.width / 2);
-    centerLine.setAttribute('y2', this.options.height);
-    centerLine.setAttribute('stroke', '#333333');
-    centerLine.setAttribute('stroke-width', 2);
-    centerLine.setAttribute('class', 'center-line');
-    this.svg.appendChild(centerLine);
+  drawSpecialAgeLines() {
+    const specialLineGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    specialLineGroup.setAttribute('class', 'special-age-lines');
+    
+    // 15歳、65歳、75歳の特別な横線とラベル
+    const specialAges = [15, 65, 75];
+    const ageLabels = ['15歳', '65歳', '75歳'];
+    
+    specialAges.forEach((age, index) => {
+      const y = this.options.height - (age * this.options.ageHeight);
+      
+      // 枠一杯の横線
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', 0);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', this.options.width);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', '#999');
+      line.setAttribute('stroke-width', '3');
+      
+      // 年齢ラベル
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.textContent = ageLabels[index];
+      label.setAttribute('x', this.options.width - 10);
+      label.setAttribute('y', y - 5);
+      label.setAttribute('text-anchor', 'end');
+      label.setAttribute('dominant-baseline', 'bottom');
+      label.setAttribute('font-size', '14');
+      label.setAttribute('fill', '#666');
+      label.setAttribute('font-weight', 'bold');
+      
+      specialLineGroup.appendChild(line);
+      specialLineGroup.appendChild(label);
+    });
+    
+    this.svg.appendChild(specialLineGroup);
   }
+
+
 
   drawGenderLabels() {
     // 男性ラベル
@@ -233,7 +276,7 @@ class PyramidSVGRenderer {
 
   clearBars() {
     // 既存のバー要素を削除
-    const bars = this.svg.querySelectorAll('.age-bar, .male-bar, .female-bar, .population-label');
+    const bars = this.svg.querySelectorAll('.age-bar, .male-bar, .female-bar, .population-label, .male-bottom-line, .female-bottom-line');
     bars.forEach(bar => bar.remove());
   }
 
@@ -261,6 +304,19 @@ class PyramidSVGRenderer {
       maleBar.setAttribute('data-population', maleCount);
       
       this.svg.appendChild(maleBar);
+      
+      // 5歳ごとの棒のボトムラインを太くする
+      if (age % 5 === 0) {
+        const bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        bottomLine.setAttribute('x1', this.options.width / 2 - maleWidth - 10);
+        bottomLine.setAttribute('y1', agePosition + currentBarHeight);
+        bottomLine.setAttribute('x2', this.options.width / 2 - 10);
+        bottomLine.setAttribute('y2', agePosition + currentBarHeight);
+        bottomLine.setAttribute('stroke', this.options.maleStrokeColor);
+        bottomLine.setAttribute('stroke-width', '3');
+        bottomLine.setAttribute('class', 'male-bottom-line');
+        this.svg.appendChild(bottomLine);
+      }
       
       // 人数ラベル
       if (this.options.showNumbers && maleWidth > 30) {
@@ -293,6 +349,19 @@ class PyramidSVGRenderer {
       femaleBar.setAttribute('data-population', femaleCount);
       
       this.svg.appendChild(femaleBar);
+      
+      // 5歳ごとの棒のボトムラインを太くする
+      if (age % 5 === 0) {
+        const bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        bottomLine.setAttribute('x1', this.options.width / 2 + 10);
+        bottomLine.setAttribute('y1', agePosition + currentBarHeight);
+        bottomLine.setAttribute('x2', this.options.width / 2 + femaleWidth + 10);
+        bottomLine.setAttribute('y2', agePosition + currentBarHeight);
+        bottomLine.setAttribute('stroke', this.options.femaleStrokeColor);
+        bottomLine.setAttribute('stroke-width', '3');
+        bottomLine.setAttribute('class', 'female-bottom-line');
+        this.svg.appendChild(bottomLine);
+      }
       
       // 人数ラベル
       if (this.options.showNumbers && femaleWidth > 30) {
