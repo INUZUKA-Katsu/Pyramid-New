@@ -59,11 +59,20 @@ class PyramidSVGRenderer {
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     this.svg.setAttribute('width', this.options.width);
     this.svg.setAttribute('height', this.options.height);
-    this.svg.setAttribute('viewBox', `0 0 ${this.options.width} ${this.options.height}`);
+    // viewBoxは固定（1108x600）で、transformで拡大縮小
+    this.svg.setAttribute('viewBox', '0 0 1108 600');
     this.svg.style.backgroundColor = this.options.backgroundColor;
     
-    // 背景とグリッドを描画
+    // 背景を描画
     this.drawBackground();
+    
+    // 全要素をグループ化するためのg要素を作成
+    this.sceneGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    this.sceneGroup.setAttribute('id', 'pyramid-scene');
+    this.sceneGroup.setAttribute('transform', 'translate(0,0) scale(1)');
+    this.svg.appendChild(this.sceneGroup);
+    
+    // グリッドを描画
     if (this.options.showGrid) {
       this.drawGrid();
     }
@@ -83,12 +92,12 @@ class PyramidSVGRenderer {
   }
 
   drawBackground() {
-    // 背景の矩形
+    // 背景の矩形（固定座標1108x600）
     const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     bg.setAttribute('x', 0);
     bg.setAttribute('y', 0);
-    bg.setAttribute('width', this.options.width);
-    bg.setAttribute('height', this.options.height);
+    bg.setAttribute('width', 1108);
+    bg.setAttribute('height', 600);
     bg.setAttribute('fill', this.options.backgroundColor);
     this.svg.appendChild(bg);
   }
@@ -97,21 +106,25 @@ class PyramidSVGRenderer {
     const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     gridGroup.setAttribute('class', 'grid');
     
+    // 固定座標（1108x600）を使用
+    const viewBoxWidth = 1108;
+    const viewBoxHeight = 600;
+    
     // 男女の各棒の起点に縦線を引く
     const leftStartLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    leftStartLine.setAttribute('x1', this.options.width / 2 - 10);
+    leftStartLine.setAttribute('x1', viewBoxWidth / 2 - 10);
     leftStartLine.setAttribute('y1', 0);
-    leftStartLine.setAttribute('x2', this.options.width / 2 - 10);
-    leftStartLine.setAttribute('y2', this.options.height);
+    leftStartLine.setAttribute('x2', viewBoxWidth / 2 - 10);
+    leftStartLine.setAttribute('y2', viewBoxHeight);
     leftStartLine.setAttribute('stroke', '#ccc');
     leftStartLine.setAttribute('stroke-width', '1');
     gridGroup.appendChild(leftStartLine);
     
     const rightStartLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    rightStartLine.setAttribute('x1', this.options.width / 2 + 10);
+    rightStartLine.setAttribute('x1', viewBoxWidth / 2 + 10);
     rightStartLine.setAttribute('y1', 0);
-    rightStartLine.setAttribute('x2', this.options.width / 2 + 10);
-    rightStartLine.setAttribute('y2', this.options.height);
+    rightStartLine.setAttribute('x2', viewBoxWidth / 2 + 10);
+    rightStartLine.setAttribute('y2', viewBoxHeight);
     rightStartLine.setAttribute('stroke', '#ccc');
     rightStartLine.setAttribute('stroke-width', '1');
     gridGroup.appendChild(rightStartLine);
@@ -120,9 +133,9 @@ class PyramidSVGRenderer {
     for (let age = 0; age <= 100; age++) {
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', 0);
-      line.setAttribute('y1', this.options.height - (age * this.options.ageHeight));
-      line.setAttribute('x2', this.options.width);
-      line.setAttribute('y2', this.options.height - (age * this.options.ageHeight));
+      line.setAttribute('y1', viewBoxHeight - (age * this.options.ageHeight));
+      line.setAttribute('x2', viewBoxWidth);
+      line.setAttribute('y2', viewBoxHeight - (age * this.options.ageHeight));
       // 5歳ごとに線を少し太くする
       if (age % 5 === 0) {
         line.setAttribute('stroke', '#ddd');
@@ -135,19 +148,23 @@ class PyramidSVGRenderer {
       gridGroup.appendChild(line);
     }
     
-    this.svg.appendChild(gridGroup);
+    this.sceneGroup.appendChild(gridGroup);
   }
 
   drawAgeLabels() {
     const ageLabelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     ageLabelGroup.setAttribute('class', 'age-labels');
     
+    // 固定座標（1108x600）を使用
+    const viewBoxWidth = 1108;
+    const viewBoxHeight = 600;
+    
     // 5歳ごとに年齢ラベルを表示（0歳から100歳まで）
     for (let age = 0; age <= 100; age += 5) {
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       label.textContent = age;
-      label.setAttribute('x', this.options.width / 2);
-      label.setAttribute('y', this.options.height - (age * this.options.ageHeight) - this.options.ageHeight / 2);
+      label.setAttribute('x', viewBoxWidth / 2);
+      label.setAttribute('y', viewBoxHeight - (age * this.options.ageHeight) - this.options.ageHeight / 2);
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('dominant-baseline', 'middle');
       label.setAttribute('font-size', '12');
@@ -157,25 +174,29 @@ class PyramidSVGRenderer {
       ageLabelGroup.appendChild(label);
     }
     
-    this.svg.appendChild(ageLabelGroup);
+    this.sceneGroup.appendChild(ageLabelGroup);
   }
 
   drawSpecialAgeLines() {
     const specialLineGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     specialLineGroup.setAttribute('class', 'special-age-lines');
     
+    // 固定座標（1108x600）を使用
+    const viewBoxWidth = 1108;
+    const viewBoxHeight = 600;
+    
     // 15歳、65歳、75歳の特別な横線とラベル
     const specialAges = [15, 65, 75];
     const ageLabels = ['15歳', '65歳', '75歳'];
     
     specialAges.forEach((age, index) => {
-      const y = this.options.height - (age * this.options.ageHeight);
+      const y = viewBoxHeight - (age * this.options.ageHeight);
       
       // 枠一杯の横線
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', 0);
       line.setAttribute('y1', y);
-      line.setAttribute('x2', this.options.width);
+      line.setAttribute('x2', viewBoxWidth);
       line.setAttribute('y2', y);
       line.setAttribute('stroke', '#999');
       line.setAttribute('stroke-width', '3');
@@ -183,7 +204,7 @@ class PyramidSVGRenderer {
       // 年齢ラベル
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       label.textContent = ageLabels[index];
-      label.setAttribute('x', this.options.width - 10);
+      label.setAttribute('x', viewBoxWidth - 10);
       label.setAttribute('y', y - 5);
       label.setAttribute('text-anchor', 'end');
       label.setAttribute('dominant-baseline', 'bottom');
@@ -195,7 +216,7 @@ class PyramidSVGRenderer {
       specialLineGroup.appendChild(label);
     });
     
-    this.svg.appendChild(specialLineGroup);
+    this.sceneGroup.appendChild(specialLineGroup);
   }
 
 
@@ -203,7 +224,7 @@ class PyramidSVGRenderer {
   drawGenderLabels() {
     // 男性ラベル
     const maleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    maleLabel.setAttribute('x', this.options.width / 2 - 50);
+    maleLabel.setAttribute('x', 1108 / 2 - 50);
     maleLabel.setAttribute('y', 20);
     maleLabel.setAttribute('text-anchor', 'middle');
     maleLabel.setAttribute('fill', this.options.maleColor);
@@ -211,11 +232,11 @@ class PyramidSVGRenderer {
     maleLabel.setAttribute('font-weight', 'bold');
     maleLabel.setAttribute('class', 'gender-label');
     maleLabel.textContent = '男性';
-    this.svg.appendChild(maleLabel);
+    this.sceneGroup.appendChild(maleLabel);
     
     // 女性ラベル
     const femaleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    femaleLabel.setAttribute('x', this.options.width / 2 + 50);
+    femaleLabel.setAttribute('x', 1108 / 2 + 50);
     femaleLabel.setAttribute('y', 20);
     femaleLabel.setAttribute('text-anchor', 'middle');
     femaleLabel.setAttribute('fill', this.options.femaleColor);
@@ -223,7 +244,7 @@ class PyramidSVGRenderer {
     femaleLabel.setAttribute('font-weight', 'bold');
     femaleLabel.setAttribute('class', 'gender-label');
     femaleLabel.textContent = '女性';
-    this.svg.appendChild(femaleLabel);
+    this.sceneGroup.appendChild(femaleLabel);
   }
 
   calculateScale(data, unitSize = null, margin = 15) {
@@ -234,15 +255,21 @@ class PyramidSVGRenderer {
     
     if (this.options.scaleMode === 'fixed') {
       this.scale = this.options.maxWidth / this.getMaxPopulation(data);
-          } else {
-        // 元の実装と同じロジック: 400 * 101 / 総人口
-        const totalPopulation = this.getTotalPopulation(data);
-        if (totalPopulation > 0) {
-          this.scale = (400 * 101) / totalPopulation;
-        } else {
-          this.scale = 0;
-        }
+    } else {
+      // 自動モード: 現在のサイズに基づいてスケールを計算
+      // 元の比率（400/1108）を維持しつつ、現在の幅に適用
+      const originalRatio = 400 / 1108;
+      const currentMaxWidth = this.options.width * originalRatio;
+      const totalPopulation = this.getTotalPopulation(data);
+      if (totalPopulation > 0) {
+        this.scale = (currentMaxWidth * 101) / totalPopulation;
+      } else {
+        this.scale = 0;
       }
+    }
+    
+    // デバッグ用: スケール値をコンソールに出力
+    console.log(`calculateScale: width=${this.options.width}, currentMaxWidth=${this.options.width * (400/1108)}, scale=${this.scale}`);
   }
 
   getMaxPopulation(data) {
@@ -284,14 +311,18 @@ class PyramidSVGRenderer {
     // barHeightが指定されている場合は使用、そうでなければオプションの値を使用
     const currentBarHeight = barHeight !== null && barHeight !== undefined ? barHeight : this.options.ageHeight;
     
+    // 固定座標（1108x600）を使用
+    const viewBoxWidth = 1108;
+    const viewBoxHeight = 600;
+    
     // 年齢の位置を計算（0歳が下、100歳が上）
-    const agePosition = this.options.height - (age * currentBarHeight) - currentBarHeight;
+    const agePosition = viewBoxHeight - (age * currentBarHeight) - currentBarHeight;
     
     // 男性の棒を描画（左側）- 中央線から10px離す
     if (maleCount > 0) {
       const maleWidth = this.calculateBarWidth(maleCount, unitSize);
       const maleBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      maleBar.setAttribute('x', this.options.width / 2 - maleWidth - 10); // 中央線から10px離す
+      maleBar.setAttribute('x', viewBoxWidth / 2 - maleWidth - 10); // 中央線から10px離す
       maleBar.setAttribute('y', agePosition);
       maleBar.setAttribute('width', maleWidth);
       maleBar.setAttribute('height', currentBarHeight);
@@ -303,32 +334,33 @@ class PyramidSVGRenderer {
       maleBar.setAttribute('data-gender', 'male');
       maleBar.setAttribute('data-population', maleCount);
       
-      this.svg.appendChild(maleBar);
+      this.sceneGroup.appendChild(maleBar);
       
       // 5歳ごとの棒のボトムラインを太くする
       if (age % 5 === 0) {
         const bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        bottomLine.setAttribute('x1', this.options.width / 2 - maleWidth - 10);
+        bottomLine.setAttribute('x1', viewBoxWidth / 2 - maleWidth - 10);
         bottomLine.setAttribute('y1', agePosition + currentBarHeight);
-        bottomLine.setAttribute('x2', this.options.width / 2 - 10);
+        bottomLine.setAttribute('x2', viewBoxWidth / 2 - 10);
         bottomLine.setAttribute('y2', agePosition + currentBarHeight);
         bottomLine.setAttribute('stroke', this.options.maleStrokeColor);
         bottomLine.setAttribute('stroke-width', '3');
         bottomLine.setAttribute('class', 'male-bottom-line');
-        this.svg.appendChild(bottomLine);
+        this.sceneGroup.appendChild(bottomLine);
       }
       
       // 人数ラベル
       if (this.options.showNumbers && maleWidth > 30) {
         const maleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        maleLabel.setAttribute('x', this.options.width / 2 - maleWidth - 15); // 棒の左端から5px左
+        maleLabel.setAttribute('x', viewBoxWidth / 2 - maleWidth - 15); // 棒の左端から5px左
         maleLabel.setAttribute('y', agePosition + currentBarHeight / 2);
         maleLabel.setAttribute('text-anchor', 'end');
         maleLabel.setAttribute('fill', this.options.textColor);
         maleLabel.setAttribute('font-size', this.options.fontSize - 3);
         maleLabel.setAttribute('class', 'population-label');
         maleLabel.textContent = maleCount.toLocaleString();
-        this.svg.appendChild(maleLabel);
+        maleLabel.setAttribute('dominant-baseline', 'middle');
+        this.sceneGroup.appendChild(maleLabel);
       }
     }
     
@@ -336,7 +368,7 @@ class PyramidSVGRenderer {
     if (femaleCount > 0) {
       const femaleWidth = this.calculateBarWidth(femaleCount, unitSize);
       const femaleBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      femaleBar.setAttribute('x', this.options.width / 2 + 10); // 中央線から10px離す
+      femaleBar.setAttribute('x', viewBoxWidth / 2 + 10); // 中央線から10px離す
       femaleBar.setAttribute('y', agePosition);
       femaleBar.setAttribute('width', femaleWidth);
       femaleBar.setAttribute('height', currentBarHeight);
@@ -348,32 +380,33 @@ class PyramidSVGRenderer {
       femaleBar.setAttribute('data-gender', 'female');
       femaleBar.setAttribute('data-population', femaleCount);
       
-      this.svg.appendChild(femaleBar);
+      this.sceneGroup.appendChild(femaleBar);
       
       // 5歳ごとの棒のボトムラインを太くする
       if (age % 5 === 0) {
         const bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        bottomLine.setAttribute('x1', this.options.width / 2 + 10);
+        bottomLine.setAttribute('x1', viewBoxWidth / 2 + 10);
         bottomLine.setAttribute('y1', agePosition + currentBarHeight);
-        bottomLine.setAttribute('x2', this.options.width / 2 + femaleWidth + 10);
+        bottomLine.setAttribute('x2', viewBoxWidth / 2 + femaleWidth + 10);
         bottomLine.setAttribute('y2', agePosition + currentBarHeight);
         bottomLine.setAttribute('stroke', this.options.femaleStrokeColor);
         bottomLine.setAttribute('stroke-width', '3');
         bottomLine.setAttribute('class', 'female-bottom-line');
-        this.svg.appendChild(bottomLine);
+        this.sceneGroup.appendChild(bottomLine);
       }
       
       // 人数ラベル
       if (this.options.showNumbers && femaleWidth > 30) {
         const femaleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        femaleLabel.setAttribute('x', this.options.width / 2 + femaleWidth + 15); // 棒の右端から5px右
+        femaleLabel.setAttribute('x', viewBoxWidth / 2 + femaleWidth + 15); // 棒の右端から5px右
         femaleLabel.setAttribute('y', agePosition + currentBarHeight / 2);
         femaleLabel.setAttribute('text-anchor', 'start');
         femaleLabel.setAttribute('fill', this.options.textColor);
         femaleLabel.setAttribute('font-size', this.options.fontSize - 3);
         femaleLabel.setAttribute('class', 'population-label');
         femaleLabel.textContent = femaleCount.toLocaleString();
-        this.svg.appendChild(femaleLabel);
+        femaleLabel.setAttribute('dominant-baseline', 'middle');
+        this.sceneGroup.appendChild(femaleLabel);
       }
     }
   }
@@ -450,15 +483,29 @@ class PyramidSVGRenderer {
 
   // 方式1: 全体サイズ指定によるリサイズ
   resizeByDimensions(width, height) {
+    // 新しいサイズを設定
     this.options.width = width;
     this.options.height = height;
+    
+    // SVGのサイズを変更
     this.svg.setAttribute('width', width);
     this.svg.setAttribute('height', height);
-    this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
     
-    if (this.data) {
-      this.render(this.data);
-    }
+    // viewBoxは固定（1108x600）のまま
+    // transform属性で拡大縮小を行う
+    const scaleX = width / 1108;
+    const scaleY = height / 600;
+    const scale = Math.min(scaleX, scaleY); // 相似形を保つ
+    
+    // 中央を基準とした拡大縮小
+    const translateX = (width - 1108 * scale) / 2;
+    const translateY = (height - 600 * scale) / 2;
+    
+    // sceneGroupのtransform属性を更新
+    this.sceneGroup.setAttribute('transform', `translate(${translateX},${translateY}) scale(${scale})`);
+    
+    // デバッグ用
+    console.log(`resizeByDimensions: width=${width}, height=${height}, scale=${scale}, translate=(${translateX},${translateY})`);
   }
 
   // 方式2: 個別パラメータ指定によるリサイズ
