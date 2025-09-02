@@ -434,8 +434,22 @@ class PyramidSVGRenderer {
     }
   }
 
-  // ピラミッドのサイズ調整
-  resize(width, height) {
+  // ピラミッドのサイズ調整（ハイブリッド方式）
+  resize(options = {}) {
+    if (options.width && options.height) {
+      // 方式1: 全体サイズ指定
+      this.resizeByDimensions(options.width, options.height);
+    } else if (options.unitSize || options.barHeight) {
+      // 方式2: 個別パラメータ指定
+      this.resizeByParameters(options.unitSize, options.barHeight);
+    } else if (typeof options === 'number' && typeof arguments[1] === 'number') {
+      // 後方互換性: resize(width, height) の呼び出し
+      this.resizeByDimensions(options, arguments[1]);
+    }
+  }
+
+  // 方式1: 全体サイズ指定によるリサイズ
+  resizeByDimensions(width, height) {
     this.options.width = width;
     this.options.height = height;
     this.svg.setAttribute('width', width);
@@ -444,6 +458,31 @@ class PyramidSVGRenderer {
     
     if (this.data) {
       this.render(this.data);
+    }
+  }
+
+  // 方式2: 個別パラメータ指定によるリサイズ
+  resizeByParameters(unitSize = null, barHeight = null) {
+    let needsReinit = false;
+    
+    // unitSizeが指定されている場合
+    if (unitSize !== null && unitSize !== undefined) {
+      this.options.unitSize = unitSize;
+      needsReinit = true;
+    }
+    
+    // barHeightが指定されている場合
+    if (barHeight !== null && barHeight !== undefined) {
+      this.options.ageHeight = barHeight;
+      needsReinit = true;
+    }
+    
+    // パラメータが変更された場合は再初期化
+    if (needsReinit) {
+      this.init();
+      if (this.data) {
+        this.render(this.data, this.options.unitSize, this.options.ageHeight);
+      }
     }
   }
 
