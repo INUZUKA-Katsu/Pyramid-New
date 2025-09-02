@@ -101,8 +101,8 @@ class PyramidSVGRenderer {
     const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     bg.setAttribute('x', 0);
     bg.setAttribute('y', 0);
-    bg.setAttribute('width', this.options.width);
-    bg.setAttribute('height', this.options.height);
+    bg.setAttribute('width', 1108);
+    bg.setAttribute('height', 600);
     bg.setAttribute('fill', this.options.backgroundColor);
     this.sceneGroup.appendChild(bg);
   }
@@ -326,6 +326,10 @@ class PyramidSVGRenderer {
     // 現在のviewBoxのサイズの棒の使用（動的に計算）
     const viewBoxWidth = this.options.width;
     const viewBoxHeight = this.options.height;
+    
+    // 固定座標（1108x600）を使用
+    const viewBoxWidth = 1108;
+    const viewBoxHeight = 600;
     
     // 年齢の位置を計算（0歳が下、100歳が上）
         const agePosition = viewBoxHeight - (age * barHeight) - barHeight;
