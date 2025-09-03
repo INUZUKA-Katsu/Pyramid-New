@@ -1,26 +1,6 @@
 // 横浜市の人口ピラミッド SVG描画エンジン ver1.3 2024.12.30
 // 既存のpyramid.jsとの互換性を保ちながら、SVGによる柔軟な描画を実現
 
-// 元の実装と同じunit_sizeの値を定義
-const UNIT_SIZE_VALUES = {
-  "age": 0.01082,
-  "tsurumi": 0.1398,
-  "kanagawa": 0.1672,
-  "nishi": 0.4038,
-  "naka": 0.27086,
-  "minami": 0.1398,
-  "konan": 0.1398,
-  "hokubu": 0.1398,
-  "midori": 0.1398,
-  "tsuzuki": 0.1398,
-  "sakae": 0.1398,
-  "izumi": 0.1398,
-  "seya": 0.1398,
-  "asahi": 0.1398,
-  "kohoku": 0.1398,
-  "tsurumi4ku": 0.1398
-};
-
 class PyramidSVGRenderer {
   constructor(containerId, options = {}) {
     this.containerId = containerId;
@@ -28,7 +8,8 @@ class PyramidSVGRenderer {
     this.options = {
       width: 1108,
       height: 600,
-      ageHeight: 6, // 各年齢の高さ
+      unitSize: null,
+      barHeight: null, // 各年齢の棒の高さ
       maleColor: '#0066cc',
       femaleColor: '#cc0066',
       maleStrokeColor: '#004499',
@@ -42,21 +23,27 @@ class PyramidSVGRenderer {
       showNumbers: true,
       scaleMode: 'auto', // 'auto', 'fixed'
       maxWidth: 400, // 最大バー幅（ピクセル）
-      ...options
+      ...options //引数で渡された値でデフォルト値を上書き
     };
-    
+    this.options.barHeight = this.options.height / 101;
     this.svg = null;
     this.data = null;
-    this.scale = 1;
     this.init();
+    // インスタンスをグローバル変数に保存
+    window.renderPyramid = this;
   }
 
   init() {
+    console.log('init');
     // 既存のコンテナをクリア
     this.container.innerHTML = '';
     
     // SVG要素を作成
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+    console.log('this.options.width', this.options.width);
+    console.log('this.options.height', this.options.height);
+    
     this.svg.setAttribute('width', this.options.width);
     this.svg.setAttribute('height', this.options.height);
     // viewBoxは固定（1108x600）で、transformで拡大縮小
@@ -128,18 +115,23 @@ class PyramidSVGRenderer {
     rightStartLine.setAttribute('stroke', '#ccc');
     rightStartLine.setAttribute('stroke-width', '1');
     gridGroup.appendChild(rightStartLine);
-    
+
     // 横線（各歳の境界線）
     for (let age = 0; age <= 100; age++) {
+      
+      //console.log('viewBoxHeight', viewBoxHeight);
+      //console.log('age', age);
+      //console.log('this.options.barHeight', this.options.barHeight);
+
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', 0);
-      line.setAttribute('y1', viewBoxHeight - (age * this.options.ageHeight));
+      line.setAttribute('y1', viewBoxHeight - (age * this.options.barHeight));
       line.setAttribute('x2', viewBoxWidth);
-      line.setAttribute('y2', viewBoxHeight - (age * this.options.ageHeight));
-      // 5歳ごとに線を少し太くする
+      line.setAttribute('y2', viewBoxHeight - (age * this.options.barHeight));
+      // 5歳ごとに線の色を少しく濃くする
       if (age % 5 === 0) {
-        line.setAttribute('stroke', '#ddd');
-        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke', '#cccccc');
+        line.setAttribute('stroke-width', '1');
       } else {
         line.setAttribute('stroke', '#eee');
         line.setAttribute('stroke-width', '1');
@@ -164,7 +156,7 @@ class PyramidSVGRenderer {
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       label.textContent = age;
       label.setAttribute('x', viewBoxWidth / 2);
-      label.setAttribute('y', viewBoxHeight - (age * this.options.ageHeight) - this.options.ageHeight / 2);
+      label.setAttribute('y', viewBoxHeight - (age * this.options.barHeight) - this.options.barHeight / 2);
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('dominant-baseline', 'middle');
       label.setAttribute('font-size', '12');
@@ -190,16 +182,16 @@ class PyramidSVGRenderer {
     const ageLabels = ['15歳', '65歳', '75歳'];
     
     specialAges.forEach((age, index) => {
-      const y = viewBoxHeight - (age * this.options.ageHeight);
-      
+      const y = viewBoxHeight - (age * this.options.barHeight);
+    
       // 枠一杯の横線
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', 0);
       line.setAttribute('y1', y);
       line.setAttribute('x2', viewBoxWidth);
       line.setAttribute('y2', y);
-      line.setAttribute('stroke', '#999');
-      line.setAttribute('stroke-width', '3');
+      line.setAttribute('stroke', '#919191');
+      line.setAttribute('stroke-width', '1');
       
       // 年齢ラベル
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -218,8 +210,6 @@ class PyramidSVGRenderer {
     
     this.sceneGroup.appendChild(specialLineGroup);
   }
-
-
 
   drawGenderLabels() {
     // 男性ラベル
@@ -247,29 +237,21 @@ class PyramidSVGRenderer {
     this.sceneGroup.appendChild(femaleLabel);
   }
 
-  calculateScale(data, unitSize = null, margin = 15) {
-    if (unitSize !== null && unitSize !== undefined) {
-      this.scale = unitSize;
-      return;
+  // ユニットサイズの初期値を求める
+  calculateUnitSize(data, unitSize = null, margin = 15) {
+
+    function get_unitSize(totalPopulation,pyramidHeight,whRatio){
+      let pyramidWidth = pyramidHeight*whRatio;
+      let unitSize     = pyramidWidth/(totalPopulation / 101);
+      console.log('pyramidWidth', pyramidWidth);
+      console.log('totalPopulation', totalPopulation);
+      return unitSize;
     }
-    
-    if (this.options.scaleMode === 'fixed') {
-      this.scale = this.options.maxWidth / this.getMaxPopulation(data);
-    } else {
-      // 自動モード: 現在のサイズに基づいてスケールを計算
-      // 元の比率（400/1108）を維持しつつ、現在の幅に適用
-      const originalRatio = 400 / 1108;
-      const currentMaxWidth = this.options.width * originalRatio;
-      const totalPopulation = this.getTotalPopulation(data);
-      if (totalPopulation > 0) {
-        this.scale = (currentMaxWidth * 101) / totalPopulation;
-      } else {
-        this.scale = 0;
-      }
-    }
-    
-    // デバッグ用: スケール値をコンソールに出力
-    console.log(`calculateScale: width=${this.options.width}, currentMaxWidth=${this.options.width * (400/1108)}, scale=${this.scale}`);
+    const totalPopulation = this.getTotalPopulation(data);
+    const pyramidHeight = this.options.height;
+    const whRatio = 0.5;  //人口ピラミッドが完全な長方形だった場合の縦横比
+ 
+    this.options.unitSize = get_unitSize(totalPopulation,pyramidHeight,whRatio);
   }
 
   getMaxPopulation(data) {
@@ -287,7 +269,7 @@ class PyramidSVGRenderer {
   getTotalPopulation(data) {
     let total = 0;
     data.forEach(item => {
-      if (item[2] && item[3]) {
+      if (item[0].match(/^[0-9]+(以上)?$/)) {
         const male = parseInt(item[2].replace(/,/g, '')) || 0;
         const female = parseInt(item[3].replace(/,/g, '')) || 0;
         total += male + female;
@@ -297,7 +279,7 @@ class PyramidSVGRenderer {
   }
 
   calculateBarWidth(count, unitSize = null) {
-    const scale = unitSize || this.scale;
+    const scale = unitSize || this.options.unitSize;
     return Math.max(1, count * scale); // 最小幅1ピクセル
   }
 
@@ -309,9 +291,10 @@ class PyramidSVGRenderer {
 
   drawAgeBar(age, maleCount, femaleCount, unitSize = null, barHeight = null) {
     // barHeightが指定されている場合は使用、そうでなければオプションの値を使用
-    const currentBarHeight = barHeight !== null && barHeight !== undefined ? barHeight : this.options.ageHeight;
+    const currentBarHeight = barHeight !== null && barHeight !== undefined ? barHeight : this.options.barHeight;
     
-    // 現在のviewBoxのサイズを使用（動的に計算）
+    unitSize: null
+    // 現在のviewBoxのサイズの棒の使用（動的に計算）
     const viewBoxWidth = this.options.width;
     const viewBoxHeight = this.options.height;
     
@@ -416,11 +399,11 @@ class PyramidSVGRenderer {
     this.clearBars();
     
     // スケールを計算
-    this.calculateScale(data, unitSize);
+    this.calculateUnitSize(data, unitSize);
     
     // barHeightが指定されている場合はオプションを更新
     if (barHeight !== null && barHeight !== undefined) {
-      this.options.ageHeight = barHeight;
+      this.currentBarHeight = barHeight;
     }
     
     // データから年齢別人口のマップを作成
@@ -459,7 +442,7 @@ class PyramidSVGRenderer {
 
   // スケールの動的変更
   setScale(scale) {
-    this.scale = scale;
+    this.unitSize = scale;
     if (this.data) {
       this.render(this.data, scale);
     }
@@ -472,6 +455,8 @@ class PyramidSVGRenderer {
       this.resizeByScale2(options.scale);
     } else if (options.unitSize || options.barHeight) {
       // 方式2: 個別パラメータ指定
+      console.log('options.unitSize', options.unitSize);
+      console.log('options.barHeight', options.barHeight);
       this.resizeByParameters(options.unitSize, options.barHeight);
     } else if (typeof options === 'number' && typeof arguments[1] === 'number') {
       // 後方互換性: resize(width, height) の呼び出し
@@ -527,7 +512,7 @@ class PyramidSVGRenderer {
     
     // barHeightが指定されている場合
     if (barHeight !== null && barHeight !== undefined) {
-      this.options.ageHeight = barHeight;
+      this.options.barHeight = barHeight;
       needsReinit = true;
     }
     
@@ -535,7 +520,7 @@ class PyramidSVGRenderer {
     if (needsReinit) {
       this.init();
       if (this.data) {
-        this.render(this.data, this.options.unitSize, this.options.ageHeight);
+        this.render(this.data, this.options.unitSize, this.options.barHeight);
       }
     }
   }
@@ -574,6 +559,9 @@ class PyramidSVGRenderer {
   }
 
 }
+//*************class PyramidSVGRenderer はここまで*************
+
+
 
 // 既存のpyramid.jsとの互換性を保つための関数
 function createSVGPyramid(containerId, pyramidData, unitSize, options = {}) {
@@ -581,7 +569,7 @@ function createSVGPyramid(containerId, pyramidData, unitSize, options = {}) {
 }
 
 // 既存のchange_pyramid関数を拡張してSVGレンダラーを使用可能にする
-function change_pyramid_svg(pyramidData, unit_size, containerId = 'pyramid', options = {}) {
+function change_pyramid_svg(pyramidData, unitSize, containerId = 'pyramid', options = {}) {
   // 既存のHTMLベースの描画を無効化
   const existingContainer = document.getElementById(containerId);
   if (existingContainer) {
@@ -600,7 +588,7 @@ function change_pyramid_svg(pyramidData, unit_size, containerId = 'pyramid', opt
   }
   
   // SVGレンダラーでピラミッドを描画
-  const renderer = createSVGPyramid(svgContainerId, pyramidData, unit_size, options);
+  const renderer = createSVGPyramid(svgContainerId, pyramidData, unitSize, options);
   
   // 既存のデータ処理ロジックを維持
   if (pyramidData instanceof Array) {
@@ -659,16 +647,17 @@ function change_pyramid_svg(pyramidData, unit_size, containerId = 'pyramid', opt
   return renderer;
 }
 
+
 // 既存のchange_pyramid関数を拡張（オプション）
-function change_pyramid(pyramidData, unit_size) {
+function change_pyramid(pyramidData, unitSize) {
   // SVGレンダラーを使用するかどうかの判定
   const useSVG = window.useSVGRenderer === true;
   
   if (useSVG) {
-    return change_pyramid_svg(pyramidData, unit_size);
+    return change_pyramid_svg(pyramidData, unitSize);
   } else {
     // 既存のHTMLベースの描画処理
-    return change_pyramid_original(pyramidData, unit_size);
+    return change_pyramid_original(pyramidData, unitSize);
   }
 }
 
