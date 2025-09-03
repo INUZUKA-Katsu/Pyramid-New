@@ -149,7 +149,7 @@
             
             <div class="control-group">
                 <label>デモデータ</label>
-                <select id="demoData" onchange="loadDemoData()">
+                <select id="demoData">
                     <option value="shi" selected>横浜市 2022年１月１日）</option>
                     <option value="aoba">青葉区 2022年１月１日</option>
                     <option value="nishi">西区 2022年１月１日</option>
@@ -209,6 +209,11 @@
 
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
+            // セレクトボックスのイベントリスナーを設定
+            const demoDataSelect = document.getElementById('demoData');
+            demoDataSelect.addEventListener('change', changeDemoData);
+
+            // 初期データの読み込み
             loadDemoData();
             
             // バーの高さスライダーのイベントリスナーを設定
@@ -324,8 +329,9 @@
             document.getElementById('barHeightValue').textContent = value + 'px';
         }
 
-        // デモデータの読み込み
+        // データの読み込み
         function loadDemoData() {
+            console.log('loadDemoData 関数定義完了');
             const selectedData = document.getElementById('demoData').value;
             const dataScript = document.getElementById(selectedData + '-data');
             
@@ -335,15 +341,27 @@
             }
 
             try {
+                console.log('dataScript', dataScript.textContent);
                 const data = JSON.parse(dataScript.textContent);
+                console.log('data', data['kakusai_betsu'][0]);
                 renderPyramid(data);
             } catch (error) {
                 console.error('データの解析に失敗しました:', error);
             }
         }
 
+        // データの切り替え　共通描画部分は変更ないのでupdateDataメソッドを使用
+        function changeDemoData() {
+            console.log('changeDemoData 関数定義完了');
+            const selectedData = document.getElementById('demoData').value;
+            const dataScript = document.getElementById(selectedData + '-data');
+            const data = JSON.parse(dataScript.textContent);
+            currentRenderer.updateData(data);
+        }
+
         // ピラミッドの描画
         function renderPyramid(data) {
+            console.log('renderPyramid 関数定義完了');
             if (!isSVGMode) {
                 document.getElementById('pyramid-container').innerHTML = 
                     '<p style="text-align: center; padding: 50px;">このデモではSVG描画のみ対応しています</p>';
@@ -356,9 +374,7 @@
             };
 
             try {
-                currentRenderer = new PyramidSVGRenderer('pyramid-container', options);
-                currentRenderer.render(data.kakusai_betsu);
-                
+                currentRenderer = new PyramidSVGRenderer('pyramid-container', data, options);
                 document.getElementById('status').textContent = 
                     `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
             } catch (error) {
@@ -367,6 +383,10 @@
                     '<p style="text-align: center; padding: 50px; color: red;">描画エラーが発生しました</p>';
             }
         }
+        // 定義完了後の確認
+        console.log('スクリプト読み込み完了時:');
+        console.log('loadDemoData:', typeof loadDemoData);
+        console.log('renderPyramid:', typeof renderPyramid);
     </script>
 </body>
 </html>
