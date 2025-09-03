@@ -26,6 +26,15 @@ class PyramidApp
     elsif path == '/exist.cgi'
       header["content-type"] = 'text/plain'
       response = File.exist?('.' + CGI.unescape(req.query_string)) ? 'true' : 'nil'
+    elsif path.match(/\/[^\/]*(sample|demo).*\.html/)
+      header["content-type"] = 'text/html'
+      if path.match(/sample/)
+        path=File.join(File.dirname(__FILE__), '../js', path)
+        response = File.read(path)
+      else
+        path=File.join(File.dirname(__FILE__),'..', path)
+        response = File.read(path)
+      end
     else
       return [404, {}, ["Not Found"]]
     end
