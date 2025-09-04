@@ -242,34 +242,27 @@
         }
 
         // ユニットサイズの変更
-        let unitSize =null;
-        let barHeight =null;
         const uin = document.getElementById('uin');
         const uout = document.getElementById('uout');
         const radio = document.getElementById('unitsize');
         uin.addEventListener('click', () => {
-          if(unitSize === null) {
-            unitSize = currentRenderer.options.unitSize;
-            barHeight = currentRenderer.options.barHeight;
-          }
           if(radio.checked) {
-            unitSize = unitSize+0.001;
+            let unitSize = currentRenderer.options.unitSize*1.01;
+            currentRenderer.resize({"unitSize" : unitSize});
           } else {
-            barHeight = barHeight+0.1;
+            let barHeight = currentRenderer.options.barHeight*1.01;
+            currentRenderer.resize({"barHeight" : barHeight});
           }
-          currentRenderer.resize({"unitSize" : unitSize, "barHeight" : barHeight});
+          
         });
         uout.addEventListener('click', () => {
-          if(unitSize === null) {
-            unitSize = currentRenderer.options.unitSize;
-            barHeight = currentRenderer.options.barHeight;
-          }
           if(radio.checked) {
-            unitSize = unitSize-0.001;
+            let unitSize = currentRenderer.options.unitSize*0.99;
+            currentRenderer.resize({"unitSize" : unitSize});
           } else {
-            barHeight = barHeight-0.1;
+            let barHeight = currentRenderer.options.barHeight*0.99;
+            currentRenderer.resize({"barHeight" : barHeight});
           }
-          currentRenderer.resize({"unitSize" : unitSize, "barHeight" : barHeight});
         });
 
         // ピラミッドサイズの変更
@@ -341,9 +334,9 @@
             }
 
             try {
-                console.log('dataScript', dataScript.textContent);
+                //console.log('dataScript', dataScript.textContent);
                 const data = JSON.parse(dataScript.textContent);
-                console.log('data', data['kakusai_betsu'][0]);
+                //console.log('data', data['kakusai_betsu'][0]);
                 renderPyramid(data);
             } catch (error) {
                 console.error('データの解析に失敗しました:', error);
