@@ -36,6 +36,7 @@
         src="./js/tooltip/jquery.darktooltip.js"
       ></script>
       <script type="text/javascript" src="/js/html2canvas.js"></script>
+      <!--script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> -->
       <script type="text/javascript">
         //  http://rubentd.com/darktooltip/
         var w;
@@ -646,8 +647,8 @@
           }
           div#basic_data {
             position: absolute;
-            top:400px;
-            right:-10px;
+            top:615px;
+            left:1090px;
             width: 280px;
             font-size: 11pt;
             text-align: center;
@@ -1509,8 +1510,8 @@
             footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
             
             // #basic_dataをSVG描画領域内の右下に配置
-            const basicLeftPos = pyramidContainer_rect.right - basicWidth - 10;
-            const basicTopPos = pyramidContainer_rect.bottom - basic.offsetHeight - 10;
+            const basicLeftPos = pyramidContainer_rect.right - basicWidth - 20;
+            const basicTopPos = pyramidContainer_rect.bottom - basic.offsetHeight - 15;
             basic.style.left = basicLeftPos + "px";
             basic.style.top = basicTopPos + "px";
             basic.style.display = "block";
@@ -1523,8 +1524,8 @@
             const svgFixedWidth = 1108;
             if (windowWidth > svgFixedWidth) {
               // #basic_dataをSVG描画領域内の右下に配置
-              const basicLeftPos = pyramidContainer_rect.right - basicWidth - 10;
-              const basicTopPos = pyramidContainer_rect.bottom - basic.offsetHeight - 10;
+              const basicLeftPos = pyramidContainer_rect.right - basicWidth - 20;
+              const basicTopPos = pyramidContainer_rect.bottom - basic.offsetHeight - 15;
               basic.style.left = basicLeftPos + "px";
               basic.style.top = basicTopPos + "px";
               basic.style.display = "block";
