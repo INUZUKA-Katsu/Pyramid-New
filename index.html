@@ -273,7 +273,7 @@
         }
 
         #source_container {
-          margin-bottom: 60px;
+          margin-bottom: 10px;
         }
 
         #footer {
@@ -350,7 +350,7 @@
           }
         }
         div.footer {
-          margin-top: 30px;
+          margin-top: 0px;
         }
 
         @media print {
@@ -756,6 +756,19 @@
             text-align: left;
           }
         }
+        
+        /* ローディングスピナーアニメーション */
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        /* ローディング表示のレスポンシブ対応 */
+        @media (max-width: 1200px) {
+          #loading-container {
+            margin-left: 0 !important;
+          }
+        }
       </style>
     </head>
     <body onload="on_page_load()">
@@ -802,9 +815,21 @@
         </div>
 
         <h1 id="h1" data-html2canvas-ignore="true">横浜市の人口ピラミッド</h1>
-        <h2 id="h2">横浜市(平成28年1月1日現在)</h2>
+        
+        <!-- データ読み込み中の表示 -->
+        <div id="loading-container" style="text-align: center; padding: 60px 20px; color: #666; margin-left: 250px; max-width: 1108px;">
+          <div style="font-size: 18px; margin-bottom: 20px;">
+            <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></div>
+            データを読み込み中です...
+          </div>
+          <div style="font-size: 14px; color: #999;">
+            人口統計データを取得しています。しばらくお待ちください。
+          </div>
+        </div>
+        
+        <h2 id="h2" style="display: none;">横浜市(平成28年1月1日現在)</h2>
 
-        <div id="container-flex">
+        <div id="container-flex" style="display: none;">
           <div id="pyramid-block">
             <div id="link" data-html2canvas-ignore="true">
               <a href="#cho">地域別人口ピラミッドのための町丁名の指定</a>
@@ -1250,7 +1275,7 @@
       <!-- #screen_shot_section ここまで -->
 
       <!-- フッタ部分 -->
-      <div class="footer" id="footer" data-html2canvas-ignore="true">
+      <div class="footer" id="footer" data-html2canvas-ignore="true" style="display: none;">
         <hr class="margin-top margin-bottom" />
         <!-- ここから著作権情報と連絡先 -->
         <address>
@@ -1407,6 +1432,11 @@
           const dataScript = document.getElementById(selectedData + "-data");
           const data = JSON.parse(dataScript.textContent);
           currentRenderer.updateData(data);
+          
+          // データ更新後に#basic_dataの位置を再計算
+          setTimeout(() => {
+            centerContents();
+          }, 100);
         }
 
         // ピラミッドの描画
@@ -1427,6 +1457,20 @@
             currentRenderer = new PyramidSVGRenderer("pyramid-container", data);
             //document.getElementById('status').textContent =
             //    `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
+            
+            // SVG描画完了後に表示を切り替え
+            setTimeout(() => {
+              // ローディング表示を非表示に
+              document.getElementById("loading-container").style.display = "none";
+              
+              // メインコンテンツを表示
+              document.getElementById("h2").style.display = "block";
+              document.getElementById("container-flex").style.display = "flex";
+              document.getElementById("footer").style.display = "block";
+              
+              // #basic_dataの位置を再計算
+              centerContents();
+            }, 100);
           } catch (error) {
             console.error("描画に失敗しました:", error);
             document.getElementById("pyramid-container").innerHTML =
@@ -1445,20 +1489,12 @@
           const footer = document.querySelector("#footer");
           const basic = document.querySelector("#basic_data");
           const pyramidContainer = document.querySelector("#pyramid-container");
-          //if (!menu) return;
 
-          const pyramid_rect = pyramid.getBoundingClientRect();
           const pyramidContainer_rect = pyramidContainer.getBoundingClientRect();
-
           const menuWidth = menu.offsetWidth;
           const pyramidWidth = pyramid.offsetWidth;
           const windowWidth = window.innerWidth;
-          const footerwidth = footer.offsetWidth;
           const basicWidth = basic.offsetWidth;
-
-          const pyramidBottom = pyramid_rect.bottom;
-          const pyramidRight = pyramid_rect.right;
-          const menuHeight = menu.offsetHeight;
 
           // 画面中央に配置（ウィンドウ中央 - (メニュー幅 + ピラミッド幅)の半分）
           const menuLeftPos = Math.max(
@@ -1466,18 +1502,6 @@
             (windowWidth - (menuWidth + pyramidWidth)) / 2 - 10
           );
           const pyramidLeftPos = Math.max(0, menuLeftPos + menuWidth);
-
-          const rect1 = menu.getBoundingClientRect();
-          const rect2 = pyramid.getBoundingClientRect();
-          console.log("window.innerWidth", window.innerWidth);
-          console.log("pyramidRight", pyramidRight);
-          //console.log("menu.top", rect.top);
-          //console.log("menu.bottom", rect.bottom);
-          //console.log("menu.offsetHeight", menu.offsetHeight);
-          //console.log("pyramidBottom", pyramidBottom);
-          //console.log("menuHeight", menuHeight);
-          //console.log("fotter_top", pyramidBottom + menuHeight + 50);
-          //console.log("");
 
           if (windowWidth >= 1200) {
             menu.style.left = menuLeftPos + "px";
@@ -1494,12 +1518,21 @@
             menu.style.left = "0px";
             pyramid.style.left = "0px";
             footer.style["margin-left"] = "0px";
-            // #basic_dataを非表示にする
-            basic.style.display = "none";
+            
+            // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
+            const svgFixedWidth = 1108;
+            if (windowWidth > svgFixedWidth) {
+              // #basic_dataをSVG描画領域内の右下に配置
+              const basicLeftPos = pyramidContainer_rect.right - basicWidth - 10;
+              const basicTopPos = pyramidContainer_rect.bottom - basic.offsetHeight - 10;
+              basic.style.left = basicLeftPos + "px";
+              basic.style.top = basicTopPos + "px";
+              basic.style.display = "block";
+            } else {
+              // SVG領域の固定幅より画面幅が小さい場合は非表示
+              basic.style.display = "none";
+            }
           }
-
-          // 必要に応じてtopやその他のスタイルも指定
-          // menu.style.top = '100px';
         }
 
         // 初回実行
