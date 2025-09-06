@@ -278,6 +278,7 @@
         }
 
         #footer {
+          margin-top: 30px;
           margin-left: 260px;
           z-index: 1000;
         }
@@ -323,7 +324,7 @@
             display: flex;
             flex-direction: row; /* 横並び */
             gap: 30px;
-            align-items: center; /* 中央揃え */
+            align-items: flex-start; /* 上揃え */
             flex-wrap: wrap; /* 画面狭いとき折り返し可能 */
           }
           .left-controls .control-group {
@@ -1100,11 +1101,7 @@
               class="control-group"
               data-html2canvas-ignore="true"
             >
-              <h3>スクリーンショット</h3>
-              <div class="button-group">
-                <button onClick="screen_shot()" id="screen_shot_button">
-                  スクリーンショット
-                </button>
+              <h3>スクリーンショット
                 <a
                   href="#here"
                   class="header"
@@ -1112,6 +1109,11 @@
                   id="screen_shot_tooltip"
                   ><img src="./image/info-icon.png"
                 /></a>
+              </h3>
+              <div class="button-group">
+                <button onClick="screen_shot()" id="screen_shot_button">
+                  スクリーンショット
+                </button>
                 <span id="dialog"></span>
               </div>
             </div>
@@ -1159,6 +1161,7 @@
               <div class="button-group">
                 <button onclick="toggleNumbers()">人数表示切替</button>
                 <button onclick="toggleGrid()">グリッド切替</button>
+                <button onclick="toggleAgeGroup()" id="age_group_toggle">年齢３区分を非表示</button>
               </div>
             </div>
           </div>
@@ -1389,6 +1392,22 @@
             currentRenderer.updateOptions({
               showGrid: currentOptions.showGrid,
             });
+          }
+        }
+
+        // 年齢3区分表示の切り替え
+        function toggleAgeGroup() {
+          const basicData = document.getElementById("basic_data");
+          const toggleButton = document.getElementById("age_group_toggle");
+          
+          if (basicData.style.display === "none") {
+            // 非表示の場合は表示に
+            basicData.style.display = "block";
+            toggleButton.textContent = "年齢３区分を非表示";
+          } else {
+            // 表示の場合は非表示に
+            basicData.style.display = "none";
+            toggleButton.textContent = "年齢３区分を表示";
           }
         }
 
