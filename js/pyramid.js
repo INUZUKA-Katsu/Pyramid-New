@@ -1773,6 +1773,48 @@ function kubunSelectDisp() {
   basic_data_position();
 }
 
+// 年齢入力値の検証関数
+function validateAgeInput(input) {
+  const value = parseInt(input.value);
+  const min = parseInt(input.min);
+  const max = parseInt(input.max);
+  
+  // 値が範囲外の場合は修正
+  if (value < min) {
+    input.value = min;
+  } else if (value > max) {
+    input.value = max;
+  }
+  
+  // 開始年齢と終了年齢の整合性チェック
+  const smiddle = document.getElementById('smiddle');
+  const emiddle = document.getElementById('emiddle');
+  
+  if (smiddle && emiddle) {
+    const startAge = parseInt(smiddle.value);
+    const endAge = parseInt(emiddle.value);
+    
+    if (startAge >= endAge) {
+      // 開始年齢が終了年齢以上の場合、終了年齢を調整
+      if (input.id === 'smiddle') {
+        emiddle.value = Math.min(99, startAge + 1);
+        updateAgeDisplay('end', emiddle.value);
+      } else {
+        smiddle.value = Math.max(0, endAge - 1);
+        updateAgeDisplay('start', smiddle.value);
+      }
+    }
+  }
+}
+
+// 年齢表示を更新する関数
+function updateAgeDisplay(type, value) {
+  const displayElement = document.getElementById(type + 'AgeDisplay');
+  if (displayElement) {
+    displayElement.textContent = value;
+  }
+}
+
 function current_kubun() {
   var opt = document.getElementById("kubun_unit");
   var num = opt.options.selectedIndex;

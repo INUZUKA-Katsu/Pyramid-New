@@ -650,15 +650,15 @@
             position: absolute;
             top:615px;
             left:1090px;
-            width: 280px;
+            width: 420px;
             font-size: 11pt;
-            text-align: center;
+            text-align: right;
             z-index: 1000;
           }
           #jinko_sosu {
             display: table;
             margin-left: auto;
-            margin-right: 2em;
+            margin-right: 0;
             margin-bottom: 1em;
           }
           #jinko_sosu span.tr {
@@ -677,6 +677,7 @@
             position: relative;
             bottom: 0px;
             right: 0px;
+            margin-left: auto;
           }
           #nenrei_3kubun span.tr {
             display: table-row;
@@ -689,10 +690,106 @@
           }
           #nenrei_3kubun input {
             width: 2.5em;
-            height: 1em;
-            text-align: left;
-            border-width: 0;
-            padding: 0;
+            height: 1.2em;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px;
+            font-size: 10pt;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+          }
+          #nenrei_3kubun input:focus {
+            border-color: #0066cc;
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 3px rgba(0, 102, 204, 0.3);
+            z-index: 10;
+            transform: scale(1.1);
+          }
+          #nenrei_3kubun input:hover {
+            border-color: #999;
+            z-index: 10;
+            transform: scale(1.1);
+          }
+          
+          /* セル全体を一つのブロックとして扱う */
+          #nenrei_3kubun .age-cell-container {
+            position: relative;
+            display: inline-block;
+            white-space: nowrap;
+          }
+          
+          #nenrei_3kubun .age-text {
+            display: inline-block;
+            margin: 0 1px;
+          }
+          
+          /* スピンコントロールの隠し表示 - セル内絶対配置 */
+          #nenrei_3kubun .age-input-container {
+            position: absolute;
+            display: inline-block;
+            width: 2.5em;
+            height: 1.2em;
+            top: -3px;
+            z-index: 1;
+          }
+          
+          /* 開始年齢の位置 */
+          #nenrei_3kubun .age-input-container:first-of-type {
+            left: -0.6em;
+          }
+          
+          /* 終了年齢の位置（〜の後） */
+          #nenrei_3kubun .age-input-container:last-of-type {
+            left: 2.0em; /* 空白 + 〜 の幅分 - 半文字分左に移動 */
+          }
+          
+          #nenrei_3kubun .age-display {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            padding: 2px;
+            font-weight: 600;
+            color: #1616179a;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            line-height: 1.2em;
+          }
+          
+          #nenrei_3kubun .age-display:hover {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+          }
+          
+          #nenrei_3kubun .age-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+          }
+          
+          #nenrei_3kubun .age-input-container:hover .age-input {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1.1);
+            z-index: 10;
+          }
+          
+          #nenrei_3kubun .age-input-container:hover .age-display {
+            opacity: 0;
+            pointer-events: none;
           }
           #nenrei_3kubun span.right {
             text-align: right;
@@ -1235,20 +1332,40 @@
               </span>
               <span class="tr">
                 <span class="td" id="kubun2_title">
-                  <input
-                    type="number"
-                    id="smiddle"
-                    value="15"
-                    onchange="kubunChange()"
-                  />
-                  〜
-                  <input
-                    type="number"
-                    id="emiddle"
-                    value="64"
-                    onchange="kubunChange()"
-                  />
-                  歳
+                  <div class="age-cell-container">
+                    <span class="age-text">　</span>
+                    <div class="age-input-container">
+                      <span class="age-display" id="startAgeDisplay">15</span>
+                      <input
+                        type="number"
+                        id="smiddle"
+                        class="age-input"
+                        value="15"
+                        min="0"
+                        max="99"
+                        onchange="kubunChange(); updateAgeDisplay('start', this.value)"
+                        oninput="validateAgeInput(this); updateAgeDisplay('start', this.value)"
+                        title="開始年齢（0-99歳）"
+                      />
+                    </div>
+                    <span class="age-text">〜</span>
+                    <span class="age-text">　</span>
+                    <div class="age-input-container">
+                      <span class="age-display" id="endAgeDisplay">64</span>
+                      <input
+                        type="number"
+                        id="emiddle"
+                        class="age-input"
+                        value="64"
+                        min="0"
+                        max="99"
+                        onchange="kubunChange(); updateAgeDisplay('end', this.value)"
+                        oninput="validateAgeInput(this); updateAgeDisplay('end', this.value)"
+                        title="終了年齢（0-99歳）"
+                      />
+                    </div>
+                    <span class="age-text">歳</span>
+                  </div>
                 </span>
                 <span class="td" id="ku2_sosu">xx,xxx人</span>
                 <span class="td" id="ku2_male">xx,xxx人</span>
@@ -1312,6 +1429,7 @@
           showNumbers: true,
           showGrid: true,
         };
+
 
         // 初期化
         document.addEventListener("DOMContentLoaded", function () {
@@ -1560,6 +1678,7 @@
 
         // ウィンドウリサイズ時に再度計算して反映
         window.addEventListener("resize", centerContents);
+
       </script>
     </body>
   </html>
