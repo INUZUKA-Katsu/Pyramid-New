@@ -1933,13 +1933,42 @@ function screen_shot() {
   //スクリーンショット用にピラミッドのデザインを一部変更する.
   //***********************************************/
 
-  //***** SVG要素の背景色を無くす *****
-  var svgElement = document.getElementById("pyramid-svg"); // SVG要素のID
+  //***** SVG要素の背景色をなくす *****
+
+  // 背景用のrect要素を取得
+  var svgElement = document.getElementById("pyramid-svg");
+  var bgRect = svgElement.querySelector('rect[fill="#f5f5f5"]');
+
   // 現在のスタイルを保存
-  var originalFill = svgElement.style.fill;
-  var originalFillOpacity = svgElement.style.fillOpacity; 
+  var originalBgColor = svgElement.style.backgroundColor;
+  var originalRectFill = bgRect ? bgRect.getAttribute("fill") : null;
+
   // 背景色を無くす
-  svgElement.style.fill = "none";
+  svgElement.style.backgroundColor = "transparent";
+  if (bgRect) {
+    bgRect.setAttribute("fill", "transparent");
+  }
+
+  //***** #basic_dataブロックをスクリーンショット撮影範囲内に移動 *****
+  var basicData = document.getElementById("basic_data");
+  var originalBasicLeft = basicData.style.left;
+  var originalBasicTop = basicData.style.top;
+  var originalBasicPosition = basicData.style.position;
+  
+  // 現在の位置を取得
+  var basicRect = basicData.getBoundingClientRect();
+  var svgRect = svgElement.getBoundingClientRect();
+  
+  // スクリーンショット撮影範囲内に移動（左に幅分、上に高さ分移動）
+  var newLeft = basicRect.left - basicRect.width + 10; // 左に幅分 + 10px余白
+  var newTop = basicRect.top - basicRect.height/2 + 10;  // 上に高さ分 + 10px余白
+  
+  // 位置を絶対座標で設定
+  basicData.style.position = "fixed";
+  basicData.style.left = newLeft + "px";
+  basicData.style.top = newTop + "px";
+  basicData.style.zIndex = "9999"; // 最前面に表示
+
 
   //***** 3区分別人口の中位階層の入力欄を単純なテキストに *****
   var s = document.getElementById("smiddle");
@@ -1950,24 +1979,43 @@ function screen_shot() {
     var org_txt = title.innerHTML;
     title.innerHTML = alt_txt;
   }
-  
+
   //***** グラフタイトルとグラフ本体部分だけのスクリーンショットを撮るために撮影範囲を決める. *****
   var h2 = document.getElementById("h2");
   var rect1 = h2.getBoundingClientRect();
   var rect2 = svgElement.getBoundingClientRect();
-  if (rect1.left < rect2.left) {
-    var x_pos = rect1.left;
-  } else {
-    var x_pos = rect2.left;
-  }
-  var y_pos = rect1.top;
-  if (h2.clientWidth < svgElement.clientWidth) {
-    var c_width = svgElement.clientWidth;
-  } else {
-    var c_width = h2.clientWidth;
-  }
-  var c_height = rect2.top - rect1.top + svgElement.clientHeight;
+  var basicData = document.getElementById("basic_data");
+  var rect3 = basicData.getBoundingClientRect();
+
+console.log("SVG.right", rect2.right);
+console.log("SVG.bottom", rect2.bottom);
+console.log("basicData.left", rect3.left);
+console.log("basicData.right", rect3.right);
+console.log("basicData.top", rect3.top);
+console.log("basicData.bottom", rect3.bottom);
+
+  // 全ての要素を含む範囲を計算
+  var minLeft = Math.min(rect1.left, rect2.left, rect3.left);
+  var maxRight = Math.max(rect1.right, rect2.right, rect3.right);
+  var minTop = Math.min(rect1.top, rect2.top, rect3.top);
+  var maxBottom = Math.max(rect1.bottom, rect2.bottom, rect3.bottom);
+
+  var x_pos = minLeft;
+  var y_pos = minTop;
+  var c_width = maxRight - minLeft;
+  var c_height = maxBottom - minTop;
+
   window.scrollTo(0, 0);
+
+  html2canvas(document.body, {
+    x: x_pos - 20,
+    y: y_pos - 30,
+    width: c_width + 50,
+    height: c_height + 50,
+    windowWidth: c_width,
+    windowHeight: c_height,
+    scale: 3,
+  });
 
   html2canvas(document.body, {
     x: -20,
@@ -2018,10 +2066,17 @@ function screen_shot() {
     }, 100);
 
     //***** グラフデザインを元に戻す. *****
-    
-    //--ピラミッドに背景色をつける.
-    svgElement.style.fill = originalFill;
 
+    //--ピラミッドに背景色をつける.
+    svgElement.style.backgroundColor = originalBgColor;
+    if (bgRect) {
+      bgRect.setAttribute("fill", originalRectFill);
+    }
+    //--#basic_dataブロックを元の位置に戻す
+    basicData.style.position = originalBasicPosition;
+    basicData.style.left = originalBasicLeft;
+    basicData.style.top = originalBasicTop;
+    basicData.style.zIndex = "auto";
   });
 }
 
