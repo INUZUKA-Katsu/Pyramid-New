@@ -48,7 +48,15 @@
           tooltip_reset();
           tooltip_set();
         });
-        function tooltip_set() {
+        function tooltip_set() {          
+          $(".header").darkTooltip({
+            animation: "none",
+            size: "small",
+            gravity: "north",
+            theme: "light",
+            trigger: "click",
+            container: "body"  // この行を追加
+          });
           $(".header").darkTooltip({
             animation: "none",
             size: "small",
@@ -1169,13 +1177,14 @@
                 <a
                   href="#here"
                   class="header"
-                  data-tooltip=""
+                  data-tooltip="テスト表示"
                   id="screen_shot_tooltip"
                   ><img src="./image/info-icon.png"
                 /></a>
                 <span id="dialog"></span>
               </div>
             </div>
+
             <div class="control-group">
               <h3>縦横サイズ変更</h3>
               <div class="button-group">
