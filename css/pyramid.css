@@ -21,7 +21,7 @@
                   }
       td          { padding:0;margin:0;border:none;
                     white-space:nowrap;
-                    background-color:silver;
+                    background-color:#f8f9fa;
                     height:4;
                     line-height: 100%;
                     font-size:4px;
@@ -51,13 +51,13 @@
                   }
       div.bar     { height:5px;
                     display:inline-block;margin:0;padding:0;}
-      div.left    { background-color:#3333FF; margin:0;margin-left:4px;}
-      div.right   { background-color:#FF3366; margin:0;margin-right:4px;}
+      div.left    { background-color:#4a90e2; margin:0;margin-left:4px;}
+      div.right   { background-color:#e24a90; margin:0;margin-right:4px;}
       div#button  { text-align: right; }
       div#cho     { display:inline-block;
                     vertical-align: top;
                     margin-top:3.5em;
-                    background-color:#FFFFF0; }
+                    background-color:#ffffff; }
       div.cho     { display:inline-block;
                     margin-left:0;margin-top:2em;
                     vertical-align:top;text-align:left;}

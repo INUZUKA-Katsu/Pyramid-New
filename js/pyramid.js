@@ -1981,7 +1981,7 @@ function screen_shot() {
 
   // 背景用のrect要素を取得
   var svgElement = document.getElementById("pyramid-svg");
-  var bgRect = svgElement.querySelector('rect[fill="#f5f5f5"]');
+  var bgRect = svgElement.querySelector('rect[fill="#f8f9fa"]');
 
   // 現在のスタイルを保存
   var originalBgColor = svgElement.style.backgroundColor;

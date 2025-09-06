@@ -20,7 +20,10 @@
         type="text/css"
       />
       <!-- Tippy.js CSS -->
-      <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+      <link
+        rel="stylesheet"
+        href="https://unpkg.com/tippy.js@6/dist/tippy.css"
+      />
       <script type="text/javascript" src="./js/pyramid.js"></script>
       <script type="text/javascript" src="./js/PyramidSVGRenderer.js"></script>
       <script type="text/javascript" src="./js/jquery-3.1.1.js"></script>
@@ -44,55 +47,61 @@
           w = $(window).width();
           // Tippy.jsは自動的にリサイズに対応
         });
-        
+
         function initializeTooltips() {
           // スクリーンショットツールチップ（クリック表示）
-          tippy('#screen_shot_tooltip', {
-            content: '表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを保存したいときは、画像の右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。',
-            placement: 'top',
-            theme: 'light',
-            trigger: 'click',
+          tippy("#screen_shot_tooltip", {
+            content:
+              "表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを保存したいときは、画像の右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。",
+            placement: "top",
+            theme: "light",
+            trigger: "click",
             interactive: false,
             maxWidth: 300,
             allowHTML: true,
             arrow: true,
-            offset: [0, 10]
+            offset: [0, 10],
           });
-          
+
           // ヘッダーツールチップ（クリック表示）
-          $('.header').each(function() {
-            const tooltipText = $(this).attr('data-tooltip');
+          $(".header").each(function () {
+            const tooltipText = $(this).attr("data-tooltip");
             if (tooltipText) {
               tippy(this, {
                 content: tooltipText,
-                placement: 'top',
-                theme: 'light',
-                trigger: 'click',
+                placement: "top",
+                theme: "light",
+                trigger: "click",
                 interactive: false,
                 maxWidth: 400,
                 allowHTML: true,
                 arrow: true,
-                offset: [0, 10]
+                offset: [0, 10],
               });
             }
           });
-          
+
           // その他のツールチップ（クリック表示）
-          $('.info-icon-left, .info-icon-right, .info-icon-bottom, .info-icon-3kubun').each(function() {
-            const tooltipText = $(this).attr('data-tooltip');
+          $(
+            ".info-icon-left, .info-icon-right, .info-icon-bottom, .info-icon-3kubun"
+          ).each(function () {
+            const tooltipText = $(this).attr("data-tooltip");
             if (tooltipText) {
-              const placement = $(this).hasClass('info-icon-bottom') ? 'top' : 
-                               $(this).hasClass('info-icon-right') ? 'left' : 'bottom';
+              const placement = $(this).hasClass("info-icon-bottom")
+                ? "top"
+                : $(this).hasClass("info-icon-right")
+                ? "left"
+                : "bottom";
               tippy(this, {
                 content: tooltipText,
                 placement: placement,
-                theme: 'light',
-                trigger: 'click',
+                theme: "light",
+                trigger: "click",
                 interactive: false,
                 maxWidth: 300,
                 allowHTML: true,
                 arrow: true,
-                offset: [0, 10]
+                offset: [0, 10],
               });
             }
           });
@@ -119,7 +128,7 @@
       <!--link type="text/css" href="./css/pyramid.css" rel="stylesheet"-->
       <style type="text/css">
         /* Tippy.js カスタムスタイル */
-        .tippy-box[data-theme~='light'] {
+        .tippy-box[data-theme~="light"] {
           background-color: #fff;
           color: #333;
           border: 1px solid #e0e0e0;
@@ -128,28 +137,28 @@
           line-height: 1.4;
           max-width: 400px;
         }
-        
-        .tippy-box[data-theme~='light'] .tippy-content {
+
+        .tippy-box[data-theme~="light"] .tippy-content {
           padding: 12px 16px;
         }
-        
-        .tippy-box[data-theme~='light'] .tippy-arrow {
+
+        .tippy-box[data-theme~="light"] .tippy-arrow {
           color: #fff;
         }
-        
-        .tippy-box[data-theme~='light'] .tippy-arrow::before {
+
+        .tippy-box[data-theme~="light"] .tippy-arrow::before {
           border: 1px solid #e0e0e0;
         }
-        
+
         /* スクリーンショットツールチップ専用スタイル */
         #screen_shot_tooltip {
           transition: color 0.2s ease;
         }
-        
+
         #screen_shot_tooltip:hover {
           color: #007bff !important;
         }
-        
+
         /*.controls {
           display: flex;
           flex-wrap: wrap;
@@ -228,10 +237,17 @@
         }
 
         .left-controls .control-group {
-          background: white;
+          background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
           padding: 15px;
-          border-radius: 8px;
+          border-radius: 12px;
           border: 1px solid #dee2e6;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          transition: all 0.2s ease;
+        }
+
+        .left-controls .control-group:hover {
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+          transform: translateY(-2px);
         }
 
         .left-controls .control-group h3 {
@@ -250,8 +266,28 @@
 
         .left-controls .button-group button {
           width: 100%;
-          padding: 8px 12px;
-          font-size: 12px;
+          padding: 10px 14px;
+          font-size: 13px;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          color: #495057;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-weight: 500;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .left-controls .button-group button:hover {
+          background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+          border-color: #4a90e2;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+        }
+
+        .left-controls .button-group button:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 4px rgba(74, 144, 226, 0.1);
         }
 
         .left-controls .radio-group {
@@ -280,25 +316,43 @@
         .control-group select,
         .control-group input,
         .control-group button {
-          padding: 8px 12px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          background: white;
+          padding: 10px 14px;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          background: #ffffff;
+          font-size: 14px;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .control-group select:focus,
+        .control-group input:focus {
+          outline: none;
+          border-color: #4a90e2;
+          box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
         }
 
         .control-group button {
-          background: #007bff;
+          background: linear-gradient(135deg, #4a90e2 0%, #3a7bc8 100%);
           color: white;
           cursor: pointer;
           border: none;
+          font-weight: 500;
         }
 
         .control-group button:hover {
-          background: #0056b3;
+          background: linear-gradient(135deg, #3a7bc8 0%, #2a6bb4 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+        }
+
+        .control-group button:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
         }
 
         .control-group button.active {
-          background: #28a745;
+          background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
         }
 
         #cho {
@@ -443,9 +497,50 @@
           select,
           input {
             font-size: 11pt;
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
           }
-          button {
+
+          select:focus,
+          input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+          }
+
+          select:hover,
+          input:hover {
+            border-color: #adb5bd;
+          }
+          button,
+          input[type="button"] {
             font-size: 11pt;
+            padding: 8px 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #4a90e2 0%, #3a7bc8 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+
+          button:hover,
+          input[type="button"]:hover {
+            background: linear-gradient(135deg, #3a7bc8 0%, #2a6bb4 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+          }
+
+          button:active,
+          input[type="button"]:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
           }
           h1 {
             font-size: 200%;
@@ -681,8 +776,8 @@
           }
           div#basic_data {
             position: absolute;
-            top:615px;
-            left:1090px;
+            top: 615px;
+            left: 1090px;
             width: 420px;
             font-size: 11pt;
             text-align: right;
@@ -704,6 +799,10 @@
           }
           div#select {
             text-align: right;
+            margin-bottom: 5px;
+          }
+          #kubun_unit {
+            width: 12em;
           }
           #nenrei_3kubun {
             display: table;
@@ -723,7 +822,7 @@
           }
           #nenrei_3kubun input {
             width: 2.5em;
-            height: 1.2em;
+            height: 0.5em;
             text-align: center;
             border: 1px solid #ccc;
             border-radius: 3px;
@@ -747,19 +846,19 @@
             z-index: 10;
             transform: scale(1.1);
           }
-          
+
           /* セル全体を一つのブロックとして扱う */
           #nenrei_3kubun .age-cell-container {
             position: relative;
             display: inline-block;
             white-space: nowrap;
           }
-          
+
           #nenrei_3kubun .age-text {
             display: inline-block;
             margin: 0 1px;
           }
-          
+
           /* スピンコントロールの隠し表示 - セル内絶対配置 */
           #nenrei_3kubun .age-input-container {
             position: absolute;
@@ -769,17 +868,17 @@
             top: -3px;
             z-index: 1;
           }
-          
+
           /* 開始年齢の位置 */
           #nenrei_3kubun .age-input-container:first-of-type {
             left: -0.6em;
           }
-          
+
           /* 終了年齢の位置（〜の後） */
           #nenrei_3kubun .age-input-container:last-of-type {
-            left: 2.0em; /* 空白 + 〜 の幅分 - 半文字分左に移動 */
+            left: 2em; /* 空白 + 〜 の幅分 - 半文字分左に移動 */
           }
-          
+
           #nenrei_3kubun .age-display {
             display: inline-block;
             width: 100%;
@@ -794,12 +893,12 @@
             transition: all 0.3s ease;
             line-height: 1.2em;
           }
-          
+
           #nenrei_3kubun .age-display:hover {
             background-color: #f0f0f0;
             border-color: #ccc;
           }
-          
+
           #nenrei_3kubun .age-input {
             position: absolute;
             top: 0;
@@ -812,14 +911,14 @@
             transform: scale(0.8);
             transition: all 0.3s ease;
           }
-          
+
           #nenrei_3kubun .age-input-container:hover .age-input {
             opacity: 1;
             pointer-events: auto;
             transform: scale(1.1);
             z-index: 10;
           }
-          
+
           #nenrei_3kubun .age-input-container:hover .age-display {
             opacity: 0;
             pointer-events: none;
@@ -888,13 +987,17 @@
             text-align: left;
           }
         }
-        
+
         /* ローディングスピナーアニメーション */
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
-        
+
         /* ローディング表示のレスポンシブ対応 */
         @media (max-width: 1200px) {
           #loading-container {
@@ -903,12 +1006,12 @@
         }
       </style>
     </head>
-    <body onload="on_page_load()">
+     <body onload="on_page_load()">
       <!--旧システムコード対応-->
       <input type="hidden" id="save" />
       <input type="hidden" id="clear" checked />
 
-      <div id="main">
+       <div id="main">
         <div id="header" data-html2canvas-ignore="true">
           <a
             href="#"
@@ -947,30 +1050,61 @@
         </div>
 
         <h1 id="h1" data-html2canvas-ignore="true">横浜市の人口ピラミッド</h1>
-        
+
         <!-- データ読み込み中の表示 -->
-        <div id="loading-container" style="text-align: center; padding: 60px 20px; color: #666; margin-left: 250px; max-width: 1108px;">
-          <div style="font-size: 18px; margin-bottom: 20px;">
-            <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></div>
+        <div
+          id="loading-container"
+          style="
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            margin-left: 250px;
+            max-width: 1108px;
+          "
+        >
+          <div style="font-size: 18px; margin-bottom: 20px">
+            <div
+              style="
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 3px solid #f8f9fa;
+                border-top: 3px solid #4a90e2;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-right: 10px;
+              "
+            ></div>
             データを読み込み中です...
           </div>
-          <div style="font-size: 14px; color: #999;">
+          <div style="font-size: 14px; color: #adb5bd">
             人口統計データを取得しています。しばらくお待ちください。
           </div>
         </div>
-        
-        <h2 id="h2" style="display: none;">横浜市(平成28年1月1日現在)</h2>
 
-        <div id="container-flex" style="display: none;">
+        <h2 id="h2" style="display: none">横浜市(平成28年1月1日現在)</h2>
+
+        <div id="container-flex" style="display: none">
           <div id="pyramid-block">
             <div id="link" data-html2canvas-ignore="true">
-              <a href="#cho" style="display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+              <a
+                href="#cho"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                  white-space: nowrap;
+                "
+              >
                 地域別人口ピラミッドのための町丁名の指定
               </a>
-                <span class="info-icon-right" data-tooltip="区のピラミッドを表示するとグラフの下部にその区内の町丁名のチェックボックスが表示されます。町丁名を指定して[町丁別人口ピラミッド]ボタンをクリックすると指定した地域のグラフを表示します。町丁名は複数の指定が可能で、複数の町丁からなる任意の地域の人口ピラミッドを表示することができます。" style="cursor: pointer;">
-                  <img src="./image/tooltip-icon.png" class="small-icon"
-                /></span>
-              
+              <span
+                class="info-icon-right"
+                data-tooltip="区のピラミッドを表示するとグラフの下部にその区内の町丁名のチェックボックスが表示されます。町丁名を指定して[町丁別人口ピラミッド]ボタンをクリックすると指定した地域のグラフを表示します。町丁名は複数の指定が可能で、複数の町丁からなる任意の地域の人口ピラミッドを表示することができます。"
+                style="cursor: pointer"
+              >
+                <img src="./image/tooltip-icon.png" class="small-icon"
+              /></span>
             </div>
 
             <!-- #市区、年月セレクトボックス -->
@@ -1231,12 +1365,13 @@
               class="control-group"
               data-html2canvas-ignore="true"
             >
-              <h3>スクリーンショット
+              <h3>
+                スクリーンショット
                 <a
                   href="#"
                   class="header"
                   id="screen_shot_tooltip"
-                  style="margin-left: 8px; display: inline-block;"
+                  style="margin-left: 8px; display: inline-block"
                   ><img src="./image/tooltip-icon.png" class="small-icon"
                 /></a>
               </h3>
@@ -1291,7 +1426,9 @@
               <div class="button-group">
                 <button onclick="toggleNumbers()">人数表示切替</button>
                 <button onclick="toggleGrid()">グリッド切替</button>
-                <button onclick="toggleAgeGroup()" id="age_group_toggle">年齢３区分を非表示</button>
+                <button onclick="toggleAgeGroup()" id="age_group_toggle">
+                  年齢３区分を非表示
+                </button>
               </div>
             </div>
           </div>
@@ -1324,7 +1461,6 @@
               <select
                 id="kubun_unit"
                 onchange="kubunDisplay()"
-                style="width: 11em"
               >
                 <option value="構成比" selected="selected">
                   年齢3区分別構成比
@@ -1336,7 +1472,7 @@
                 id="info_3kubun"
                 class="info-icon-3kubun"
                 data-tooltip="年齢3区分の中位の年齢を自由に変更することができます。例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を見ることができます。<br>ピラミッドと重なってしまうときは非表示にしてください。"
-                style="cursor: pointer;"
+                style="cursor: pointer"
                 ><img src="./image/tooltip-icon.png" class="small-icon"
               /></span>
               <input
@@ -1418,7 +1554,6 @@
             <!--#nenrei_3kuibun ここまで-->
           </div>
           <!--#basic_data ここまで-->
-
         </div>
         <!-- #container-flex ここまで -->
       </div>
@@ -1429,7 +1564,12 @@
       <!-- #screen_shot_section ここまで -->
 
       <!-- フッタ部分 -->
-      <div class="footer" id="footer" data-html2canvas-ignore="true" style="display: none;">
+      <div
+        class="footer"
+        id="footer"
+        data-html2canvas-ignore="true"
+        style="display: none"
+      >
         <hr class="margin-top margin-bottom" />
         <!-- ここから著作権情報と連絡先 -->
         <address>
@@ -1462,7 +1602,6 @@
           showNumbers: true,
           showGrid: true,
         };
-
 
         // 初期化
         document.addEventListener("DOMContentLoaded", function () {
@@ -1550,7 +1689,7 @@
         function toggleAgeGroup() {
           const basicData = document.getElementById("basic_data");
           const toggleButton = document.getElementById("age_group_toggle");
-          
+
           if (basicData.style.display === "none") {
             // 非表示の場合は表示に
             basicData.style.display = "block";
@@ -1603,7 +1742,7 @@
           const dataScript = document.getElementById(selectedData + "-data");
           const data = JSON.parse(dataScript.textContent);
           currentRenderer.updateData(data);
-          
+
           // データ更新後に#basic_dataの位置を再計算
           setTimeout(() => {
             centerContents();
@@ -1628,24 +1767,25 @@
             currentRenderer = new PyramidSVGRenderer("pyramid-container", data);
             //document.getElementById('status').textContent =
             //    `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
-            
+
             // SVG描画完了後に表示を切り替え
             setTimeout(() => {
               // ローディング表示を非表示に
-              document.getElementById("loading-container").style.display = "none";
-              
+              document.getElementById("loading-container").style.display =
+                "none";
+
               // メインコンテンツを表示
               document.getElementById("h2").style.display = "block";
               document.getElementById("container-flex").style.display = "flex";
               document.getElementById("footer").style.display = "block";
-              
+
               // #basic_dataの位置を再計算
               centerContents();
             }, 100);
           } catch (error) {
             console.error("描画に失敗しました:", error);
             document.getElementById("pyramid-container").innerHTML =
-              '<p style="text-align: center; padding: 50px; color: red;">描画エラーが発生しました</p>';
+              '<p style="text-align: center; padding: 50px; color: #dc3545;">描画エラーが発生しました</p>';
           }
         }
         // 定義完了後の確認
@@ -1661,7 +1801,8 @@
           const basic = document.querySelector("#basic_data");
           const pyramidContainer = document.querySelector("#pyramid-container");
 
-          const pyramidContainer_rect = pyramidContainer.getBoundingClientRect();
+          const pyramidContainer_rect =
+            pyramidContainer.getBoundingClientRect();
           const menuWidth = menu.offsetWidth;
           const pyramidWidth = pyramid.offsetWidth;
           const windowWidth = window.innerWidth;
@@ -1678,10 +1819,11 @@
             menu.style.left = menuLeftPos + "px";
             pyramid.style.left = pyramidLeftPos + "px";
             footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
-            
+
             // #basic_dataをSVG描画領域内の右下に配置
             const basicLeftPos = pyramidContainer_rect.right - basicWidth - 20;
-            const basicTopPos = pyramidContainer_rect.bottom - basic.offsetHeight - 15;
+            const basicTopPos =
+              pyramidContainer_rect.bottom - basic.offsetHeight - 15;
             basic.style.left = basicLeftPos + "px";
             basic.style.top = basicTopPos + "px";
             basic.style.display = "block";
@@ -1689,13 +1831,15 @@
             menu.style.left = "0px";
             pyramid.style.left = "0px";
             footer.style["margin-left"] = "0px";
-            
+
             // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
             const svgFixedWidth = 1108;
             if (windowWidth > svgFixedWidth) {
               // #basic_dataをSVG描画領域内の右下に配置
-              const basicLeftPos = pyramidContainer_rect.right - basicWidth - 20;
-              const basicTopPos = pyramidContainer_rect.bottom - basic.offsetHeight - 15;
+              const basicLeftPos =
+                pyramidContainer_rect.right - basicWidth - 20;
+              const basicTopPos =
+                pyramidContainer_rect.bottom - basic.offsetHeight - 15;
               basic.style.left = basicLeftPos + "px";
               basic.style.top = basicTopPos + "px";
               basic.style.display = "block";
@@ -1711,7 +1855,6 @@
 
         // ウィンドウリサイズ時に再度計算して反映
         window.addEventListener("resize", centerContents);
-
       </script>
     </body>
   </html>
