@@ -182,7 +182,7 @@ class PyramidSVGRenderer {
       label.setAttribute('y', viewBoxHeight - (age * this.options.barHeight) - this.options.barHeight / 2);
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('dominant-baseline', 'middle');
-      label.setAttribute('font-size', '12');
+      label.setAttribute('font-size', '10');
       label.setAttribute('fill', '#666');
       label.setAttribute('font-weight', 'bold');
       
@@ -364,7 +364,7 @@ class PyramidSVGRenderer {
       }
       
       // 人数ラベル
-      if (this.options.showNumbers && maleWidth > 30) {
+      if (this.options.showNumbers && maleCount > 0) {
         const maleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         maleLabel.setAttribute('x', viewBoxWidth / 2 - maleWidth - 15); // 棒の左端から5px左
         maleLabel.setAttribute('y', agePosition + barHeight / 2);
@@ -409,7 +409,7 @@ class PyramidSVGRenderer {
       }
       
       // 人数ラベル
-      if (this.options.showNumbers && femaleWidth > 30) {
+      if (this.options.showNumbers && femaleCount > 0) {
         const femaleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         femaleLabel.setAttribute('x', viewBoxWidth / 2 + femaleWidth + 15); // 棒の右端から5px右
         femaleLabel.setAttribute('y', agePosition + barHeight / 2);
