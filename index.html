@@ -19,11 +19,8 @@
         href="./js/jquery-ui-1.12.1/jquery-ui.min.css"
         type="text/css"
       />
-      <link
-        rel="stylesheet"
-        href="./js/tooltip/darktooltip.css"
-        type="text/css"
-      />
+      <!-- Tippy.js CSS -->
+      <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
       <script type="text/javascript" src="./js/pyramid.js"></script>
       <script type="text/javascript" src="./js/PyramidSVGRenderer.js"></script>
       <script type="text/javascript" src="./js/jquery-3.1.1.js"></script>
@@ -31,71 +28,74 @@
         type="text/javascript"
         src="./js/jquery-ui-1.12.1/jquery-ui.min.js"
       ></script>
-      <script
-        type="text/javascript"
-        src="./js/tooltip/jquery.darktooltip.js"
-      ></script>
+      <!-- Tippy.js JavaScript -->
+      <script src="https://unpkg.com/@popperjs/core@2"></script>
+      <script src="https://unpkg.com/tippy.js@6"></script>
       <script type="text/javascript" src="/js/html2canvas.js"></script>
       <!--script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> -->
       <script type="text/javascript">
-        //  http://rubentd.com/darktooltip/
+        // Tippy.js ツールチップ設定
         var w;
         $(function () {
           w = $(window).width();
-          tooltip_set();
+          initializeTooltips();
         });
         $(window).resize(function () {
           w = $(window).width();
-          tooltip_reset();
-          tooltip_set();
+          // Tippy.jsは自動的にリサイズに対応
         });
-        function tooltip_set() {
-          $("#screen_shot_tooltip").darkTooltip({
-            animation: "none",
-            size: "small",
-            gravity: "north",
-            theme: "light",
-            trigger: "click",
-            container: "body", // この行を追加
+        
+        function initializeTooltips() {
+          // スクリーンショットツールチップ（クリック表示）
+          tippy('#screen_shot_tooltip', {
+            content: '表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを保存したいときは、画像の右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。',
+            placement: 'top',
+            theme: 'light',
+            trigger: 'click',
+            interactive: false,
+            maxWidth: 300,
+            allowHTML: true,
+            arrow: true,
+            offset: [0, 10]
           });
-          $(".header").darkTooltip({
-            animation: "none",
-            size: "small",
-            gravity: "north",
-            theme: "light",
-            trigger: "click",
+          
+          // ヘッダーツールチップ（クリック表示）
+          $('.header').each(function() {
+            const tooltipText = $(this).attr('data-tooltip');
+            if (tooltipText) {
+              tippy(this, {
+                content: tooltipText,
+                placement: 'top',
+                theme: 'light',
+                trigger: 'click',
+                interactive: false,
+                maxWidth: 400,
+                allowHTML: true,
+                arrow: true,
+                offset: [0, 10]
+              });
+            }
           });
-          $(".info-icon-left").darkTooltip({
-            animation: "none",
-            size: "small",
-            gravity: device("bottom", "bottom"),
-            theme: "light",
-            trigger: "click",
+          
+          // その他のツールチップ（クリック表示）
+          $('.info-icon-left, .info-icon-right, .info-icon-bottom, .info-icon-3kubun').each(function() {
+            const tooltipText = $(this).attr('data-tooltip');
+            if (tooltipText) {
+              const placement = $(this).hasClass('info-icon-bottom') ? 'top' : 
+                               $(this).hasClass('info-icon-right') ? 'left' : 'bottom';
+              tippy(this, {
+                content: tooltipText,
+                placement: placement,
+                theme: 'light',
+                trigger: 'click',
+                interactive: false,
+                maxWidth: 300,
+                allowHTML: true,
+                arrow: true,
+                offset: [0, 10]
+              });
+            }
           });
-          $(".info-icon-right").darkTooltip({
-            animation: "none",
-            size: "small",
-            gravity: device("bottom", "left"),
-            theme: "light",
-            trigger: "click",
-          });
-          $(".info-icon-bottom").darkTooltip({
-            animation: "none",
-            size: "small",
-            gravity: device("top", "left"),
-            theme: "light",
-            trigger: "click",
-          });
-          $(".info-icon-3kubun").darkTooltip({
-            animation: "none",
-            size: "small",
-            gravity: device("top", "left"),
-            theme: "light",
-            trigger: "click",
-          });
-        }
-        function tooltip_reset() {
-          $("ins").remove();
         }
         function device(pc, mobile) {
           if (w > 1800) {
@@ -118,6 +118,38 @@
       </script>
       <!--link type="text/css" href="./css/pyramid.css" rel="stylesheet"-->
       <style type="text/css">
+        /* Tippy.js カスタムスタイル */
+        .tippy-box[data-theme~='light'] {
+          background-color: #fff;
+          color: #333;
+          border: 1px solid #e0e0e0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          line-height: 1.4;
+          max-width: 400px;
+        }
+        
+        .tippy-box[data-theme~='light'] .tippy-content {
+          padding: 12px 16px;
+        }
+        
+        .tippy-box[data-theme~='light'] .tippy-arrow {
+          color: #fff;
+        }
+        
+        .tippy-box[data-theme~='light'] .tippy-arrow::before {
+          border: 1px solid #e0e0e0;
+        }
+        
+        /* スクリーンショットツールチップ専用スタイル */
+        #screen_shot_tooltip {
+          transition: color 0.2s ease;
+        }
+        
+        #screen_shot_tooltip:hover {
+          color: #007bff !important;
+        }
+        
         /*.controls {
           display: flex;
           flex-wrap: wrap;
@@ -402,8 +434,8 @@
           }
           img.small-icon {
             vertical-align: -17%;
-            width: 1em;
-            height: 1.1em;
+            width: 1.5em;
+            height: 1.5em;
           }
           caption {
             text-align: right;
@@ -458,7 +490,8 @@
                               right:0;
                               top:2.3em;*/
             margin-left: auto;
-            width: 22em;
+            width: 22.5em;
+            white-space: nowrap;
             margin-bottom: 0.5em;
           }
           div#comment {
@@ -931,13 +964,13 @@
         <div id="container-flex" style="display: none;">
           <div id="pyramid-block">
             <div id="link" data-html2canvas-ignore="true">
-              <a href="#cho">地域別人口ピラミッドのための町丁名の指定</a>
-              <a
-                href="#"
-                class="info-icon-right"
-                data-tooltip="区のピラミッドを表示するとグラフの下部にその区内の町丁名のチェックボックスが表示されます。町丁名を指定して[町丁別人口ピラミッド]ボタンをクリックすると指定した地域のグラフを表示します。町丁名は複数の指定が可能で、複数の町丁からなる任意の地域の人口ピラミッドを表示することができます。"
-                ><img src="./image/info-icon.png"
-              /></a>
+              <a href="#cho" style="display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                地域別人口ピラミッドのための町丁名の指定
+              </a>
+                <span class="info-icon-right" data-tooltip="区のピラミッドを表示するとグラフの下部にその区内の町丁名のチェックボックスが表示されます。町丁名を指定して[町丁別人口ピラミッド]ボタンをクリックすると指定した地域のグラフを表示します。町丁名は複数の指定が可能で、複数の町丁からなる任意の地域の人口ピラミッドを表示することができます。" style="cursor: pointer;">
+                  <img src="./image/tooltip-icon.png" class="small-icon"
+                /></span>
+              
             </div>
 
             <!-- #市区、年月セレクトボックス -->
@@ -1124,7 +1157,7 @@
                     href="#"
                     class="info-icon-right"
                     data-tooltip="動画をクリックすると一番古いものから最新のものまで、年を自動的に切り替えて移り変わりを動画のように表示します。"
-                    ><img src="./image/info-icon.png"
+                    ><img src="./image/tooltip-icon.png" class="small-icon"
                   /></a>
                 </form>
               </div>
@@ -1179,7 +1212,7 @@
                     href="#here"
                     class="info-icon-bottom"
                     data-tooltip="地域の人口ピラミッドを表示するには、町丁名をチェックしてから[町丁別人口ピラミッド]をクリックしてください。複数選択が可能です。"
-                    ><img src="./image/info-icon.png"
+                    ><img src="./image/tooltip-icon.png" class="small-icon"
                   /></a>
                 </div>
                 <div id="cho_list">
@@ -1200,11 +1233,11 @@
             >
               <h3>スクリーンショット
                 <a
-                  href="#here"
+                  href="#"
                   class="header"
-                  data-tooltip="テスト表示"
                   id="screen_shot_tooltip"
-                  ><img src="./image/info-icon.png"
+                  style="margin-left: 8px; display: inline-block;"
+                  ><img src="./image/tooltip-icon.png" class="small-icon"
                 /></a>
               </h3>
               <div class="button-group">
@@ -1299,13 +1332,13 @@
                 <option value="人口">年齢3区分別人口</option>
                 <option value="非表示">年齢3区分別人口/構成比非表示</option>
               </select>
-              <a
-                href="#"
+              <span
                 id="info_3kubun"
                 class="info-icon-3kubun"
                 data-tooltip="年齢3区分の中位の年齢を自由に変更することができます。例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を見ることができます。<br>ピラミッドと重なってしまうときは非表示にしてください。"
-                ><img src="./image/info-icon.png"
-              /></a>
+                style="cursor: pointer;"
+                ><img src="./image/tooltip-icon.png" class="small-icon"
+              /></span>
               <input
                 id="kubun_button"
                 type="submit"

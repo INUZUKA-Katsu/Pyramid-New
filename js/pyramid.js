@@ -1949,17 +1949,19 @@ function round(number, precision) {
 //iOSデバイスの場合、スクリーンショットボタンの表示文字列を変更する.
 function modify_screen_shot_button() {
   var agent = navigator.userAgent.toLowerCase();
+  var tiptxt;
+  
   if (agent.indexOf("iphone") != -1 || agent.indexOf("ipad") != -1) {
-    var tiptxt =
-      "表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを写真(Photos)に保存したいときは、画像をロングタップして保存を選択してください。";
+    tiptxt = "表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを写真(Photos)に保存したいときは、画像をロングタップして保存を選択してください。";
   } else {
-    var tiptxt =
-      "表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを保存したいときは、画像の右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。";
+    tiptxt = "表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを保存したいときは、画像の右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。";
   }
-  var tip = document.getElementById("screen_shot_tooltip");
-  tip.setAttribute("data-tooltip", tiptxt);
-  tooltip_reset();
-  tooltip_set();
+  
+  // Tippy.jsでツールチップの内容を更新
+  var tipElement = document.getElementById("screen_shot_tooltip");
+  if (tipElement && tipElement._tippy) {
+    tipElement._tippy.setContent(tiptxt);
+  }
 }
 function time_stamp() {
   var now = new Date();
