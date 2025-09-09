@@ -42,9 +42,12 @@ end
 
 #動作テスト
 #S3=S3Client.new
-#S3.get_list("Pyramid/nenreibetsu/").each do |f|
-#    if ans = f.match(/tsurumi(\d{4})-j\.txt/)
-#      p S3.last_modified(f)
-#      p ans[1]
-#    end
+##S3.get_list("Pyramid/nenreibetsu/").each do |f|
+#S3.get_list("Pyramid/").each do |f|
+#    p f  
+#    #if ans = f.match(/tsurumi(\d{4})-j\.txt/)
+#    #  p f
+#    #  #p S3.last_modified(f)
+#    #  #p ans[1]
+#    #end
 #end

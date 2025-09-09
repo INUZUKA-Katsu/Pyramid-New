@@ -168,6 +168,13 @@ function showNinzu_Setting() {
 
 //動画ボタンを押したときの処理
 function ani_mation() {
+  // 従来の動画機能を実行
+  console.log('従来の動画機能を開始');
+  legacy_animation();
+}
+
+// 既存のアニメーション実装（フォールバック用）
+function legacy_animation() {
   var pyramode = get_pyramid_mode();
   if (pyramode == "shiku") {
     var op = document
@@ -290,10 +297,13 @@ function change_display(pyramode, nengetsu, unit_size) {
 }
 //市区ピラミッドを作成する.
 function shiku_pyramid(nengetsu, unit_size) {
+  myFunc()
   //ローカルデータがあればローカルデータで描画する.
   //console.log("step1");
   //console.log(nengetsu); //市区を変更したときは、undefined
-  var ans = escape_ajax("shiku_json", nengetsu, unit_size);
+
+  //テストのため一時的にコメント化
+  var ans ; //= escape_ajax("shiku_json", nengetsu, unit_size);
   //console.log("step2");
   if (ans === false || ans == undefined) {
     //ローカルデータが存在しないときはサーバから取得して描画する.
@@ -330,6 +340,7 @@ function escape_ajax(mode, nengetsu, unit_size) {
     //console.log("step1.5-1-2");
     //console.log(response);
     modify_html(response, mode, nengetsu, unit_size);
+    return true;
   } else {
     //console.log("step1.5-2");
     return false;
@@ -487,12 +498,20 @@ function modify_html(response, mode, nengetsu, unit_size) {
 
 //#######  ピラミッドを描画するコアプログラム  ##########
 
-//ピラミッド描画エンジン
-function change_pyramid(objectData, unit_size) {
+//ピラミッド描画エンジン(引数isAnm: アニメーション中かどうかのフラグ, isInterpolation: 補間アニメーション中かどうかのフラグ)
+function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
   console.log("change_pyramid開始");
+  console.log(objectData["kijunbi"]);
+  console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
+  
+  myFunc();
 
   //ピラミッドを描画する。
-  renderPyramid(objectData);
+  if (currentRenderer == null) {
+    renderPyramid(objectData);
+  } else {
+    currentRenderer.updateData(objectData, isAnm);
+  }
 
   //その他の情報
 
@@ -502,6 +521,28 @@ function change_pyramid(objectData, unit_size) {
   var not_exist = objectData["not_exist"];
   var kijunbi = objectData["kijunbi"];
   var source = objectData["source_url"];
+  
+  // デバッグ: kakusai_betsuの構造を確認
+  console.log("change_pyramid: kakusai_betsu配列の長さ:", objectData["kakusai_betsu"].length);
+  console.log("change_pyramid: kakusai_betsu[0]の内容:", objectData["kakusai_betsu"][0]);
+  console.log("change_pyramid: kakusai_betsu[0][1] (総数):", objectData["kakusai_betsu"][0][1]);
+  console.log("change_pyramid: kakusai_betsu[0][2] (男性):", objectData["kakusai_betsu"][0][2]);
+  console.log("change_pyramid: kakusai_betsu[0][3] (女性):", objectData["kakusai_betsu"][0][3]);
+  
+  // 重要な情報をalertで表示
+  if (objectData["kakusai_betsu"] && objectData["kakusai_betsu"].length > 0) {
+    const firstElement = objectData["kakusai_betsu"][0];
+    console.warn(`📊 人口データ表示:\n` +
+          `kakusai_betsu配列長: ${objectData["kakusai_betsu"].length}\n` +
+          `kakusai_betsu[0]: ${JSON.stringify(firstElement)}\n` +
+          `総数: ${firstElement[1]}\n` +
+          `男性: ${firstElement[2]}\n` +
+          `女性: ${firstElement[3]}\n` +
+          `最初の要素[0]: ${firstElement[0]} (${typeof firstElement[0]})`);
+  } else {
+    console.warn(`❌ エラー: kakusai_betsuが空または未定義です！`);
+  }
+  
   var sosu = objectData["kakusai_betsu"][0][1];
   var male = objectData["kakusai_betsu"][0][2];
   var female = objectData["kakusai_betsu"][0][3];
@@ -511,7 +552,7 @@ function change_pyramid(objectData, unit_size) {
 
   console.log("change_pyramid step2.1");
 
-  displey_hitoku_comment(objectData["hitoku"]);
+  if (!isAnm) displey_hitoku_comment(objectData["hitoku"]);
 
   console.log("change_pyramid step3");
 
@@ -574,20 +615,21 @@ function change_pyramid(objectData, unit_size) {
   //    time_series[1].push(parseInt(m_len));
   //    time_series[2].push(parseInt(f_len));
   //  adjust_size(time_series);
-  var nengetsu = get_selected_nengetsu();
-  if (nengetsu == undefined) {
-    nengetsu = $nengetsu;
+  if (!isAnm){
+    var nengetsu = get_selected_nengetsu();
+    if (nengetsu == undefined) {
+      nengetsu = $nengetsu;
+    }
+    if (
+      nengetsu == "9501" &&
+      (shiku == "港北区" ||
+        shiku == "緑区" ||
+        shiku == "都筑区" ||
+        shiku == "青葉区")
+    ) {
+      shiku = "港北・緑・青葉・都筑４区";
+    }
   }
-  if (
-    nengetsu == "9501" &&
-    (shiku == "港北区" ||
-      shiku == "緑区" ||
-      shiku == "都筑区" ||
-      shiku == "青葉区")
-  ) {
-    shiku = "港北・緑・青葉・都筑４区";
-  }
-
   console.log("change_pyramid step4");
 
   var h2 = shiku + '<span class="inline-block">' + kijunbi + "</span>";
@@ -610,21 +652,25 @@ function change_pyramid(objectData, unit_size) {
   //h2(タイトル)を西暦主体に書き直す.
   h2 = change_seireki_main(h2);
   document.getElementById("h2").innerHTML = h2;
-  document.getElementById("sosu").innerHTML = plus_comma(sosu);
-  document.getElementById("male").innerHTML = plus_comma(male);
-  document.getElementById("female").innerHTML = plus_comma(female);
+  if (!isInterpolation) {
+    document.getElementById("sosu").innerHTML = plus_comma(sosu);
+    document.getElementById("male").innerHTML = plus_comma(male);
+    document.getElementById("female").innerHTML = plus_comma(female);
+  }
   document.getElementById("source").innerHTML = source_str(shiku, source);
-  basic_data_position();
-
+  if (!isAnm) basic_data_position();
+  
   console.log("change_pyramid step6");
 
   //現在のピラミッドを次回ロード時に再現するための情報を保存する.
-  save_last_pyramid();
+  if (!isAnm) save_last_pyramid();
 
   console.log("change_pyramid step7");
 
-  //年齢３区分別の人口構成比を表示
-  kubunDisplay();
+  //年齢３区分別の人口構成比を表示（補間アニメーション中はスキップ）
+  if (!isInterpolation) {
+    kubunDisplay();
+  }
 
   function source_str(shiku, source) {
     console.log("source_str開始");
@@ -891,6 +937,7 @@ function cho_list() {
     document.getElementById("cho_list").innerHTML = "";
     document.getElementById("cho").style.display = "none";
     document.getElementById("link").style.display = "none";
+
   } else {
     //ローカルデータがあればローカルデータで描画する.
     if (escape_ajax("cho_list") == false) {
@@ -899,7 +946,7 @@ function cho_list() {
     }
     document.getElementById("cho").style.display = "inline-block";
     document.getElementById("cho_year").style.display = "inline-block";
-    document.getElementById("link").style.display = "block";
+    document.getElementById("link").style.display = "inline-block";
   }
   //フッターの位置を調整する.
   //adjustFooterPosition();
@@ -974,12 +1021,12 @@ function change_cmbbox_display(pyramode) {
     case "shiku":
       //alert("change_cmbbox_display shiku");
       document.getElementById("shiku_year").style.display = "inline-block";
-      //document.getElementById("doga").style.display       = "inline-block";
+      document.getElementById("doga").style.display       = "inline-block";
       document.getElementById("cho_year").style.display = "none";
       break;
     case "cho":
       document.getElementById("shiku_year").style.display = "none";
-      //document.getElementById("doga").style.display       = "none";
+      document.getElementById("doga").style.display       = "inline-block";
       document.getElementById("cho_year").style.display = "inline-block";
   }
 }
@@ -1097,6 +1144,7 @@ function get_selected_nengetsu(pyramode) {
   } catch (e) {
     var cmb_value = undefined;
   }
+  console.log("get_selected_nengetsu cmb_value", cmb_value);
   return cmb_value;
 }
 
@@ -2327,4 +2375,7 @@ function htmlToArray(html) {
   data.push(female);
   //alert(JSON.stringify(data));
   return data;
+}
+function myFunc() {
+  console.trace();
 }

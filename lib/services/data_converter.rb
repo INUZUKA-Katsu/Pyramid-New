@@ -12,7 +12,19 @@ class DataConverter
   
   # CSVからJSONに変換
   def csv_to_json(csv, kijunbi, cho_list, ku = nil)
+    puts "csv_to_json開始: csv=#{csv}, kijunbi=#{kijunbi}, cho_list=#{cho_list}, ku=#{ku}"
     return nil unless csv
+    
+    # cho_listが文字列の場合は配列に変換
+    if cho_list.is_a?(String)
+      begin
+        cho_list = JSON.parse(cho_list)
+        puts "cho_listを配列に変換: #{cho_list}"
+      rescue JSON::ParserError => e
+        puts "cho_listのJSON解析エラー: #{e.message}"
+        cho_list = [cho_list] # フォールバック: 単一要素の配列にする
+      end
+    end
     
     csv = csv.force_encoding("utf-8") if RUBY_VERSION[0] == "2"
     ary = []
@@ -29,6 +41,8 @@ class DataConverter
     
     return build_empty_json(cho_list, kijunbi) if ary.size <= 1
     
+    p "csv_to_json: step1"
+
     # データを集計
     title = ary[0].map { |c| c.match(/歳/) ? c.sub(/歳.*/, "") : c }
     male = sum_arrays(ary.select { |l| l[2] == "男" })
@@ -43,6 +57,7 @@ class DataConverter
     title.zip(total, male, female) { |ti, to, m, f| j_ary << [ti, to, m, f] }
     j_ary.slice!(0, 3) # 最初の3要素を削除
     
+    p "csv_to_json: step2"
     build_json_data(exist_cho, kijunbi, j_ary, not_exist, hitoku, ku)
   end
   
@@ -114,6 +129,16 @@ class DataConverter
   
   # 空のJSONデータを構築
   def build_empty_json(cho_list, kijunbi)
+    # cho_listが文字列の場合は配列に変換
+    if cho_list.is_a?(String)
+      begin
+        cho_list = JSON.parse(cho_list)
+      rescue JSON::ParserError => e
+        puts "build_empty_json: cho_listのJSON解析エラー: #{e.message}"
+        cho_list = [cho_list] # フォールバック: 単一要素の配列にする
+      end
+    end
+    
     title = ["年齢"] + (0..100).to_a.map(&:to_s) + ["100歳以上"]
     j_ary = title.map { |i| [i, "0", "0", "0"] }
     j_ary.slice!(0, 3)

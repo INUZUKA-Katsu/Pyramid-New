@@ -32,6 +32,7 @@ class DataFetcher
   
   # 町丁別CSVデータを取得
   def fetch_cho_csv(ku, nengetsu)
+    puts "fetch_cho_csv開始: ku=#{ku}, nengetsu=#{nengetsu}"
     file_path = @file_manager.local_file_path(:csv, ku, nengetsu)
     csv = @file_manager.read_file(file_path)
     
@@ -39,17 +40,21 @@ class DataFetcher
     csv = convert_encoding(csv) if csv
     
     if csv && csv.match(/(,\d+){102}/)
+      p "fetch_cho_csv: route1"
       # 120歳までのデータがある場合は100歳以上を合算
-      summarize_over_100_years_old(csv)
+      res = summarize_over_100_years_old(csv)
     else
+      p "fetch_cho_csv: route2"
       # 市サイトから取得
       csv_url = build_csv_url(ku, nengetsu)
       csv = fetch_https_body(csv_url)
       csv = convert_encoding(csv) if csv
       csv = summarize_over_100_years_old(csv)
       @file_manager.save_file(file_path, csv) if csv
-      csv
+      res = csv
     end
+    p "fetch_cho_csv: 完了"
+    res
   end
   
   # あゆみCSVデータを取得

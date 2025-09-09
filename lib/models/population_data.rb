@@ -13,18 +13,24 @@ class PopulationData
   attr_reader :json, :html_str, :csv, :json_error
   
   def initialize(ku, nengetsu, level, cho = nil, s3_client = nil)
+
+    puts "PopulationData開始"
+    puts "PopulationData: ku=#{ku}, nengetsu=#{nengetsu}, level=#{level}, cho=#{cho}"
+
     @ku = ku
     @level = level
     @cho = cho
     @json_error = nil
     
     @file_manager = FileManager.new(s3_client)
+    p :step1
     @data_fetcher = DataFetcher.new(@file_manager)
+    p :step2
     @data_converter = DataConverter.new
-    
+    p :step3
     # file_managerが初期化された後にnengetsuを処理
     @nengetsu = process_nengetsu(nengetsu, level)
-    
+    p :step4
     process_request
   end
   
@@ -36,7 +42,7 @@ class PopulationData
       puts "Processing 'new' nengetsu for level: #{level}" # デバッグ用
       begin
         result = get_latest_nengetsu
-        puts "Processed nengetsu: #{result}" # デバッグ用
+        #puts "Processed nengetsu: #{result}" # デバッグ用
         result
       rescue => e
         puts "Error in process_nengetsu: #{e.message}"
@@ -61,7 +67,7 @@ class PopulationData
       ary = []
       file_list.select { |f| f.match(/tsurumi.*txt/) }
                .each do |f|
-        puts "Processing file: #{f}"
+        #puts "Processing file: #{f}"
         # ファイル名から4桁の年を抽出（例：tsurumi2101-j.txt -> 2101）
         if ans = f.match(/tsurumi(\d{4})-j\.txt/)
           ary << ans[1]
@@ -84,6 +90,8 @@ class PopulationData
   
   # リクエストを処理
   def process_request
+    p "process_request開始"
+    p @level
     case @level
     when :shiku_json
       @json = process_shiku_data
@@ -147,13 +155,19 @@ class PopulationData
   
   # 町丁JSONデータを処理
   def process_cho_json
+    puts "process_cho_json開始: @ku=#{@ku}, @nengetsu=#{@nengetsu}, @cho=#{@cho}"
     @csv = @data_fetcher.fetch_cho_csv(@ku, @nengetsu)
+    puts "CSV取得完了: #{@csv ? '成功' : '失敗'}"
     kijunbi = @data_converter.generate_kijunbi(@nengetsu)
+    puts "kijunbi生成: #{kijunbi}"
     
     begin
+      puts "csv_to_json呼び出し: cho=#{@cho}, ku=#{@ku}"
       @json = @data_converter.csv_to_json(@csv, kijunbi, @cho, @ku)
+      puts "JSON変換完了: #{@json ? '成功' : '失敗'}"
     rescue => e
       puts "Error in CSV to JSON conversion: #{e.message}"
+      puts "Backtrace: #{e.backtrace.first(5).join("\n")}"
       @json_error = true
     end
   end
@@ -212,11 +226,13 @@ class PopulationData
   
   # 全オプションデータを処理
   def process_all_options
+    p "process_all_options開始"
     ku_str = @file_manager.read_file(@file_manager.local_file_path(:ku_option))
     shi_str = @file_manager.read_file(@file_manager.local_file_path(:shi_option))
     cho_str = @file_manager.read_file(@file_manager.local_file_path(:cho_option))
     kujuki_str = @file_manager.read_file(@file_manager.local_file_path(:kujuki_option))
-    
+    p "process_all_options終了"
+    puts ku_str[0,40]
     {
       "ku_option" => ku_str,
       "shi_option" => shi_str,
