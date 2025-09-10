@@ -507,10 +507,10 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
   myFunc();
 
   //ピラミッドを描画する。
-  if (currentRenderer == null) {
+  if (window.pyramidRenderer == null) {
     renderPyramid(objectData);
   } else {
-    currentRenderer.updateData(objectData, isAnm);
+    window.pyramidRenderer.updateData(objectData, isAnm);
   }
 
   //その他の情報
@@ -681,6 +681,8 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
     }
     //console.log("source_str nengetsu");
     //console.log(nengetsu);
+    console.log(`🔍 source_str: nengetsu = "${nengetsu}" (型: ${typeof nengetsu})`);
+    console.log(`🔍 source_str: nengetsu.match(/年/) 実行前`);
     if (shiku == "横浜市" && nengetsu.match(/年/)) {
       var stat1 = "「横浜市 人口のあゆみ 2010」";
       var stat2 = "第4表 年齢別各歳別男女別人口";
@@ -936,7 +938,7 @@ function cho_list() {
   if (shiku == "age") {
     document.getElementById("cho_list").innerHTML = "";
     document.getElementById("cho").style.display = "none";
-    document.getElementById("link").style.display = "none";
+    document.getElementById("link").style.visibility = "hidden";
 
   } else {
     //ローカルデータがあればローカルデータで描画する.
@@ -946,7 +948,7 @@ function cho_list() {
     }
     document.getElementById("cho").style.display = "inline-block";
     document.getElementById("cho_year").style.display = "inline-block";
-    document.getElementById("link").style.display = "inline-block";
+    document.getElementById("link").style.visibility = "visible";
   }
   //フッターの位置を調整する.
   //adjustFooterPosition();
@@ -1133,16 +1135,20 @@ function get_selected_nengetsu(pyramode) {
   if (pyramode === undefined) {
     pyramode = get_pyramid_mode();
   }
+  console.log(`🔍 get_selected_nengetsu: pyramode = "${pyramode}"`);
   try {
     if (pyramode == "shiku") {
       var index = document.forms[0].shiku_year.selectedIndex;
       var cmb_value = document.forms[0].shiku_year.options[index].value;
+      console.log(`🔍 get_selected_nengetsu: shiku_year selectedIndex = ${index}, value = "${cmb_value}"`);
     } else if (pyramode == "cho") {
       var index = document.forms[0].cho_year.selectedIndex;
       var cmb_value = document.forms[0].cho_year.options[index].value;
+      console.log(`🔍 get_selected_nengetsu: cho_year selectedIndex = ${index}, value = "${cmb_value}"`);
     }
   } catch (e) {
     var cmb_value = undefined;
+    console.log(`🔍 get_selected_nengetsu: エラー発生:`, e);
   }
   console.log("get_selected_nengetsu cmb_value", cmb_value);
   return cmb_value;
