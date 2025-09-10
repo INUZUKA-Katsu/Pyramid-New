@@ -82,6 +82,12 @@ class StreamingAnimationManager {
       return processedData;
     } catch (error) {
       console.error('全年次データ取得エラー:', error);
+      
+      // エラー時も表示を非表示にする
+      if (typeof hideDataLoadingMessage === 'function') {
+        hideDataLoadingMessage();
+      }
+      
       throw error;
     }
   }
@@ -187,6 +193,11 @@ class StreamingAnimationManager {
     if (this.useZoomScaleMode) {
       console.log('新しいzoomScaleモード: 全年次データを事前取得');
       
+      // データ取得中の表示
+      if (typeof showDataLoadingMessage === 'function') {
+        showDataLoadingMessage();
+      }
+      
       // アニメーション開始時に基準スケールを取得・保持
       if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
         this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
@@ -207,13 +218,17 @@ class StreamingAnimationManager {
       console.log('算出された最大総人口:', this.maxTotalPopulation);
       
       console.log('zoomScaleモード: 全年次データ取得完了、アニメーション開始');
+      
+      // データ取得完了の表示を非表示
+      if (typeof hideDataLoadingMessage === 'function') {
+        hideDataLoadingMessage();
+      }
+      
       // アニメーション開始
       this.startAnimation();
 
     } else {
       console.log('通常モード: バッチ処理でデータ取得');
-      // プログレスバーを表示
-      this.showProgressBar();
       
       // 最初のバッチを読み込み
       await this.loadNextBatch(shiku);
@@ -377,7 +392,6 @@ class StreamingAnimationManager {
       }
       
       this.currentBatch++;
-      this.updateProgressBar();
       
       // 次のバッチが必要かチェック
       console.log(`バッチ読み込み完了後: currentBatch=${this.currentBatch}, totalBatches=${this.totalBatches}`);
@@ -971,7 +985,6 @@ class StreamingAnimationManager {
   // アニメーション完了
   completeAnimation() {
     this.isAnimating = false;
-    this.hideProgressBar();
     console.log('ストリーミングアニメーション完了');
     
     // 年次表示を完了状態に更新
@@ -981,10 +994,7 @@ class StreamingAnimationManager {
       yearDisplay.innerHTML = `🎉 アニメーション完了！<br><small>最終年次: ${this.formatYear(lastYear)} (${this.allYears.length}年分)</small>`;
     }
     
-    // コントロールを元に戻す
-    if (typeof hideAnimationControls === 'function') {
-      hideAnimationControls();
-    }
+    // コントロールは維持する（終了ボタンで手動切り替え）
     
     // プログレススライダーを100%に更新
     this.updateProgressSlider(100);
@@ -1025,6 +1035,12 @@ class StreamingAnimationManager {
       const pyramode = get_pyramid_mode();
       console.log(`🔄 セレクトボックス同期: 年次=${year}, モード=${pyramode}`);
       
+      // 年次が有効でない場合は同期をスキップ
+      if (!year || year === undefined || year === null) {
+        console.log(`⚠️ セレクトボックス同期をスキップ: 無効な年次 (${year})`);
+        return;
+      }
+      
       // グローバル変数$nengetsuを更新
       if (typeof window.$nengetsu !== 'undefined') {
         window.$nengetsu = year;
@@ -1034,29 +1050,53 @@ class StreamingAnimationManager {
       if (pyramode === "shiku" || pyramode === "age") {
         const shikuYearSelect = document.getElementById("shiku_year");
         if (shikuYearSelect) {
-          shikuYearSelect.value = year;
-          console.log(`✅ shiku_yearセレクトボックスを${year}に更新`);
-          
-          // セレクトボックスのchangeイベントを発火して再描画
-          const changeEvent = new Event('change', { bubbles: true });
-          shikuYearSelect.dispatchEvent(changeEvent);
-          console.log(`🔄 shiku_yearセレクトボックスのchangeイベントを発火`);
+          // オプションが存在するかチェック
+          if (this.optionExists(shikuYearSelect, year)) {
+            shikuYearSelect.value = year;
+            console.log(`✅ shiku_yearセレクトボックスを${year}に更新`);
+            
+            // セレクトボックスのchangeイベントを発火して再描画
+            const changeEvent = new Event('change', { bubbles: true });
+            shikuYearSelect.dispatchEvent(changeEvent);
+            console.log(`🔄 shiku_yearセレクトボックスのchangeイベントを発火`);
+          } else {
+            console.log(`⚠️ shiku_yearセレクトボックス同期をスキップ: 年次${year}がオプションに存在しません`);
+          }
         }
       } else if (pyramode === "cho") {
         const choYearSelect = document.getElementById("cho_year");
         if (choYearSelect) {
-          choYearSelect.value = year;
-          console.log(`✅ cho_yearセレクトボックスを${year}に更新`);
-          
-          // セレクトボックスのchangeイベントを発火して再描画
-          const changeEvent = new Event('change', { bubbles: true });
-          choYearSelect.dispatchEvent(changeEvent);
-          console.log(`🔄 cho_yearセレクトボックスのchangeイベントを発火`);
+          // オプションが存在するかチェック
+          if (this.optionExists(choYearSelect, year)) {
+            choYearSelect.value = year;
+            console.log(`✅ cho_yearセレクトボックスを${year}に更新`);
+            
+            // セレクトボックスのchangeイベントを発火して再描画
+            const changeEvent = new Event('change', { bubbles: true });
+            choYearSelect.dispatchEvent(changeEvent);
+            console.log(`🔄 cho_yearセレクトボックスのchangeイベントを発火`);
+          } else {
+            console.log(`⚠️ cho_yearセレクトボックス同期をスキップ: 年次${year}がオプションに存在しません`);
+          }
         }
       }
     } catch (error) {
       console.error('セレクトボックス同期エラー:', error);
     }
+  }
+
+  // オプションが存在するかチェックするヘルパー関数
+  optionExists(selectElement, value) {
+    if (!selectElement || !selectElement.options || selectElement.options.length === 0) {
+      return false;
+    }
+    
+    for (let i = 0; i < selectElement.options.length; i++) {
+      if (selectElement.options[i].value === value) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // アニメーション停止
@@ -1066,8 +1106,6 @@ class StreamingAnimationManager {
       clearTimeout(this.animationInterval);
       this.animationInterval = null;
     }
-    this.hideProgressBar();
-    
     // 停止時にもセレクトボックスを現在の年次に同期
     const currentYear = this.getCurrentDisplayYear();
     this.syncSelectBoxToCurrentYear(currentYear);
@@ -1107,26 +1145,66 @@ class StreamingAnimationManager {
 
   // 指定の進行度に移動
   seekToProgress(progress) {
-    if (!this.allYears || this.allYears.length === 0) return;
-    
-    const targetIndex = Math.floor((progress / 100) * (this.allYears.length - 1));
-    const clampedIndex = Math.max(0, Math.min(targetIndex, this.allYears.length - 1));
-    
-    this.currentYearIndex = clampedIndex;
-    const targetYear = this.allYears[clampedIndex];
-    
-    // 現在の年次表示を更新
-    this.updateCurrentYearDisplay(targetYear);
-    
-    // ピラミッドを更新
-    if (this.currentData && this.currentData[targetYear]) {
-      change_pyramid(this.currentData[targetYear], true);
+    // より厳密な初期化チェック
+    if (!this.isInitialized()) {
+      console.warn('seekToProgress: アニメーションが初期化されていません');
+      return;
     }
     
-    // スライダーの値を更新
-    this.updateProgressSlider(progress);
-    
-    console.log(`アニメーション進行度を ${progress}% に移動 (年次: ${targetYear})`);
+    try {
+      const targetIndex = Math.floor((progress / 100) * (this.allYears.length - 1));
+      const clampedIndex = Math.max(0, Math.min(targetIndex, this.allYears.length - 1));
+      
+      this.currentYearIndex = clampedIndex;
+      const targetYear = this.allYears[clampedIndex];
+      
+      // 現在の年次表示を更新
+      this.updateYearDisplay(targetYear);
+      
+      // 新しいzoomScaleモードを使用する場合の処理（描画前に実行）
+      if (this.useZoomScaleMode && window.pyramidRenderer && this.dataCache && this.dataCache[targetYear] && this.dataCache[targetYear].kakusai_betsu) {
+        // 当年の総人口を取得
+        const currentYearTotalPopulation = parseInt(this.dataCache[targetYear].kakusai_betsu[0][1].replace(/,/g, ''));
+        
+        // 当年スケールを計算
+        const currentYearScale = this.calculateCurrentYearScale(currentYearTotalPopulation);
+        
+        // options.zoomScaleに当年スケールをセット
+        window.pyramidRenderer.options.zoomScale = currentYearScale;
+        console.warn(`🎨 seekToProgress 当年スケールセット完了: ${currentYearScale.toFixed(3)} (総人口: ${currentYearTotalPopulation.toLocaleString()})`);
+      }
+      
+      // ピラミッドを更新
+      if (this.dataCache && this.dataCache[targetYear]) {
+        change_pyramid(this.dataCache[targetYear], true, false);
+      } else {
+        console.warn(`年次 ${targetYear} のデータが見つかりません`);
+      }
+      
+      // スライダーの値を更新
+      this.updateProgressSlider(progress);
+      
+      // アニメーションを一時停止状態にする
+      this.isAnimating = false;
+      if (this.animationInterval) {
+        clearTimeout(this.animationInterval);
+        this.animationInterval = null;
+      }
+      
+      console.log(`アニメーション進行度を ${progress}% に移動 (年次: ${targetYear}) - 一時停止状態`);
+      console.log(`データキャッシュ確認: allYears.length=${this.allYears.length}, dataCache.keys=${Object.keys(this.dataCache || {}).length}`);
+    } catch (error) {
+      console.error('seekToProgress エラー:', error);
+      // エラーを再スローしない（alert表示を防ぐ）
+    }
+  }
+
+  // アニメーションが初期化されているかチェック
+  isInitialized() {
+    return this.allYears && 
+           this.allYears.length > 0 && 
+           this.dataCache && 
+           Object.keys(this.dataCache).length > 0;
   }
 
   // プログレススライダーの値を更新
@@ -1142,63 +1220,6 @@ class StreamingAnimationManager {
     }
   }
 
-  // プログレスバー表示
-  showProgressBar() {
-    let progressContainer = document.getElementById('animation-progress');
-    if (!progressContainer) {
-      progressContainer = this.createProgressBar();
-    }
-    progressContainer.style.display = 'block';
-  }
-
-  // プログレスバー作成
-  createProgressBar() {
-    const container = document.createElement('div');
-    container.id = 'animation-progress';
-    container.style.cssText = `
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.8);
-      color: white;
-      padding: 15px;
-      border-radius: 10px;
-      z-index: 1000;
-      min-width: 200px;
-    `;
-    
-    container.innerHTML = `
-      <div id="progress-text">読み込み中...</div>
-      <div style="width: 100%; height: 10px; background: #333; border-radius: 5px; margin-top: 5px;">
-        <div id="progress-bar" style="width: 0%; height: 100%; background: #4CAF50; border-radius: 5px; transition: width 0.3s;"></div>
-      </div>
-    `;
-    
-    document.body.appendChild(container);
-    return container;
-  }
-
-  // プログレスバー更新
-  updateProgressBar() {
-    const progress = (this.currentBatch / this.totalBatches) * 100;
-    const progressBar = document.getElementById('progress-bar');
-    if (progressBar) {
-      progressBar.style.width = `${progress}%`;
-    }
-    
-    const progressText = document.getElementById('progress-text');
-    if (progressText) {
-      progressText.textContent = `読み込み中: ${this.currentBatch}/${this.totalBatches} バッチ`;
-    }
-  }
-
-  // プログレスバー非表示
-  hideProgressBar() {
-    const progressContainer = document.getElementById('animation-progress');
-    if (progressContainer) {
-      progressContainer.style.display = 'none';
-    }
-  }
 
   // アニメーション速度を設定
   setAnimationSpeed(speed) {

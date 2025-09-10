@@ -508,7 +508,7 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
 
   //ピラミッドを描画する。
   if (window.pyramidRenderer == null) {
-    renderPyramid(objectData);
+    renderPyramid(objectData, isAnm);
   } else {
     window.pyramidRenderer.updateData(objectData, isAnm);
   }
@@ -679,17 +679,21 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
     if (nengetsu == undefined) {
       nengetsu = $nengetsu;
     }
+    // nengetsuがまだundefinedやnullの場合は空文字列に設定
+    if (nengetsu == undefined || nengetsu == null) {
+      nengetsu = "";
+    }
     //console.log("source_str nengetsu");
     //console.log(nengetsu);
     console.log(`🔍 source_str: nengetsu = "${nengetsu}" (型: ${typeof nengetsu})`);
     console.log(`🔍 source_str: nengetsu.match(/年/) 実行前`);
-    if (shiku == "横浜市" && nengetsu.match(/年/)) {
+    if (shiku == "横浜市" && nengetsu && typeof nengetsu === 'string' && nengetsu.match(/年/)) {
       var stat1 = "「横浜市 人口のあゆみ 2010」";
       var stat2 = "第4表 年齢別各歳別男女別人口";
       var url =
         "http://www.city.yokohama.lg.jp/ex/stat/jinko/ayumi/index-j.html";
       stat = "<a href='" + url + "'>" + stat1 + "</a>" + stat2;
-    } else if (nengetsu.match(/\d\d\d\dft/)) {
+    } else if (nengetsu && typeof nengetsu === 'string' && nengetsu.match(/\d\d\d\dft/)) {
       var str = "データの出典： 横浜市政策局ホームページ ";
       var stat = "横浜市将来推計人口";
       var url =
@@ -1622,7 +1626,93 @@ function select_nengetsu(nengetsu, pyramode) {
   if (nengetsu == undefined) {
     nengetsu = $nengetsu;
   }
-  document.getElementById(pyramode + "_year").value = nengetsu;
+  
+  const selectElement = document.getElementById(pyramode + "_year");
+  if (!selectElement) {
+    console.error(`select_nengetsu: セレクトボックスが見つかりません (${pyramode}_year)`);
+    return;
+  }
+  
+  // オプションが準備できるまで待機
+  waitForSelectOptions(selectElement, nengetsu, pyramode);
+}
+
+// セレクトボックスのオプションが準備できるまで待機する関数
+function waitForSelectOptions(selectElement, targetValue, pyramode, maxWaitTime = 10000) {
+  const startTime = Date.now();
+  
+  function checkOptions() {
+    const currentTime = Date.now();
+    
+    // タイムアウトチェック
+    if (currentTime - startTime > maxWaitTime) {
+      console.error(`select_nengetsu: オプション待機がタイムアウトしました (${pyramode}_year)`);
+      setFallbackValue(selectElement, pyramode);
+      return;
+    }
+    
+    // オプションが存在するかチェック
+    if (selectElement.options && selectElement.options.length > 0) {
+      console.log(`select_nengetsu: オプション準備完了 (${pyramode}_year), オプション数: ${selectElement.options.length}`);
+      
+      // 指定された値が存在するかチェック
+      if (optionExists(selectElement, targetValue)) {
+        selectElement.value = targetValue;
+        console.log(`select_nengetsu: 値を設定しました (${pyramode}_year = ${targetValue})`);
+      } else {
+        console.log(`select_nengetsu: 指定値が見つからないためフォールバック値を設定 (${pyramode}_year, 指定値: ${targetValue})`);
+        setFallbackValue(selectElement, pyramode);
+      }
+    } else {
+      // オプションがまだ準備されていない場合は再試行
+      console.log(`select_nengetsu: オプション待機中 (${pyramode}_year)...`);
+      setTimeout(checkOptions, 50); // 50ms間隔で再試行
+    }
+  }
+  
+  checkOptions();
+}
+
+// 指定された値がオプションに存在するかチェック
+function optionExists(selectElement, value) {
+  if (!selectElement.options || selectElement.options.length === 0) {
+    return false;
+  }
+  
+  for (let i = 0; i < selectElement.options.length; i++) {
+    if (selectElement.options[i].value === value) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// フォールバック値を設定
+function setFallbackValue(selectElement, pyramode) {
+  if (!selectElement.options || selectElement.options.length === 0) {
+    console.error(`setFallbackValue: オプションが存在しません (${pyramode}_year)`);
+    return;
+  }
+  
+  let fallbackValue;
+  
+  if (pyramode === "shiku") {
+    // 市区ピラミッドの場合："new"を選択（最新データ）
+    fallbackValue = "new";
+    if (!optionExists(selectElement, fallbackValue)) {
+      // "new"が存在しない場合は最初のオプション
+      fallbackValue = selectElement.options[0].value;
+    }
+  } else if (pyramode === "cho") {
+    // 町丁別ピラミッドの場合：最初の選択肢（最新データ）
+    fallbackValue = selectElement.options[0].value;
+  } else {
+    // その他の場合は最初のオプション
+    fallbackValue = selectElement.options[0].value;
+  }
+  
+  selectElement.value = fallbackValue;
+  console.log(`setFallbackValue: フォールバック値を設定しました (${pyramode}_year = ${fallbackValue})`);
 }
 
 function set_comment(display, mes, timer) {

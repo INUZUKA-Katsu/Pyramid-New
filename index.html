@@ -217,7 +217,9 @@
         }
         /* 描画領域上部に並ぶコントロール */
         #top-controls {
-          height:100px;
+          height: auto;
+          min-height: 100px;
+          margin-bottom: 10px;
         }
 
         /* 左端に縦に並ぶコントロール用のスタイル */
@@ -557,7 +559,6 @@
             text-align: right;
             margin-left: auto;
             margin-right: 0px;
-            margin-top: 10px;
             display: inline-block;
             vertical-align: top;
             position: relative;
@@ -566,17 +567,23 @@
             margin-left: auto;
             width: 1148px;
             white-space: nowrap;
-            display: inline-block;
+            display: block;
             text-align: right;
             gap: 8px;
             white-space: nowrap;
-            margin-bottom: 0.5em;
+            margin-bottom: 0.5m;
           }
           div#animation-controls {
             display: none;
             text-align: center;
             width: 100%;
-            padding-bottom: 10px;
+            padding: 0;
+            background-color: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            margin: 0;
+            z-index: 1000;
+            position: relative;
           }
           div#animation-type-controls {
             text-align: center;
@@ -1125,6 +1132,68 @@
           <div id="pyramid-block">
             <!-- 上部コントロール -->
             <div id="top-controls">
+              <!-- アニメーション用コントロール（通常は非表示） -->
+              <div id="animation-controls">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                  <!-- 左側: アニメーション設定ブロック -->
+                  <div id="animation-settings-block" style="display: flex; flex-direction: column; gap: 0; min-width: 200px;">
+                    <!-- アニメーションタイプ選択 -->
+                    <div id="animation-type-controls">
+                      <span style="margin-right: 10px; font-weight: bold;">アニメーション</span>
+                      <label style="margin-right: 10px;">
+                    <input type="radio" name="animation-type-inline" value="direct" checked>
+                    <span>タイプ１</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="animation-type-inline" value="interpolation">
+                    <span>タイプ２</span>
+                  </label>
+                </div>
+                
+                    <!-- 速度調節 -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="font-weight: bold;">速度:</span>
+                    <span>ゆっくり</span>
+                    <input type="range" id="animation-speed" min="50" max="500" value="200" style="width: 100px;">
+                    <span>早く</span>
+                  </div>
+                    
+                    <!-- 進捗スライダー -->
+                    <div id="animation-progress-controls" style="display: flex; align-items: center; gap: 10px; position: relative;">
+                      <span style="font-weight: bold;">進行状況:</span>
+                      <input type="range" id="animation-progress" min="0" max="100" value="0" style="width: 150px;">
+                      <span id="progress-display">0%</span>
+                      <!-- ツールチップ -->
+                      <div id="slider-tooltip" style="
+                        position: absolute;
+                        top: -40px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: rgba(0, 0, 0, 0.8);
+                        color: white;
+                        padding: 5px 10px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        white-space: nowrap;
+                        display: none;
+                        z-index: 1000;
+                        pointer-events: none;
+                      ">
+                        基準日: 準備中
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- 右側: ボタン -->
+                  <div style="display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: center; height: 100%;">
+                  <button type="button" id="start-animation-btn" onclick="startAnimationFromControls()">開始</button>
+                    <button type="button" id="pause-animation-btn" onclick="pauseAnimationFromControls()">一時停止</button>
+                    <button type="button" id="resume-animation-btn" onclick="resumeAnimationFromControls()">再開</button>
+                    <button type="button" id="stop-animation-btn" onclick="stopAnimationFromControls()">終了</button>
+                  </div>
+                </div>
+              </div>
+
               <!-- 地域別人口ピラミッドの町丁名指定へのリンク -->
               <div id="link" data-html2canvas-ignore="true">
                 <a href="#cho"> 地域別人口ピラミッドのための町丁名の指定 </a>
@@ -1137,44 +1206,6 @@
                 /></span>
               </div>
               <br />
-
-              <!-- アニメーション用コントロール（通常は非表示） -->
-              <div id="animation-controls">
-                <!-- 上段: アニメーションタイプ選択 -->
-                <div id="animation-type-controls" style="margin-bottom: 10px;">
-                  <span style="margin-right: 20px;">アニメーション</span>
-                  <label style="margin-right: 15px;">
-                    <input type="radio" name="animation-type-inline" value="direct" checked>
-                    <span>タイプ１</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="animation-type-inline" value="interpolation">
-                    <span>タイプ２</span>
-                  </label>
-                </div>
-                
-                <!-- 下段: 速度調節とボタン -->
-                <div id="animation-speed-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px;">
-                  <div style="display: flex; align-items: center; gap: 10px;">
-                    <span>ゆっくり</span>
-                    <input type="range" id="animation-speed" min="50" max="500" value="200" style="width: 100px;">
-                    <span>早く</span>
-                  </div>
-                  <button type="button" id="start-animation-btn" onclick="startAnimationFromControls()">開始</button>
-                  <button type="button" id="pause-animation-btn" onclick="pauseAnimationFromControls()">一時停止</button>
-                  <button type="button" id="resume-animation-btn" onclick="resumeAnimationFromControls()">再開</button>
-                  <button type="button" id="stop-animation-btn" onclick="stopAnimationFromControls()">終了</button>
-                </div>
-                
-                <!-- アニメーション進行スライダー -->
-                <div id="animation-progress-controls" style="margin-bottom: 10px;">
-                  <div style="display: flex; align-items: center; gap: 10px;">
-                    <span>進行状況:</span>
-                    <input type="range" id="animation-progress" min="0" max="100" value="0" style="width: 200px;">
-                    <span id="progress-display">0%</span>
-                  </div>
-                </div>
-              </div>
 
               <!-- #市区、年月セレクトボックス -->
               <div id="select-controls">
@@ -1754,17 +1785,16 @@
           //};
           console.log("rout4");
           try {
-            if (isAnimation && window.pyramidRenderer) {
-              // アニメーション中の場合は既存のレンダラーを更新
-              console.log("アニメーション中: 既存レンダラーを更新");
-              //alert("zoomScale:"+window.pyramidRenderer.options.zoomScale) ;
+            if (window.pyramidRenderer) {
+              // 既存のレンダラーがある場合は更新（zoomScaleを保持）
+              console.log("既存レンダラーを更新（zoomScale保持）");
+              console.log("更新前のzoomScale:", window.pyramidRenderer.options.zoomScale);
               window.pyramidRenderer.updateData(data, isAnimation);
+              console.log("更新後のzoomScale:", window.pyramidRenderer.options.zoomScale);
             } else {
-              // 通常の描画またはアニメーション開始時は新しいレンダラーを作成
+              // レンダラーが存在しない場合は新しいレンダラーを作成
               console.log("新しいレンダラーを作成");
-              //alert("新しいレンダラーインスタンスを作成");
               window.pyramidRenderer = new PyramidSVGRenderer("pyramid-container", data);
-              //alert(window.pyramidRenderer.options.zoomScale) ;
             }
             //document.getElementById('status').textContent =
             //    `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
@@ -1882,11 +1912,21 @@
 
           if (speedSlider) {
             speedSlider.addEventListener("input", function () {
-              const speed = parseInt(this.value);
-              document.getElementById("speed-display").textContent =
-                speed + "ms";
-              if (window.streamingAnimation) {
-                window.streamingAnimation.setAnimationSpeed(speed);
+              const sliderValue = parseInt(this.value);
+              // スライダー値を逆転（50-500 → 500-50）
+              const actualSpeed = 550 - sliderValue; // 50+500-sliderValue
+              
+              const speedDisplay = document.getElementById("speed-display");
+              if (speedDisplay) {
+                speedDisplay.textContent = actualSpeed + "ms";
+              }
+              
+              // アニメーションが初期化されている場合のみ速度を設定
+              if (window.streamingAnimation && window.streamingAnimation.setAnimationSpeed) {
+                window.streamingAnimation.setAnimationSpeed(actualSpeed);
+                console.log(`アニメーション速度を設定: スライダー値=${sliderValue} → 実際の速度=${actualSpeed}ms`);
+              } else {
+                console.log(`アニメーション未初期化: 速度設定をスキップ (スライダー値=${sliderValue} → 実際の速度=${actualSpeed}ms)`);
               }
             });
           }
@@ -1894,10 +1934,17 @@
           if (barDurationSlider) {
             barDurationSlider.addEventListener("input", function () {
               const duration = parseInt(this.value);
-              document.getElementById("bar-duration-display").textContent =
-                duration + "ms";
-              if (window.streamingAnimation) {
+              const barDurationDisplay = document.getElementById("bar-duration-display");
+              if (barDurationDisplay) {
+                barDurationDisplay.textContent = duration + "ms";
+              }
+              
+              // アニメーションが初期化されている場合のみ期間を設定
+              if (window.streamingAnimation && window.streamingAnimation.setBarAnimationDuration) {
                 window.streamingAnimation.setBarAnimationDuration(duration);
+                console.log(`バーアニメーション期間を設定: ${duration}ms`);
+              } else {
+                console.log(`アニメーション未初期化: バーアニメーション期間設定をスキップ (${duration}ms)`);
               }
             });
           }
@@ -1929,22 +1976,21 @@
           document.getElementById('link').style.display = 'none';
           document.getElementById('select-controls').style.display = 'none';
           document.getElementById('animation-controls').style.display = 'block';
-          //document.getElementById('animation-type-controls').style.display = 'inline-block';
-          //document.getElementById('animation-speed-controls').style.display = 'inline-block';
+          
+          // 進捗スライダーを初期化
+          setupAnimationProgressSlider();
         }
 
         function hideAnimationControls() {
           document.getElementById('link').style.display = 'block';
           document.getElementById('select-controls').style.display = 'block';
           document.getElementById('animation-controls').style.display = 'none';
-          //document.getElementById('animation-type-controls').style.display = 'none';
-          //document.getElementById('animation-speed-controls').style.display = 'none';
         }
 
         // アニメーション開始
         async function startAnimationFromControls() {
           const animationType = document.querySelector('input[name="animation-type-inline"]:checked').value;
-          const speed = document.getElementById('animation-speed').value;
+          // 速度は後でアニメーション設定時に確実に読み取る
           
           // デバッグ: 現在のモードを確認
           const currentMode = get_pyramid_mode();
@@ -1956,10 +2002,18 @@
           const useFixedUnitSize = await showPopulationSizeDialog();
           console.log('ユーザー選択: 総人口変化反映 =', useFixedUnitSize);
           
+          // キャンセルされた場合はアニメーションを開始しない
+          if (useFixedUnitSize === null) {
+            console.log('アニメーション開始がキャンセルされました');
+            return;
+          }
           
           // アニメーション設定を更新
           if (window.streamingAnimation) {
-            window.streamingAnimation.animationSpeed = parseInt(speed);
+            // 速度設定（スライダーの現在値を確実に読み取り）
+            const sliderValue = parseInt(document.getElementById('animation-speed').value);
+            const currentSpeed = 550 - sliderValue; // スライダー値を逆転
+            window.streamingAnimation.animationSpeed = currentSpeed;
             window.streamingAnimation.useInterpolation = (animationType === 'interpolation');
             window.streamingAnimation.interpolationDuration = 1000;
             window.streamingAnimation.useFixedUnitSize = useFixedUnitSize;
@@ -1967,6 +2021,8 @@
             // デバッグ: 設定値を確認
             console.log('アニメーション設定更新:');
             console.log('  - animationType:', animationType);
+            console.log('  - sliderValue:', sliderValue);
+            console.log('  - animationSpeed:', currentSpeed);
             console.log('  - useInterpolation:', window.streamingAnimation.useInterpolation);
             console.log('  - useFixedUnitSize:', window.streamingAnimation.useFixedUnitSize);
           }
@@ -1974,18 +2030,21 @@
           // アニメーション開始
           if (useFixedUnitSize) {
             // 総人口変化反映モード: 事前に全データを取得してunitSizeを計算
-            startAnimationWithFixedUnitSize();
+            await startAnimationWithFixedUnitSize();
           } else {
             // 通常モード（補間・非補間共通）
             // zoomScaleモードを無効化
             window.streamingAnimation.useZoomScaleMode = false;
             if (window.streamingAnimation) {
-              window.streamingAnimation.startStreamingAnimation();
+              await window.streamingAnimation.startStreamingAnimation();
             } else {
               console.error('ストリーミングアニメーションが利用できません');
               alert('ストリーミングアニメーションが利用できません');
             }
           }
+          
+          // アニメーション開始後にスライダーを有効化
+          updateSliderState();
         }
 
         // 総人口変化反映の選択ダイアログを表示
@@ -2065,7 +2124,7 @@
             
             document.getElementById('dialog-cancel').onclick = () => {
               document.body.removeChild(dialog);
-              resolve(false);
+              resolve(null); // キャンセル時はnullを返す
             };
           });
         }
@@ -2088,11 +2147,14 @@
             
             // アニメーション開始（StreamingAnimationManager内で全年次データ取得と最大総人口算出を行う）
             if (window.streamingAnimation) {
-              window.streamingAnimation.startStreamingAnimation();
+              await window.streamingAnimation.startStreamingAnimation();
             } else {
               console.error('ストリーミングアニメーションが利用できません');
               alert('ストリーミングアニメーションが利用できません');
             }
+            
+            // アニメーション開始後にスライダーを有効化
+            updateSliderState();
             
           } catch (error) {
             console.error('人口変化反映アニメーション開始エラー:', error);
@@ -2101,11 +2163,14 @@
             // エラー時はzoomScaleモードを無効にして通常モードで開始
             window.streamingAnimation.useZoomScaleMode = false;
             if (window.streamingAnimation) {
-              window.streamingAnimation.startStreamingAnimation();
+              await window.streamingAnimation.startStreamingAnimation();
             } else {
               console.error('ストリーミングアニメーションが利用できません');
               alert('ストリーミングアニメーションが利用できません');
             }
+            
+            // エラー時でもアニメーション開始後にスライダーを有効化
+            updateSliderState();
           }
         }
 
@@ -2180,9 +2245,54 @@
 
         // アニメーション停止
         function stopAnimationFromControls() {
+          // 元の選択状態を保存
+          const originalNengetsu = get_selected_nengetsu();
+          const originalPyramode = get_pyramid_mode();
+          console.log(`終了ボタン: 元の選択状態を保存 - 年次: ${originalNengetsu}, モード: ${originalPyramode}`);
+          
           // ストリーミングアニメーションの停止
           if (window.streamingAnimation) {
             window.streamingAnimation.stopAnimation();
+          }
+          
+          // スライダーを無効化
+          updateSliderState();
+          
+          // スライドバーの進捗度情報をクリア
+          const progressSlider = document.getElementById('animation-progress');
+          const progressDisplay = document.getElementById('progress-display');
+          if (progressSlider) {
+            progressSlider.value = 0;
+          }
+          if (progressDisplay) {
+            progressDisplay.textContent = '0%';
+          }
+          
+          // 元の選択状態を復元
+          if (originalNengetsu && originalNengetsu !== undefined) {
+            console.log(`終了ボタン: 元の選択状態を復元 - 年次: ${originalNengetsu}`);
+            select_nengetsu(originalNengetsu, originalPyramode);
+          }
+        }
+
+        // スライダーの操作可否を制御する関数
+        function updateSliderState() {
+          const progressSlider = document.getElementById('animation-progress');
+          if (!progressSlider) return;
+          
+          // アニメーションが初期化されているかチェック
+          const isReady = window.streamingAnimation && 
+                         window.streamingAnimation.allYears && 
+                         window.streamingAnimation.allYears.length > 0 &&
+                         window.streamingAnimation.dataCache &&
+                         Object.keys(window.streamingAnimation.dataCache).length > 0;
+          
+          if (isReady) {
+            progressSlider.style.pointerEvents = 'auto';  // 操作可能
+            console.log('スライダーを有効化しました（pointer-events: auto）');
+          } else {
+            progressSlider.style.pointerEvents = 'none';  // 操作不可
+            console.log('スライダーを無効化しました（pointer-events: none）');
           }
         }
 
@@ -2195,13 +2305,22 @@
           
           let isDragging = false;
           
+          // スライダーを100%の長さで表示（最大値を100に設定）
+          progressSlider.max = 100;
+          
+          // 初期状態では無効化
+          updateSliderState();
+          
           // スライダーの値変更時
           progressSlider.addEventListener('input', function() {
-            if (!isDragging && window.streamingAnimation) {
-              const progress = parseInt(this.value);
-              progressDisplay.textContent = progress + '%';
-              
-              // アニメーションを指定の進行度に移動
+            const progress = parseInt(this.value);
+            progressDisplay.textContent = progress + '%';
+            
+            if (isDragging) {
+              // ドラッグ中はツールチップのみ表示
+              showSliderTooltip(progress);
+            } else if (window.streamingAnimation) {
+              // ドラッグ中でない場合はピラミッドを描画
               window.streamingAnimation.seekToProgress(progress);
             }
           });
@@ -2217,13 +2336,13 @@
           // ドラッグ終了
           progressSlider.addEventListener('mouseup', function() {
             isDragging = false;
+            hideSliderTooltip();
+            
             if (window.streamingAnimation) {
               const progress = parseInt(this.value);
+              // ドラッグ停止時にピラミッドを描画
               window.streamingAnimation.seekToProgress(progress);
-              // 一時停止状態でない場合は再開
-              if (window.streamingAnimation && !window.streamingAnimation.isAnimating) {
-                window.streamingAnimation.resumeAnimation();
-              }
+              // 一時停止状態を維持（再開ボタンで手動再開）
             }
           });
           
@@ -2237,18 +2356,161 @@
           
           progressSlider.addEventListener('touchend', function() {
             isDragging = false;
+            hideSliderTooltip();
+            
             if (window.streamingAnimation) {
               const progress = parseInt(this.value);
+              // ドラッグ停止時にピラミッドを描画
               window.streamingAnimation.seekToProgress(progress);
-              if (window.streamingAnimation && !window.streamingAnimation.isAnimating) {
-                window.streamingAnimation.resumeAnimation();
-              }
+              // 一時停止状態を維持（再開ボタンで手動再開）
             }
           });
         }
 
+        // スライダーツールチップ表示
+        function showSliderTooltip(progress) {
+          const tooltip = document.getElementById('slider-tooltip');
+          if (!tooltip || !window.streamingAnimation) return;
+          
+          // 進行度から年次を計算
+          const targetIndex = Math.floor((progress / 100) * (window.streamingAnimation.allYears.length - 1));
+          const clampedIndex = Math.max(0, Math.min(targetIndex, window.streamingAnimation.allYears.length - 1));
+          const targetYear = window.streamingAnimation.allYears[clampedIndex];
+          
+          // 年次をフォーマット
+          const formattedYear = window.streamingAnimation.formatYear(targetYear);
+          
+          // ツールチップを表示
+          tooltip.textContent = `基準日: ${formattedYear}`;
+          tooltip.style.display = 'block';
+        }
+
+        // スライダーツールチップ非表示
+        function hideSliderTooltip() {
+          const tooltip = document.getElementById('slider-tooltip');
+          if (tooltip) {
+            tooltip.style.display = 'none';
+          }
+        }
+
+        // 現在選択されている市区を日本語表記で取得
+        function get_selected_shiku_japanese() {
+          const index = document.forms[0].shiku.selectedIndex;
+          const text = document.forms[0].shiku.options[index].text;
+          return text;
+        }
+
+        // 市区・年次変更検知とキャッシュクリア
+        function checkAndClearCacheIfShikuChanged() {
+          if (!window.streamingAnimation) {
+            console.log('StreamingAnimationManagerが存在しません');
+            return;
+          }
+
+          // 現在選択されている市区を取得（日本語表記）
+          const currentShiku = get_selected_shiku_japanese();
+          console.log('現在選択されている市区:', currentShiku);
+
+          // 現在選択されている年次を取得
+          const currentNengetsu = get_selected_nengetsu();
+          console.log('現在選択されている年次:', currentNengetsu);
+
+          // キャッシュされている市区と年次を取得
+          let cachedShiku = null;
+          let cachedYear = null;
+          if (window.streamingAnimation.dataCache && Object.keys(window.streamingAnimation.dataCache).length > 0) {
+            const firstYear = Object.keys(window.streamingAnimation.dataCache)[0];
+            cachedShiku = window.streamingAnimation.dataCache[firstYear]?.shiku;
+            cachedYear = firstYear;
+            console.log('キャッシュされている市区:', cachedShiku);
+            console.log('キャッシュされている年次:', cachedYear);
+          }
+
+          // 年次の下2桁を取得する関数
+          function getLastTwoDigits(nengetsu) {
+            if (!nengetsu || typeof nengetsu !== 'string') return '';
+            return nengetsu.slice(-2);
+          }
+
+          // 判定条件
+          let shouldClearCache = false;
+          let reason = '';
+
+          if (!cachedShiku) {
+            // キャッシュが存在しない場合
+            console.log('キャッシュが存在しません（初回またはキャッシュクリア済み）');
+            return;
+          }
+
+          // 1. 市区が変更されている場合
+          if (currentShiku !== cachedShiku) {
+            shouldClearCache = true;
+            reason = `市区が変更されました: ${cachedShiku} → ${currentShiku}`;
+          }
+          // 2. 年次の下2桁がどちらか一方だけが"09"の場合（市区ピラミッドと町丁別ピラミッドの切り替え）
+          else {
+            const currentLastTwo = getLastTwoDigits(currentNengetsu);
+            const cachedLastTwo = getLastTwoDigits(cachedYear);
+            
+            const currentIsCho = currentLastTwo === '09';
+            const cachedIsCho = cachedLastTwo === '09';
+            
+            if (currentIsCho !== cachedIsCho) {
+              shouldClearCache = true;
+              const currentType = currentIsCho ? '町丁別' : '市区';
+              const cachedType = cachedIsCho ? '町丁別' : '市区';
+              reason = `ピラミッドタイプが変更されました: ${cachedType} → ${currentType} (${cachedYear} → ${currentNengetsu})`;
+            }
+          }
+
+          if (shouldClearCache) {
+            console.log(reason);
+            clearAnimationCache();
+          } else {
+            console.log('市区・年次ともに変更されていません');
+          }
+        }
+
+        // アニメーションキャッシュをクリア
+        function clearAnimationCache() {
+          if (!window.streamingAnimation) return;
+
+          console.log('アニメーションキャッシュをクリアします');
+
+          // キャッシュデータをクリア
+          window.streamingAnimation.dataCache = {};
+          window.streamingAnimation.allYears = [];
+          window.streamingAnimation.currentYearIndex = 0;
+          window.streamingAnimation.maxTotalPopulation = null;
+          window.streamingAnimation.baseZoomScale = null;
+          
+          // アニメーション状態は保持（市区変更時は新しいアニメーションを開始するため）
+          // window.streamingAnimation.isAnimating = false; // 削除
+
+          // タイマーをクリア
+          if (window.streamingAnimation.animationInterval) {
+            clearTimeout(window.streamingAnimation.animationInterval);
+            window.streamingAnimation.animationInterval = null;
+          }
+
+          // スライドバーの状態をリセット
+          const progressSlider = document.getElementById('animation-progress');
+          const progressDisplay = document.getElementById('progress-display');
+          if (progressSlider) {
+            progressSlider.value = 0;
+          }
+          if (progressDisplay) {
+            progressDisplay.textContent = '0%';
+          }
+
+          console.log('アニメーションキャッシュのクリアが完了しました');
+        }
+
         // 動画ボタンのクリック処理
         function toggleAnimationPanel() {
+          // 市区変更検知とキャッシュクリア
+          checkAndClearCacheIfShikuChanged();
+          
           showAnimationControls();
         }
       </script>
