@@ -1161,7 +1161,18 @@
                     <span>早く</span>
                   </div>
                   <button type="button" id="start-animation-btn" onclick="startAnimationFromControls()">開始</button>
-                  <button type="button" id="stop-animation-btn" onclick="stopAnimationFromControls()">停止</button>
+                  <button type="button" id="pause-animation-btn" onclick="pauseAnimationFromControls()">一時停止</button>
+                  <button type="button" id="resume-animation-btn" onclick="resumeAnimationFromControls()">再開</button>
+                  <button type="button" id="stop-animation-btn" onclick="stopAnimationFromControls()">終了</button>
+                </div>
+                
+                <!-- アニメーション進行スライダー -->
+                <div id="animation-progress-controls" style="margin-bottom: 10px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>進行状況:</span>
+                    <input type="range" id="animation-progress" min="0" max="100" value="0" style="width: 200px;">
+                    <span id="progress-display">0%</span>
+                  </div>
                 </div>
               </div>
 
@@ -1202,107 +1213,8 @@
                       name="shiku_year"
                       id="shiku_year"
                     >
-                      <option value="2065ft">2065年(将来推計)</option>
-                      <option value="2064ft">2064年(将来推計)</option>
-                      <option value="2063ft">2063年(将来推計)</option>
-                      <option value="2062ft">2062年(将来推計)</option>
-                      <option value="2061ft">2061年(将来推計)</option>
-                      <option value="2060ft">2060年(将来推計)</option>
-                      <option value="2059ft">2059年(将来推計)</option>
-                      <option value="2058ft">2058年(将来推計)</option>
-                      <option value="2057ft">2057年(将来推計)</option>
-                      <option value="2056ft">2056年(将来推計)</option>
-                      <option value="2055ft">2055年(将来推計)</option>
-                      <option value="2054ft">2054年(将来推計)</option>
-                      <option value="2053ft">2053年(将来推計)</option>
-                      <option value="2052ft">2052年(将来推計)</option>
-                      <option value="2051ft">2051年(将来推計)</option>
-                      <option value="2050ft">2050年(将来推計)</option>
-                      <option value="2049ft">2049年(将来推計)</option>
-                      <option value="2048ft">2048年(将来推計)</option>
-                      <option value="2047ft">2047年(将来推計)</option>
-                      <option value="2046ft">2046年(将来推計)</option>
-                      <option value="2045ft">2045年(将来推計)</option>
-                      <option value="2044ft">2044年(将来推計)</option>
-                      <option value="2043ft">2043年(将来推計)</option>
-                      <option value="2042ft">2042年(将来推計)</option>
-                      <option value="2041ft">2041年(将来推計)</option>
-                      <option value="2040ft">2040年(将来推計)</option>
-                      <option value="2039ft">2039年(将来推計)</option>
-                      <option value="2038ft">2038年(将来推計)</option>
-                      <option value="2037ft">2037年(将来推計)</option>
-                      <option value="2036ft">2036年(将来推計)</option>
-                      <option value="2035ft">2035年(将来推計)</option>
-                      <option value="2034ft">2034年(将来推計)</option>
-                      <option value="2033ft">2033年(将来推計)</option>
-                      <option value="2032ft">2032年(将来推計)</option>
-                      <option value="2031ft">2031年(将来推計)</option>
-                      <option value="2030ft">2030年(将来推計)</option>
-                      <option value="2029ft">2029年(将来推計)</option>
-                      <option value="2028ft">2028年(将来推計)</option>
-                      <option value="2027ft">2027年(将来推計)</option>
-                      <option value="2026ft">2026年(将来推計)</option>
-                      <option value="2025ft">2025年(将来推計)</option>
-                      <option value="2024ft">2024年(将来推計)</option>
-                      <option value="2023ft">2023年(将来推計)</option>
+                      <!-- 動的オプション読み込み用プレースホルダー -->
                       <option value="new" selected>　　 最新</option>
-                      <option value="202101">令和3年1月1日現在</option>
-                      <option value="202001">令和2年1月1日現在</option>
-                      <option value="201901">平成31年1月1日現在</option>
-                      <option value="201801">平成30年1月1日現在</option>
-                      <option value="201701">平成29年1月1日現在</option>
-                      <option value="201601">平成28年1月1日現在</option>
-                      <option value="201501">平成27年1月1日現在</option>
-                      <option value="201401">平成26年1月1日現在</option>
-                      <option value="201301">平成25年1月1日現在</option>
-                      <option value="201201">平成24年1月1日現在</option>
-                      <option value="201101">平成23年1月1日現在</option>
-                      <option value="201001">平成22年1月1日現在</option>
-                      <option value="200901">平成21年1月1日現在</option>
-                      <option value="200801">平成20年1月1日現在</option>
-                      <option value="200701">平成19年1月1日現在</option>
-                      <option value="200601">平成18年1月1日現在</option>
-                      <option value="200501">平成17年1月1日現在</option>
-                      <option value="200401">平成16年1月1日現在</option>
-                      <option value="200301">平成15年1月1日現在</option>
-                      <option value="200201">平成14年1月1日現在</option>
-                      <option value="200101">平成13年1月1日現在</option>
-                      <option value="200001">平成12年1月1日現在</option>
-                      <option value="199901">平成11年1月1日現在</option>
-                      <option value="199801">平成10年1月1日現在</option>
-                      <option value="199701">平成9年1月1日現在</option>
-                      <option value="199601">平成8年1月1日現在</option>
-                      <option value="199501">平成7年1月1日現在</option>
-                      <option value="199401">平成6年1月1日現在</option>
-                      <option value="199301">平成5年1月1日現在</option>
-                      <option value="199201">平成4年1月1日現在</option>
-                      <option value="199101">平成3年1月1日現在</option>
-                      <option value="199001">平成2年1月1日現在</option>
-                      <option value="198901">昭和64年1月1日現在</option>
-                      <option value="198801">昭和63年1月1日現在</option>
-                      <option value="198701">昭和62年1月1日現在</option>
-                      <option value="198601">昭和61年1月1日現在</option>
-                      <option value="198501">昭和60年1月1日現在</option>
-                      <option value="198401">昭和59年1月1日現在</option>
-                      <option value="198301">昭和58年1月1日現在</option>
-                      <option value="198201">昭和57年1月1日現在</option>
-                      <option value="198101">昭和56年1月1日現在</option>
-                      <option value="198001">昭和55年1月1日現在</option>
-                      <option value="197901">昭和54年1月1日現在</option>
-                      <option value="197801">昭和53年1月1日現在</option>
-                      <option value="197701">昭和52年1月1日現在</option>
-                      <option value="197601">昭和51年1月1日現在</option>
-                      <option value="197510">昭和50年10月1日現在</option>
-                      <option value="197010">昭和45年10月1日現在</option>
-                      <option value="196510">昭和40年10月1日現在</option>
-                      <option value="196010">昭和35年10月1日現在</option>
-                      <option value="195510">昭和30年10月1日現在</option>
-                      <option value="195010">昭和25年10月1日現在</option>
-                      <option value="194710">昭和22年10月1日現在</option>
-                      <option value="193510">昭和10年10月1日現在</option>
-                      <option value="193010">昭和5年10月1日現在</option>
-                      <option value="192510">大正14年10月1日現在</option>
-                      <option value="192010">大正9年10月1日現在</option>
                     </select>
 
                     <select
@@ -1355,18 +1267,7 @@
                     /></a>
 
 
-
                   </form>
-                </div>
-                <div class="control-group demo-controls">
-                  <label>デモデータ</label>
-                  <select id="demoData">
-                    <option value="shi" selected>
-                      横浜市 2022年１月１日）
-                    </option>
-                    <option value="aoba">青葉区 2022年１月１日</option>
-                    <option value="nishi">西区 2022年１月１日</option>
-                  </select>
                 </div>
               </div>
               <!-- #select-controls ここまで -->
@@ -1377,70 +1278,6 @@
             <div id="pyramid-container"></div>
             <!-- #pyramid-container ここまで -->
 
-            <!-- アニメーション制御パネル -->
-            <div
-              id="animation-controls"
-              style="
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 15px;
-                border-radius: 10px;
-                z-index: 1000;
-                display: none;
-              "
-            >
-              <h4 style="margin: 0 0 10px 0">アニメーション制御</h4>
-
-              <div style="margin-bottom: 10px">
-                <label>再生速度:</label>
-                <input
-                  type="range"
-                  id="animation-speed"
-                  min="50"
-                  max="1000"
-                  value="200"
-                  style="width: 100px"
-                />
-                <span id="speed-display">200ms</span>
-              </div>
-
-              <div style="margin-bottom: 10px">
-                <label>棒の変化速度:</label>
-                <input
-                  type="range"
-                  id="bar-animation-duration"
-                  min="200"
-                  max="2000"
-                  value="800"
-                  style="width: 100px"
-                />
-                <span id="bar-duration-display">800ms</span>
-              </div>
-
-              <div>
-                <button
-                  id="pause-animation"
-                  onclick="window.streamingAnimation.pauseAnimation()"
-                >
-                  一時停止
-                </button>
-                <button
-                  id="resume-animation"
-                  onclick="window.streamingAnimation.resumeAnimation()"
-                >
-                  再開
-                </button>
-                <button
-                  id="stop-animation"
-                  onclick="window.streamingAnimation.stopAnimation()"
-                >
-                  停止
-                </button>
-              </div>
-            </div>
 
             <!-- 現在の年次表示 -->
             <div
@@ -1745,6 +1582,7 @@
       <!-- ここまでフッタ部分 -->
 
       <script>
+        // currentRendererをwindow.pyramidRendererに統一
         let currentRenderer = null;
         let isSVGMode = true;
         let currentOptions = {
@@ -1754,6 +1592,9 @@
 
         // 初期化
         document.addEventListener("DOMContentLoaded", function () {
+          // アニメーション進行スライダーの初期化
+          setupAnimationProgressSlider();
+          
           // セレクトボックスのイベントリスナーを設定
           //const demoDataSelect = document.getElementById("demoData");
           //demoDataSelect.addEventListener("change", changeDemoData);
@@ -1769,21 +1610,21 @@
         const uout = document.getElementById("uout");
         const radio = document.getElementById("unitsize");
         uin.addEventListener("click", () => {
-          if (radio.checked) {
-            let unitSize = currentRenderer.options.unitSize * 1.01;
-            currentRenderer.resize({ unitSize: unitSize });
+            if (radio.checked) {
+            let unitSize = window.pyramidRenderer.options.unitSize * 1.01;
+            window.pyramidRenderer.resize({ unitSize: unitSize });
           } else {
-            let barHeight = currentRenderer.options.barHeight * 1.01;
-            currentRenderer.resize({ barHeight: barHeight });
+            let barHeight = window.pyramidRenderer.options.barHeight * 1.01;
+            window.pyramidRenderer.resize({ barHeight: barHeight });
           }
         });
         uout.addEventListener("click", () => {
           if (radio.checked) {
-            let unitSize = currentRenderer.options.unitSize * 0.99;
-            currentRenderer.resize({ unitSize: unitSize });
+            let unitSize = window.pyramidRenderer.options.unitSize * 0.99;
+            window.pyramidRenderer.resize({ unitSize: unitSize });
           } else {
-            let barHeight = currentRenderer.options.barHeight * 0.99;
-            currentRenderer.resize({ barHeight: barHeight });
+            let barHeight = window.pyramidRenderer.options.barHeight * 0.99;
+            window.pyramidRenderer.resize({ barHeight: barHeight });
           }
         });
 
@@ -1795,13 +1636,13 @@
         zin.addEventListener("click", () => {
           scale = Math.min(1.5, scale + 0.01);
           zoom.value = scale;
-          currentRenderer.resize({ scale: scale });
+          window.pyramidRenderer.resize({ scale: scale });
           zoom.textContent = (scale * 100).toFixed(0) + "%";
         });
         zout.addEventListener("click", () => {
           scale = Math.max(0.25, scale - 0.01);
           zoom.value = scale;
-          currentRenderer.resize({ scale: scale });
+          window.pyramidRenderer.resize({ scale: scale });
           zoom.textContent = (scale * 100).toFixed(0) + "%";
         });
 
@@ -1809,16 +1650,16 @@
           const scale = parseFloat(
             document.getElementById("pyramidSize").value
           );
-          if (currentRenderer) {
-            currentRenderer.resize({ scale: scale });
+          if (window.pyramidRenderer) {
+            window.pyramidRenderer.resize({ scale: scale });
           }
         }
 
         // 人数表示の切り替え
         function toggleNumbers() {
           currentOptions.showNumbers = !currentOptions.showNumbers;
-          if (currentRenderer) {
-            currentRenderer.updateOptions({
+          if (window.pyramidRenderer) {
+            window.pyramidRenderer.updateOptions({
               showNumbers: currentOptions.showNumbers,
             });
           }
@@ -1827,8 +1668,8 @@
         // グリッド表示の切り替え
         function toggleGrid() {
           currentOptions.showGrid = !currentOptions.showGrid;
-          if (currentRenderer) {
-            currentRenderer.updateOptions({
+          if (window.pyramidRenderer) {
+            window.pyramidRenderer.updateOptions({
               showGrid: currentOptions.showGrid,
             });
           }
@@ -1852,14 +1693,14 @@
 
         // ハイブリッドリサイズの適用
         function applyHybridResize() {
-          if (!currentRenderer) return;
+          if (!window.pyramidRenderer) return;
 
           const barHeight = parseFloat(
             document.getElementById("barHeightSlider").value
           );
           const newHeight = Math.floor(101 * barHeight + 100); // 101年齢 × barHeight + 100pxマージン
 
-          currentRenderer.resize({ barHeight: barHeight, height: newHeight });
+          window.pyramidRenderer.resize({ barHeight: barHeight, height: newHeight });
         }
 
         // データの読み込み
@@ -1913,14 +1754,17 @@
           //};
           console.log("rout4");
           try {
-            if (isAnimation && currentRenderer) {
+            if (isAnimation && window.pyramidRenderer) {
               // アニメーション中の場合は既存のレンダラーを更新
               console.log("アニメーション中: 既存レンダラーを更新");
-              currentRenderer.updateData(data, isAnimation);
+              //alert("zoomScale:"+window.pyramidRenderer.options.zoomScale) ;
+              window.pyramidRenderer.updateData(data, isAnimation);
             } else {
               // 通常の描画またはアニメーション開始時は新しいレンダラーを作成
               console.log("新しいレンダラーを作成");
-              currentRenderer = new PyramidSVGRenderer("pyramid-container", data);
+              //alert("新しいレンダラーインスタンスを作成");
+              window.pyramidRenderer = new PyramidSVGRenderer("pyramid-container", data);
+              //alert(window.pyramidRenderer.options.zoomScale) ;
             }
             //document.getElementById('status').textContent =
             //    `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
@@ -2112,9 +1956,6 @@
           const useFixedUnitSize = await showPopulationSizeDialog();
           console.log('ユーザー選択: 総人口変化反映 =', useFixedUnitSize);
           
-          // ボタンの表示切り替え
-          document.getElementById('start-animation-btn').style.display = 'none';
-          document.getElementById('stop-animation-btn').style.display = 'inline-block';
           
           // アニメーション設定を更新
           if (window.streamingAnimation) {
@@ -2136,6 +1977,8 @@
             startAnimationWithFixedUnitSize();
           } else {
             // 通常モード（補間・非補間共通）
+            // zoomScaleモードを無効化
+            window.streamingAnimation.useZoomScaleMode = false;
             if (window.streamingAnimation) {
               window.streamingAnimation.startStreamingAnimation();
             } else {
@@ -2227,31 +2070,23 @@
           });
         }
 
-        // 固定unitSizeでのアニメーション開始
+        // 人口変化反映アニメーション開始（新しいzoomScaleモード）
         async function startAnimationWithFixedUnitSize() {
           try {
             // データ取得中の表示
             showDataLoadingMessage();
             
             const shiku = get_selected_shiku();
-            console.log('固定unitSizeアニメーション開始: shiku =', shiku);
+            console.log('人口変化反映アニメーション開始: shiku =', shiku);
             
-            // 全年次データを事前取得
-            const allData = await window.streamingAnimation.preloadAllData(shiku);
-            
-            // 最大総人口を算出
-            const maxTotalPopulation = window.streamingAnimation.calculateMaxTotalPopulation(allData);
-            
-            // 固定unitSizeを算出
-            const fixedUnitSize = window.streamingAnimation.calculateFixedUnitSize(maxTotalPopulation);
-            
-            // 固定unitSizeを設定
-            window.streamingAnimation.fixedUnitSize = fixedUnitSize;
+            // 新しいzoomScaleモードを有効化
+            window.streamingAnimation.useZoomScaleMode = true;
+            window.streamingAnimation.useFixedUnitSize = false; // 旧方式を無効化
             
             // データ取得完了の表示を非表示
             hideDataLoadingMessage();
             
-            // アニメーション開始（データは既に取得済み）
+            // アニメーション開始（StreamingAnimationManager内で全年次データ取得と最大総人口算出を行う）
             if (window.streamingAnimation) {
               window.streamingAnimation.startStreamingAnimation();
             } else {
@@ -2260,11 +2095,11 @@
             }
             
           } catch (error) {
-            console.error('固定unitSizeアニメーション開始エラー:', error);
+            console.error('人口変化反映アニメーション開始エラー:', error);
             hideDataLoadingMessage();
             alert('データの取得に失敗しました。通常モードでアニメーションを開始します。');
-            // エラー時は固定unitSizeを無効にして通常モードで開始
-            window.streamingAnimation.useFixedUnitSize = false;
+            // エラー時はzoomScaleモードを無効にして通常モードで開始
+            window.streamingAnimation.useZoomScaleMode = false;
             if (window.streamingAnimation) {
               window.streamingAnimation.startStreamingAnimation();
             } else {
@@ -2329,19 +2164,87 @@
           }
         }
 
+        // アニメーション一時停止
+        function pauseAnimationFromControls() {
+          if (window.streamingAnimation) {
+            window.streamingAnimation.pauseAnimation();
+          }
+        }
+
+        // アニメーション再開
+        function resumeAnimationFromControls() {
+          if (window.streamingAnimation) {
+            window.streamingAnimation.resumeAnimation();
+          }
+        }
+
         // アニメーション停止
         function stopAnimationFromControls() {
-          // ボタンの表示切り替え
-          document.getElementById('start-animation-btn').style.display = 'inline-block';
-          document.getElementById('stop-animation-btn').style.display = 'none';
-          
           // ストリーミングアニメーションの停止
           if (window.streamingAnimation) {
             window.streamingAnimation.stopAnimation();
           }
+        }
+
+        // アニメーション進行スライダーのイベントハンドラー
+        function setupAnimationProgressSlider() {
+          const progressSlider = document.getElementById('animation-progress');
+          const progressDisplay = document.getElementById('progress-display');
           
-          // コントロールを元に戻す
-          hideAnimationControls();
+          if (!progressSlider || !progressDisplay) return;
+          
+          let isDragging = false;
+          
+          // スライダーの値変更時
+          progressSlider.addEventListener('input', function() {
+            if (!isDragging && window.streamingAnimation) {
+              const progress = parseInt(this.value);
+              progressDisplay.textContent = progress + '%';
+              
+              // アニメーションを指定の進行度に移動
+              window.streamingAnimation.seekToProgress(progress);
+            }
+          });
+          
+          // ドラッグ開始
+          progressSlider.addEventListener('mousedown', function() {
+            isDragging = true;
+            if (window.streamingAnimation) {
+              window.streamingAnimation.pauseAnimation();
+            }
+          });
+          
+          // ドラッグ終了
+          progressSlider.addEventListener('mouseup', function() {
+            isDragging = false;
+            if (window.streamingAnimation) {
+              const progress = parseInt(this.value);
+              window.streamingAnimation.seekToProgress(progress);
+              // 一時停止状態でない場合は再開
+              if (window.streamingAnimation && !window.streamingAnimation.isAnimating) {
+                window.streamingAnimation.resumeAnimation();
+              }
+            }
+          });
+          
+          // タッチイベント対応
+          progressSlider.addEventListener('touchstart', function() {
+            isDragging = true;
+            if (window.streamingAnimation) {
+              window.streamingAnimation.pauseAnimation();
+            }
+          });
+          
+          progressSlider.addEventListener('touchend', function() {
+            isDragging = false;
+            if (window.streamingAnimation) {
+              const progress = parseInt(this.value);
+              window.streamingAnimation.seekToProgress(progress);
+              if (window.streamingAnimation && !window.streamingAnimation.isAnimating) {
+                window.streamingAnimation.resumeAnimation();
+              }
+            }
+          });
         }
 
         // 動画ボタンのクリック処理
