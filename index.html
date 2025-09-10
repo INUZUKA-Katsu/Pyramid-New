@@ -1217,87 +1217,115 @@
                 </div>
                 <div id="caption" data-html2canvas-ignore="true">
                   <form name="Form" id="form0">
-                    <select onChange="change_shiku()" name="shiku" id="shiku">
-                      <option selected="selected" value="age">横浜市</option>
-                      <option value="tsurumi">鶴見区</option>
-                      <option value="kanagawa">神奈川区</option>
-                      <option value="nishi">西区</option>
-                      <option value="naka">中区</option>
-                      <option value="minami">南区</option>
-                      <option value="konan">港南区</option>
-                      <option value="hodogaya">保土ケ谷区</option>
-                      <option value="asahi">旭区</option>
-                      <option value="isogo">磯子区</option>
-                      <option value="kanazawa">金沢区</option>
-                      <option value="kohoku">港北区</option>
-                      <option value="midori">緑区</option>
-                      <option value="aoba">青葉区</option>
-                      <option value="tsuzuki">都筑区</option>
-                      <option value="totsuka">戸塚区</option>
-                      <option value="sakae">栄区</option>
-                      <option value="izumi">泉区</option>
-                      <option value="seya">瀬谷区</option>
-                    </select>
+                    <!-- すべての要素を右寄せで横並びに配置 -->
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+                      <!-- 市区セレクトボックス -->
+                      <select onChange="change_shiku()" name="shiku" id="shiku">
+                        <option selected="selected" value="age">横浜市</option>
+                        <option value="tsurumi">鶴見区</option>
+                        <option value="kanagawa">神奈川区</option>
+                        <option value="nishi">西区</option>
+                        <option value="naka">中区</option>
+                        <option value="minami">南区</option>
+                        <option value="konan">港南区</option>
+                        <option value="hodogaya">保土ケ谷区</option>
+                        <option value="asahi">旭区</option>
+                        <option value="isogo">磯子区</option>
+                        <option value="kanazawa">金沢区</option>
+                        <option value="kohoku">港北区</option>
+                        <option value="midori">緑区</option>
+                        <option value="aoba">青葉区</option>
+                        <option value="tsuzuki">都筑区</option>
+                        <option value="totsuka">戸塚区</option>
+                        <option value="sakae">栄区</option>
+                        <option value="izumi">泉区</option>
+                        <option value="seya">瀬谷区</option>
+                      </select>
 
-                    <select
-                      onChange="change_shiku_year()"
-                      name="shiku_year"
-                      id="shiku_year"
-                    >
-                      <!-- 動的オプション読み込み用プレースホルダー -->
-                      <option value="new" selected>　　 最新</option>
-                    </select>
+                      <!-- 年月セレクトボックス（市区ピラミッド用） -->
+                      <select
+                        onChange="change_shiku_year()"
+                        name="shiku_year"
+                        id="shiku_year"
+                      >
+                        <!-- 動的オプション読み込み用プレースホルダー -->
+                        <option value="new" selected>　　 最新</option>
+                      </select>
 
-                    <select
-                      onChange="change_cho_year()"
-                      name="cho_year"
-                      id="cho_year"
-                    >
-                      <option value="202109">令和３年9月30日現在</option>
-                      <option value="202009">令和２年9月30日現在</option>
-                      <option value="201909">
-                        平成31・令和元年9月30日現在
-                      </option>
-                      <option value="201809">平成30年9月30日現在</option>
-                      <option value="201709">平成29年9月30日現在</option>
-                      <option value="201609">平成28年9月30日現在</option>
-                      <option value="201509">平成27年9月30日現在</option>
-                      <option value="201409">平成26年9月30日現在</option>
-                      <option value="201309">平成25年9月30日現在</option>
-                      <option value="201209">平成24年9月30日現在</option>
-                      <option value="201109">平成23年9月30日現在</option>
-                      <option value="201009">平成22年9月30日現在</option>
-                      <option value="200909">平成21年9月30日現在</option>
-                      <option value="200809">平成20年9月30日現在</option>
-                      <option value="200709">平成19年9月30日現在</option>
-                      <option value="200609">平成18年9月30日現在</option>
-                      <option value="200509">平成17年9月30日現在</option>
-                      <option value="200409">平成16年9月30日現在</option>
-                      <option value="200309">平成15年9月30日現在</option>
-                      <option value="200209">平成14年9月30日現在</option>
-                      <option value="200109">平成13年9月30日現在</option>
-                      <option value="200009">平成12年9月30日現在</option>
-                      <option value="199909">平成11年9月30日現在</option>
-                      <option value="199809">平成10年9月30日現在</option>
-                    </select>
+                      <!-- 年月セレクトボックス（町丁別ピラミッド用） -->
+                      <select
+                        onChange="change_cho_year()"
+                        name="cho_year"
+                        id="cho_year"
+                      >
+                        <option value="202109">令和３年9月30日現在</option>
+                        <option value="202009">令和２年9月30日現在</option>
+                        <option value="201909">
+                          平成31・令和元年9月30日現在
+                        </option>
+                        <option value="201809">平成30年9月30日現在</option>
+                        <option value="201709">平成29年9月30日現在</option>
+                        <option value="201609">平成28年9月30日現在</option>
+                        <option value="201509">平成27年9月30日現在</option>
+                        <option value="201409">平成26年9月30日現在</option>
+                        <option value="201309">平成25年9月30日現在</option>
+                        <option value="201209">平成24年9月30日現在</option>
+                        <option value="201109">平成23年9月30日現在</option>
+                        <option value="201009">平成22年9月30日現在</option>
+                        <option value="200909">平成21年9月30日現在</option>
+                        <option value="200809">平成20年9月30日現在</option>
+                        <option value="200709">平成19年9月30日現在</option>
+                        <option value="200609">平成18年9月30日現在</option>
+                        <option value="200509">平成17年9月30日現在</option>
+                        <option value="200409">平成16年9月30日現在</option>
+                        <option value="200309">平成15年9月30日現在</option>
+                        <option value="200209">平成14年9月30日現在</option>
+                        <option value="200109">平成13年9月30日現在</option>
+                        <option value="200009">平成12年9月30日現在</option>
+                        <option value="199909">平成11年9月30日現在</option>
+                        <option value="199809">平成10年9月30日現在</option>
+                      </select>
+                      
+                      <!-- 動画ボタン -->
+                      <button
+                        onClick="toggleAnimationPanel()"
+                        name="animation"
+                        type="button"
+                        id="doga"
+                      >
+                        動画
+                      </button>
 
-                    <button
-                      onClick="toggleAnimationPanel()"
-                      name="animation"
-                      type="button"
-                      id="doga"
-                    >
-                      動画
-                    </button>
+                      <!-- ツールチップアイコン -->
+                      <a
+                        href="#"
+                        class="info-icon-right"
+                        data-tooltip="動画をクリックするとアニメーション設定パネルが表示されます。従来の動画機能と新しいストリーミングアニメーション機能を選択できます。"
+                        ><img src="./image/tooltip-icon.png" class="small-icon"
+                      /></a>
+                    </div>
+                    
+                    <!-- スライドバー（市区ピラミッド用） -->
+                    <div id="shiku-year-slider-container" style="display: none; margin-top: 5px; text-align: right;">
+                      <div style="display: inline-flex; align-items: center; gap: 10px; font-size: 12px;">
+                        <span>過去</span>
+                        <input type="range" id="shiku-year-slider" min="0" max="100" value="0" style="width: 200px;">
+                        <span>最新</span>
+                        <span id="shiku-year-slider-display">最新</span>
+                      </div>
+                    </div>
+
+                    <!-- スライドバー（町丁別ピラミッド用） -->
+                    <div id="cho-year-slider-container" style="display: none; margin-top: 5px; text-align: right;">
+                      <div style="display: inline-flex; align-items: center; gap: 10px; font-size: 12px;">
+                        <span>過去</span>
+                        <input type="range" id="cho-year-slider" min="0" max="100" value="0" style="width: 200px;">
+                        <span>最新</span>
+                        <span id="cho-year-slider-display">最新</span>
+                      </div>
+                    </div>
+                    
                     <input id="unit_size" value="0.1398" type="hidden" />
-                    <a
-                      href="#"
-                      class="info-icon-right"
-                      data-tooltip="動画をクリックするとアニメーション設定パネルが表示されます。従来の動画機能と新しいストリーミングアニメーション機能を選択できます。"
-                      ><img src="./image/tooltip-icon.png" class="small-icon"
-                    /></a>
-
-
                   </form>
                 </div>
               </div>
@@ -1903,8 +1931,130 @@
         // ウィンドウリサイズ時に再度計算して反映
         window.addEventListener("resize", centerContents);
 
+        // 年月選択スライドバーの初期化とイベントリスナー
+        function setupYearSliders() {
+          // 市区ピラミッド用スライドバー
+          const shikuSlider = document.getElementById('shiku-year-slider');
+          const shikuSliderDisplay = document.getElementById('shiku-year-slider-display');
+          const shikuSliderContainer = document.getElementById('shiku-year-slider-container');
+          
+          if (shikuSlider && shikuSliderDisplay && shikuSliderContainer) {
+            let isDragging = false;
+            
+            shikuSlider.addEventListener('input', function() {
+              const progress = parseInt(this.value);
+              const pyramode = get_pyramid_mode();
+              
+              if (pyramode === 'shiku' || pyramode === 'age') {
+                const selectElement = document.getElementById('shiku_year');
+                if (selectElement && selectElement.options.length > 0) {
+                  // 方向を逆転：0%が過去、100%が最新
+                  const targetIndex = Math.floor(((100 - progress) / 100) * (selectElement.options.length - 1));
+                  const clampedIndex = Math.max(0, Math.min(targetIndex, selectElement.options.length - 1));
+                  const targetOption = selectElement.options[clampedIndex];
+                  
+                  // 表示を更新
+                  shikuSliderDisplay.textContent = targetOption.text;
+                  
+                  if (isDragging) {
+                    // ドラッグ中は表示のみ更新
+                    selectElement.value = targetOption.value;
+                  }
+                }
+              }
+            });
+            
+            shikuSlider.addEventListener('mousedown', function() {
+              isDragging = true;
+            });
+            
+            shikuSlider.addEventListener('mouseup', function() {
+              isDragging = false;
+              // ドラッグ終了時に描画
+              const selectElement = document.getElementById('shiku_year');
+              if (selectElement) {
+                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            });
+            
+            shikuSlider.addEventListener('touchstart', function() {
+              isDragging = true;
+            });
+            
+            shikuSlider.addEventListener('touchend', function() {
+              isDragging = false;
+              // ドラッグ終了時に描画
+              const selectElement = document.getElementById('shiku_year');
+              if (selectElement) {
+                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            });
+          }
+          
+          // 町丁別ピラミッド用スライドバー
+          const choSlider = document.getElementById('cho-year-slider');
+          const choSliderDisplay = document.getElementById('cho-year-slider-display');
+          const choSliderContainer = document.getElementById('cho-year-slider-container');
+          
+          if (choSlider && choSliderDisplay && choSliderContainer) {
+            let isDragging = false;
+            
+            choSlider.addEventListener('input', function() {
+              const progress = parseInt(this.value);
+              const pyramode = get_pyramid_mode();
+              
+              if (pyramode === 'cho') {
+                const selectElement = document.getElementById('cho_year');
+                if (selectElement && selectElement.options.length > 0) {
+                  // 方向を逆転：0%が過去、100%が最新
+                  const targetIndex = Math.floor(((100 - progress) / 100) * (selectElement.options.length - 1));
+                  const clampedIndex = Math.max(0, Math.min(targetIndex, selectElement.options.length - 1));
+                  const targetOption = selectElement.options[clampedIndex];
+                  
+                  // 表示を更新
+                  choSliderDisplay.textContent = targetOption.text;
+                  
+                  if (isDragging) {
+                    // ドラッグ中は表示のみ更新
+                    selectElement.value = targetOption.value;
+                  }
+                }
+              }
+            });
+            
+            choSlider.addEventListener('mousedown', function() {
+              isDragging = true;
+            });
+            
+            choSlider.addEventListener('mouseup', function() {
+              isDragging = false;
+              // ドラッグ終了時に描画
+              const selectElement = document.getElementById('cho_year');
+              if (selectElement) {
+                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            });
+            
+            choSlider.addEventListener('touchstart', function() {
+              isDragging = true;
+            });
+            
+            choSlider.addEventListener('touchend', function() {
+              isDragging = false;
+              // ドラッグ終了時に描画
+              const selectElement = document.getElementById('cho_year');
+              if (selectElement) {
+                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            });
+          }
+        }
+
         // アニメーション制御のイベントリスナー
         document.addEventListener("DOMContentLoaded", function () {
+          // 年月選択スライドバーを初期化
+          setupYearSliders();
+          
           const speedSlider = document.getElementById("animation-speed");
           const barDurationSlider = document.getElementById(
             "bar-animation-duration"

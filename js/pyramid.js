@@ -1029,11 +1029,32 @@ function change_cmbbox_display(pyramode) {
       document.getElementById("shiku_year").style.display = "inline-block";
       document.getElementById("doga").style.display       = "inline-block";
       document.getElementById("cho_year").style.display = "none";
+      
+      // スライドバーの表示/非表示を制御
+      const shikuSliderContainer = document.getElementById("shiku-year-slider-container");
+      const choSliderContainer = document.getElementById("cho-year-slider-container");
+      if (shikuSliderContainer) {
+        shikuSliderContainer.style.display = "block";
+      }
+      if (choSliderContainer) {
+        choSliderContainer.style.display = "none";
+      }
       break;
     case "cho":
       document.getElementById("shiku_year").style.display = "none";
       document.getElementById("doga").style.display       = "inline-block";
       document.getElementById("cho_year").style.display = "inline-block";
+      
+      // スライドバーの表示/非表示を制御
+      const shikuSliderContainer2 = document.getElementById("shiku-year-slider-container");
+      const choSliderContainer2 = document.getElementById("cho-year-slider-container");
+      if (shikuSliderContainer2) {
+        shikuSliderContainer2.style.display = "none";
+      }
+      if (choSliderContainer2) {
+        choSliderContainer2.style.display = "block";
+      }
+      break;
   }
 }
 //ブラウザに対応してCSSを調整する.
