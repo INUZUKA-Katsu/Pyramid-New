@@ -173,60 +173,6 @@ function ani_mation() {
   legacy_animation();
 }
 
-// 既存のアニメーション実装（フォールバック用）
-function legacy_animation() {
-  var pyramode = get_pyramid_mode();
-  if (pyramode == "shiku") {
-    var op = document
-      .getElementsByName("shiku_year")[0]
-      .getElementsByTagName("option");
-    var disp = "shiku_not_refresh_cholist";
-  } else if (pyramode == "cho") {
-    var op = document
-      .getElementsByName("cho_year")[0]
-      .getElementsByTagName("option");
-    var disp = "cho";
-  }
-  if (pyramode == "shiku") {
-    var unit_size = {
-      age: 0.01082,
-      tsurumi: 0.1398,
-      kanagawa: 0.1672,
-      nishi: 0.4038,
-      naka: 0.27086,
-      minami: 0.2072,
-      konan: 0.1888,
-      hodogaya: 0.19563,
-      asahi: 0.16439,
-      isogo: 0.24262,
-      kohoku: 0.11585,
-      midori: 0.22294,
-      aoba: 0.13037,
-      kanazawa: 0.20197,
-      tsuzuki: 0.1912,
-      totsuka: 0.14584,
-      sakae: 0.3342,
-      izumi: 0.26408,
-      seya: 0.327,
-    };
-    var shiku = get_selected_shiku();
-    set_UnitSize(unit_size[shiku]);
-  }
-  doLoop(op.length, 1, op, disp);
-}
-function doLoop(maxCount, i, op, disp) {
-  if (get_pyramid_mode() == "shiku") {
-    var unit_size = get_UnitSize();
-  }
-  if (i <= maxCount) {
-    op[op.length - i].selected = true;
-    $nengetsu = op[op.length - i].value;
-    change_display(disp, $nengetsu, unit_size);
-    setTimeout(function () {
-      doLoop(maxCount, ++i, op, disp);
-    }, 800);
-  }
-}
 
 //########################################################
 //###　主要な処理  #########################################
@@ -272,47 +218,47 @@ function localStorage_defautSetting() {
   document.getElementById("clear").checked = true;
 }
 //ピラミッドを画面表示する.
-function change_display(pyramode, nengetsu, unit_size) {
+function change_display(pyramode, nengetsu) {
   set_comment("off");
   switch (pyramode) {
     case "shiku":
       set_pyramid_mode("shiku");
-      shiku_pyramid(nengetsu, unit_size);
+      shiku_pyramid(nengetsu);
       cho_list(); //町丁名リストの表示/非表示
       change_cmbbox_display("shiku"); //年月選択セレクトボックスの市区用と町丁別用の表示切り替え
       break;
     case "shiku_not_refresh_cholist":
       set_pyramid_mode("shiku");
-      shiku_pyramid(nengetsu, unit_size);
+      shiku_pyramid(nengetsu);
       change_cmbbox_display("shiku");
       break;
     case "cho":
       set_pyramid_mode("cho");
       //町丁別ピラミッド作成
-      if (cho_pyramid(nengetsu, unit_size) == false) {
+      if (cho_pyramid(nengetsu) == false) {
         return;
       }
       change_cmbbox_display("cho");
   }
 }
 //市区ピラミッドを作成する.
-function shiku_pyramid(nengetsu, unit_size) {
+function shiku_pyramid(nengetsu) {
   myFunc()
   //ローカルデータがあればローカルデータで描画する.
   //console.log("step1");
   //console.log(nengetsu); //市区を変更したときは、undefined
 
   //テストのため一時的にコメント化
-  var ans ; //= escape_ajax("shiku_json", nengetsu, unit_size);
+  var ans ; //= escape_ajax("shiku_json", nengetsu);
   //console.log("step2");
   if (ans === false || ans == undefined) {
     //ローカルデータが存在しないときはサーバから取得して描画する.
     //console.log("step3");
-    ajax("shiku_json", nengetsu, 1, unit_size);
+    ajax("shiku_json", nengetsu, 1);
   }
 }
 //町丁別ピラミッドを作成する.
-function cho_pyramid(nengetsu, unit_size) {
+function cho_pyramid(nengetsu) {
   //alert("cho_pyramid => "+nengetsu);
   var checked = get_selected_cho();
   //町丁が選択されていないときはメッセージを表示して終了.
@@ -320,16 +266,16 @@ function cho_pyramid(nengetsu, unit_size) {
     return false;
   }
   //ローカルデータがあればローカルデータで描画する.
-  var ans = escape_ajax("cho_csv", nengetsu, unit_size);
+  var ans = escape_ajax("cho_csv", nengetsu);
   if (ans === false) {
     //ローカルデータが存在しないときはサーバから取得して描画する.
-    ajax("cho_json", nengetsu, 1, unit_size);
+    ajax("cho_json", nengetsu, 1);
   }
   adjust_title_size(checked.join(","));
 }
 //ローカルデータを読み出して描画処理する.（ピラミッドのみ？町丁名一覧は？）
 //mode: shiku_json, cho_json, cho_csv, cho_list
-function escape_ajax(mode, nengetsu, unit_size) {
+function escape_ajax(mode, nengetsu) {
   var key = isLocalData(mode, nengetsu);
   if (key != false) {
     //console.log("step1.5-1");
@@ -339,7 +285,7 @@ function escape_ajax(mode, nengetsu, unit_size) {
     }
     //console.log("step1.5-1-2");
     //console.log(response);
-    modify_html(response, mode, nengetsu, unit_size);
+    modify_html(response, mode, nengetsu);
     return true;
   } else {
     //console.log("step1.5-2");
@@ -348,7 +294,7 @@ function escape_ajax(mode, nengetsu, unit_size) {
 }
 //サーバからデータを取得して描画処理する.
 //mode: shiku_json, cho_json, syorai_json, cho_csv, cho_csv_for_save, all_option, shiku_option, cho_list
-function ajax(mode, nengetsu, i, unit_size) {
+function ajax(mode, nengetsu, i) {
   //console.log("ajax start");
   //console.log(nengetsu);
   if (i === undefined) {
@@ -396,8 +342,7 @@ function ajax(mode, nengetsu, i, unit_size) {
 
       //レスポンスデータをHTMLに表示またはHTMLの要素に組み込む
       if (mode != "cho_csv_for_save") {
-        modify_html(response, mode, nengetsu, unit_size);
-        //alert("modify_htmlの戻り値："+String(unit_size));
+        modify_html(response, mode, nengetsu);
       }
 
       //ローカルストレージにデータを保存
@@ -424,7 +369,7 @@ function ajax(mode, nengetsu, i, unit_size) {
 }
 
 //ローカルまたはサーバから取得したデータを元にHTML変更処理を振り分ける.
-function modify_html(response, mode, nengetsu, unit_size) {
+function modify_html(response, mode, nengetsu) {
   //s=mode+"の戻り値\n"+nengetsu+"\n"+response;
   //alert(s);
   //console.log("modify_html start");
@@ -450,7 +395,7 @@ function modify_html(response, mode, nengetsu, unit_size) {
         if (response.substr(0, 2) == "町名") {
           console.log("makePyramidData呼出し");
           var pyramidData = makePyramidData(response);
-          change_pyramid(pyramidData, unit_size);
+          change_pyramid(pyramidData);
         } else {
           console.log(e.name + "\n" + e.message);
           //alert(e.name+"\n"+e.message);
@@ -459,7 +404,7 @@ function modify_html(response, mode, nengetsu, unit_size) {
       break;
     case "cho_csv":
       var pyramidData = makePyramidData(response);
-      change_pyramid(pyramidData, unit_size);
+      change_pyramid(pyramidData);
       break;
     case "cho_list":
       //console.log("step=cho_list");
@@ -556,40 +501,6 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
 
   console.log("change_pyramid step3");
 
-  //alert(pyramidData["shiku"]);
-  //  if(pyramidData instanceof Array){
-  //    var shiku     = pyramidData[1];
-  //    var kijunbi   = pyramidData[2];
-  //    var source    = pyramidData[3];
-  //    var sosu      = pyramidData[4][1];
-  //    var male      = pyramidData[4][2];
-  //    var female    = pyramidData[4][3];
-  //    pyramidData.splice(0,5);
-  //    var kakusaiData   = pyramidData;
-  //  }else{
-  //    var shiku     = pyramidData["shiku"];
-  //    var not_exist = pyramidData["not_exist"];
-  //    var kijunbi   = pyramidData["kijunbi"];
-  //    var source    = pyramidData["source_url"];
-  //    var sosu      = pyramidData["kakusai_betsu"][0][1];
-  //    var male      = pyramidData["kakusai_betsu"][0][2];
-  //    var female    = pyramidData["kakusai_betsu"][0][3];
-  //    var kakusaiData   = pyramidData["kakusai_betsu"]
-  //    displey_hitoku_comment(pyramidData["hitoku"])
-  //    //kakusaiData.splice(0,1);
-  //  }
-  //  console.log(kijunbi);
-  //  if(unit_size===undefined){
-  //    if(sosu!="0"){
-  //      var unit    = 400*101/parseInt(sosu.replace(/,/g, ''));
-  //    }else{
-  //      var unit    = 0;
-  //    }
-  //  }else{
-  //      var unit    = unit_size;
-  //  }
-  //  //console.log("change_pyramid-2");
-  //  var time_series = [[],[],[]];
   kakusaiData.forEach(function (val) {
     var nenrei = val[0];
     var m_nin = val[2];
@@ -600,21 +511,6 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
     };
   });
 
-  //    if(val[0].match(/総数|合計|年齢不詳/) || val[2]==null){return;}
-  //    var nenrei= val[0];
-  //    var m_nin = val[2];
-  //    var f_nin = val[3];
-  //    var m_len = (parseInt(m_nin.replace(/,/g, '')) * unit ).toFixed(1);
-  //    var f_len = (parseInt(f_nin.replace(/,/g, '')) * unit ).toFixed(1);
-  //    var m_bar = m_len + "px" ;
-  //    var f_bar = f_len + "px" ;
-  //    document.getElementById("mn"+nenrei).innerHTML   = m_nin;
-  //    document.getElementById("fn"+nenrei).innerHTML   = f_nin;
-  //    document.getElementById("mb"+nenrei).style.width = m_bar;
-  //    document.getElementById("fb"+nenrei).style.width = f_bar;
-  //    time_series[1].push(parseInt(m_len));
-  //    time_series[2].push(parseInt(f_len));
-  //  adjust_size(time_series);
   if (!isAnm){
     var nengetsu = get_selected_nengetsu();
     if (nengetsu == undefined) {
@@ -724,13 +620,6 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
   }
 }
 
-function set_UnitSize(size) {
-  document.getElementById("unit_size").value = size;
-}
-
-function get_UnitSize() {
-  return document.getElementById("unit_size").value;
-}
 
 //　ピラミッド描画のためのデータ変換処理  ########################################################
 
@@ -957,21 +846,6 @@ function cho_list() {
   //フッターの位置を調整する.
   //adjustFooterPosition();
 }
-//ピラミッドの大きさが標準サイズを超えるときメインブロックやテーブルの幅を拡張する.
-//function adjust_size(time_series){
-//  var max_m  = Math.max.apply(null,time_series[1]);
-//  var max_f  = Math.max.apply(null,time_series[2]);
-//  var max    = max_m + max_f;
-//
-//  if (max>(1108-55)){
-//    var w    = (max+55)+"px";
-//  }else{
-//    var w    = "1108px";
-//  }
-//  document.getElementById("main").style.width    = w;
-//  document.getElementById("pyramid").style.width = w;
-//  document.getElementById("table").style.width   = w;
-//}
 //町丁名一覧を書き換える.
 function change_cho_list(str) {
   document.getElementById("cho_list").innerHTML = str;
@@ -2136,104 +2010,257 @@ function time_stamp() {
   console.log(hh + ":" + mm + ":" + ss);
 }
 
-//スクリーンショットを撮る.
-function screen_shot() {
-  //***********************************************/
-  //スクリーンショット用にピラミッドのデザインを一部変更する.
-  //***********************************************/
-
-  //***** SVG要素の背景色をなくす *****
-
-  // 背景用のrect要素を取得
-  var svgElement = document.getElementById("pyramid-svg");
-  var bgRect = svgElement.querySelector('rect[fill="#f8f9fa"]');
-
-  // 現在のスタイルを保存
-  var originalBgColor = svgElement.style.backgroundColor;
-  var originalRectFill = bgRect ? bgRect.getAttribute("fill") : null;
-
-  // 背景色を無くす
-  svgElement.style.backgroundColor = "transparent";
-  if (bgRect) {
-    bgRect.setAttribute("fill", "transparent");
+//***************************************/
+//***** スクリーンショット用の補助関数. *****          
+//***************************************/
+// 背景色などの装飾スタイル保存・復元機能
+function saveAndClearStyles() {
+  const elements = [
+    { id: 'body', element: document.body },
+    { id: 'pyramid-container', element: document.getElementById("pyramid-container") },
+    { id: 'pyramid-svg', element: document.getElementById("pyramid-svg") },
+    { id: 'h2', element: document.getElementById("h2") }
+  ];
+  
+  const savedStyles = {};
+  
+  elements.forEach(({ id, element }) => {
+    if (!element) return;
+    
+    const computedStyle = window.getComputedStyle(element);
+    savedStyles[id] = {
+      background: element.style.background || computedStyle.background,
+      backgroundColor: element.style.backgroundColor || computedStyle.backgroundColor,
+      boxShadow: element.style.boxShadow || computedStyle.boxShadow,
+      border: element.style.border || computedStyle.border,
+      borderTop: element.style.borderTop || computedStyle.borderTop,
+      borderRight: element.style.borderRight || computedStyle.borderRight,
+      borderBottom: element.style.borderBottom || computedStyle.borderBottom,
+      borderLeft: element.style.borderLeft || computedStyle.borderLeft
+    };
+    
+    // スタイルをクリア
+    element.style.background = "transparent";
+    element.style.backgroundColor = "transparent";
+    element.style.boxShadow = "none";
+    element.style.border = "none";
+    element.style.borderTop = "none";
+    element.style.borderRight = "none";
+    element.style.borderBottom = "none";
+    element.style.borderLeft = "none";
+    
+    // SVG要素の場合は、内部の背景rect要素も処理
+    if (id === 'pyramid-svg' && element.tagName === 'svg') {
+      const bgRect = element.querySelector('rect[fill]');
+      if (bgRect) {
+        savedStyles[id].bgRectFill = bgRect.getAttribute('fill');
+        bgRect.setAttribute('fill', 'transparent');
+      }
+    }
+  });
+  
+  // pyramid-containerの::before疑似要素のボーダーを非表示にする
+  const pyramidContainer = document.getElementById("pyramid-container");
+  if (pyramidContainer) {
+    pyramidContainer.classList.add("screenshot-mode");
   }
-
-  //***** #basic_dataブロックをスクリーンショット撮影範囲内に移動 *****
-  var basicData = document.getElementById("basic_data");
-  var originalBasicLeft = basicData.style.left;
-  var originalBasicTop = basicData.style.top;
-  var originalBasicPosition = basicData.style.position;
   
-  // 現在の位置を取得
-  var basicRect = basicData.getBoundingClientRect();
-  var svgRect = svgElement.getBoundingClientRect();
+  return savedStyles;
+}
+
+function restoreColorStyles(savedStyles) {
+  Object.keys(savedStyles).forEach(id => {
+    const element = id === 'body' ? document.body : document.getElementById(id);
+    if (!element || !savedStyles[id]) return;
+    
+    const styles = savedStyles[id];
+    element.style.background = styles.background;
+    element.style.backgroundColor = styles.backgroundColor;
+    element.style.boxShadow = styles.boxShadow;
+    element.style.border = styles.border;
+    element.style.borderTop = styles.borderTop;
+    element.style.borderRight = styles.borderRight;
+    element.style.borderBottom = styles.borderBottom;
+    element.style.borderLeft = styles.borderLeft;
+    
+    // SVG要素の場合は、内部の背景rect要素も復元
+    if (id === 'pyramid-svg' && element.tagName === 'svg' && styles.bgRectFill) {
+      const bgRect = element.querySelector('rect[fill]');
+      if (bgRect) {
+        bgRect.setAttribute('fill', styles.bgRectFill);
+      }
+    }
+  });
   
-  // スクリーンショット撮影範囲内に移動（左に幅分、上に高さ分移動）
-  var newLeft = basicRect.left - basicRect.width + 10; // 左に幅分 + 10px余白
-  var newTop = basicRect.top - basicRect.height/2 + 10;  // 上に高さ分 + 10px余白
+  // pyramid-containerの::before疑似要素のボーダーを復元する
+  const pyramidContainer = document.getElementById("pyramid-container");
+  if (pyramidContainer) {
+    pyramidContainer.classList.remove("screenshot-mode");
+  }
+}
+
+// 撮影対象要素の配置に関わるスタイル一式を保存する.
+function savePositionStyles() {
+  const elements = [
+    { id: 'h2', element: document.getElementById("h2") },
+    { id: 'basic_data', element: document.getElementById("basic_data") },
+    { id: 'pyramid_svg', element: document.getElementById("pyramid-svg") },
+    { id: 'pyramid-block', element: document.getElementById("pyramid-block") }
+  ];
   
-  // 位置を絶対座標で設定
-  basicData.style.position = "fixed";
-  basicData.style.left = newLeft + "px";
-  basicData.style.top = newTop + "px";
-  basicData.style.zIndex = "9999"; // 最前面に表示
+  const original_styles = {};
+  
+  elements.forEach(({ id, element }) => {
+    if (!element) return;
+    
+    original_styles[id] = {};
+    const computedStyle = window.getComputedStyle(element);
+    
+    // 必要なプロパティのみを保存
+    const importantProps = [
+      'position', 'left', 'top', 'right', 'bottom', 'zIndex',
+      'margin', 'padding', 'transform', 'display', 'float', 'width', 'height'
+    ];
+    
+    importantProps.forEach(prop => {
+      original_styles[id][prop] = computedStyle[prop];
+    });
+  });
+  
+  return { original_styles, elements };
+}
+
+function restorePositionStyles(savedData) {
+  const { original_styles, elements } = savedData;
+  
+  elements.forEach(({ id, element }) => {
+    if (!element || !original_styles[id]) return;
+    
+    const styles = original_styles[id];
+    
+    // pyramid-blockとbasic_dataの場合は特に注意深く復元
+    if (id === 'pyramid-block' || id === 'basic_data') {
+      // 位置関連のスタイルを確実にリセット
+      element.style.position = styles.position || '';
+      element.style.left = styles.left || '';
+      element.style.top = styles.top || '';
+      element.style.right = styles.right || '';
+      element.style.bottom = styles.bottom || '';
+      element.style.transform = styles.transform || '';
+      element.style.zIndex = styles.zIndex || '';
+      element.style.display = styles.display || '';
+      element.style.width = styles.width || '';
+      element.style.height = styles.height || '';
+    } else {
+      // その他の要素は通常通り復元
+      for (let prop in styles) {
+        element.style[prop] = styles[prop];
+      }
+    }
+  });
+}
 
 
+//***************************************/
+//******** スクリーンショットをとる *********/          
+//***************************************/
+function screen_shot() {
+
+  //***** 撮影範囲のカラースタイルを保存してクリア *****
+  const savedColorStyles = saveAndClearStyles();
+
+  //***** 対象要素の配置に関わるスタイル一式を保存 *****/
+  const savedPositionStyles = savePositionStyles();
+
+  //***** 対象要素の配置 *****/
+  // 対象要素を取得
+  const elm_h2 = document.getElementById("h2");
+  const elm_basic_data = document.getElementById("basic_data");
+  const elm_pyramid_svg = document.getElementById("pyramid-svg");
+  const elm_pyramid_block = document.getElementById("pyramid-block");
+
+  // 現在の要素の位置とサイズを取得
+  const h2_rect = elm_h2.getBoundingClientRect();
+  const basic_data_rect = elm_basic_data.getBoundingClientRect();
+  const pyramid_svg_rect = elm_pyramid_svg.getBoundingClientRect();
+
+  // 撮影範囲のサイズ（ピラミッドが中央に来るように調整）
+  const canvas_width = 1108 + 50;
+  const canvas_height = 600 + 150;
+
+  // html2canvas用の固定配置（ブラウザレンダリングとの差異を考慮）
+  const h2_left = 25;  // 左端から25px
+  const h2_top = 45;   // 上端から35px
+
+  // ピラミッドをキャンバス中央に配置（固定値で調整）
+  const pyramid_svg_left = 10;
+  const pyramid_svg_top = 150;  // h2の下に固定配置
+
+  // basic_dataをピラミッドの右下角に配置（固定値で調整）
+  const basic_data_left = 700;  // 右寄せの固定位置
+  const basic_data_top = 570;   // 下寄せの固定位置
+
+  // 対象要素を絶対位置に移動
+  elm_h2.style.position = "absolute";
+  elm_h2.style.left = h2_left + "px";
+  elm_h2.style.top = h2_top + "px";
+
+  // pyramid-blockを移動（SVG要素を含む）
+  // まず位置をリセット
+  elm_pyramid_block.style.position = "absolute";
+  elm_pyramid_block.style.left = "0px";
+  elm_pyramid_block.style.top = "0px";
+  elm_pyramid_block.style.right = "";
+  elm_pyramid_block.style.bottom = "";
+  elm_pyramid_block.style.transform = "";
+  
+  // 新しい位置に移動
+  elm_pyramid_block.style.left = pyramid_svg_left + "px";
+  elm_pyramid_block.style.top = pyramid_svg_top + "px";
+
+  // basic_dataを移動
+  // まず位置をリセット
+  elm_basic_data.style.position = "absolute";
+  elm_basic_data.style.left = "0px";
+  elm_basic_data.style.top = "0px";
+  elm_basic_data.style.right = "";
+  elm_basic_data.style.bottom = "";
+  elm_basic_data.style.transform = "";
+  elm_basic_data.style.zIndex = "";
+  elm_basic_data.style.display = "block";
+  elm_basic_data.style.width = "";
+  elm_basic_data.style.height = "";
+  
+  // 新しい位置に移動
+  elm_basic_data.style.left = basic_data_left + "px";
+  elm_basic_data.style.top = basic_data_top + "px";
+  
   //***** 3区分別人口の中位階層の入力欄を単純なテキストに *****
   var s = document.getElementById("smiddle");
+  var kubun2_title_original = null;
   if (s) {
     var e = document.getElementById("emiddle");
     var title = document.getElementById("kubun2_title");
     var alt_txt = s.value + "歳〜" + e.value + "歳";
-    var org_txt = title.innerHTML;
+    kubun2_title_original = title.innerHTML;  // 元のテキストを保存
     title.innerHTML = alt_txt;
   }
 
-  //***** グラフタイトルとグラフ本体部分だけのスクリーンショットを撮るために撮影範囲を決める. *****
-  var h2 = document.getElementById("h2");
-  var rect1 = h2.getBoundingClientRect();
-  var rect2 = svgElement.getBoundingClientRect();
-  var basicData = document.getElementById("basic_data");
-  var rect3 = basicData.getBoundingClientRect();
-
-console.log("SVG.right", rect2.right);
-console.log("SVG.bottom", rect2.bottom);
-console.log("basicData.left", rect3.left);
-console.log("basicData.right", rect3.right);
-console.log("basicData.top", rect3.top);
-console.log("basicData.bottom", rect3.bottom);
-
-  // 全ての要素を含む範囲を計算
-  var minLeft = Math.min(rect1.left, rect2.left, rect3.left);
-  var maxRight = Math.max(rect1.right, rect2.right, rect3.right);
-  var minTop = Math.min(rect1.top, rect2.top, rect3.top);
-  var maxBottom = Math.max(rect1.bottom, rect2.bottom, rect3.bottom);
-
-  var x_pos = minLeft;
-  var y_pos = minTop;
-  var c_width = maxRight - minLeft;
-  var c_height = maxBottom - minTop;
-
   window.scrollTo(0, 0);
 
+  //***** html2canvasによるスクリーンショット実行 *****/
   html2canvas(document.body, {
-    x: x_pos - 20,
-    y: y_pos - 30,
-    width: c_width + 50,
-    height: c_height + 50,
-    windowWidth: c_width,
-    windowHeight: c_height,
+    x: 0,
+    y: 0,
+    width: canvas_width, //生成する画像の幅
+    height: canvas_height, //生成する画像の高さ
+    windowWidth: 1108, //描画領域の幅
+    windowHeight: 600, //描画領域の高さ
     scale: 3,
-  });
-
-  html2canvas(document.body, {
-    x: -20,
-    y: -30,
-    width: c_width + 30,
-    height: c_height + 30,
-    windowWidth: c_width,
-    windowHeight: c_height,
-    scale: 3,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    logging: false
   }).then(function (canvas) {
     var imageData = canvas.toDataURL();
 
@@ -2276,16 +2303,17 @@ console.log("basicData.bottom", rect3.bottom);
 
     //***** グラフデザインを元に戻す. *****
 
-    //--ピラミッドに背景色をつける.
-    svgElement.style.backgroundColor = originalBgColor;
-    if (bgRect) {
-      bgRect.setAttribute("fill", originalRectFill);
+    //--スタイルを復元する
+    restoreColorStyles(savedColorStyles);
+    restorePositionStyles(savedPositionStyles);
+    
+    //--3区分別人口の中位階層のタイトルを復元する
+    if (kubun2_title_original !== null) {
+      var title = document.getElementById("kubun2_title");
+      if (title) {
+        title.innerHTML = kubun2_title_original;
+      }
     }
-    //--#basic_dataブロックを元の位置に戻す
-    basicData.style.position = originalBasicPosition;
-    basicData.style.left = originalBasicLeft;
-    basicData.style.top = originalBasicTop;
-    basicData.style.zIndex = "auto";
   });
 }
 
@@ -2493,6 +2521,7 @@ function htmlToArray(html) {
   //alert(JSON.stringify(data));
   return data;
 }
+//デバッグ用（関数の呼出元をコンソールに表示する）
 function myFunc() {
   console.trace();
 }

@@ -450,7 +450,7 @@ class PyramidSVGRenderer {
   }
 
   render() {
-
+    console.warn(`render開始 with zoomScale ${this.options.zoomScale}`);
     console.log('render開始');
     console.log('this.options.width', this.options.width);
     console.log('this.options.height', this.options.height);
@@ -499,11 +499,13 @@ class PyramidSVGRenderer {
   
     let z = this.options.zoomScale;
   
-    // 新しいデータに基づいて再描画
+    // 新しいデータに基づいてunitSizeを再計算（zoomScaleモードでは使用されないが、互換性のため保持）
     let originalUnitSize = this.calculateUnitSize(this.data);
     let scale = this.options.unitSizeScale;
     this.options.unitSize = originalUnitSize * scale;
     console.log('updateData this.options.unitSize', this.options.unitSize);
+    
+    // zoomScaleが変更されている場合は、resizeByScaleを呼び出してサイズ調整を適用
     if (z != 1) {
       this.resizeByScale(z);
     }

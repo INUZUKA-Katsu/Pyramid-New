@@ -27,7 +27,10 @@
       <script type="text/javascript" src="./js/pyramid.js"></script>
       <script type="text/javascript" src="./js/PyramidSVGRenderer.js"></script>
       <script type="text/javascript" src="./js/streaming-animation.js"></script>
-      <script type="text/javascript" src="./js/interpolation-animation.js"></script>
+      <script
+        type="text/javascript"
+        src="./js/interpolation-animation.js"
+      ></script>
       <script type="text/javascript" src="./js/jquery-3.1.1.js"></script>
       <script
         type="text/javascript"
@@ -1024,6 +1027,11 @@
           pointer-events: none;
         }
 
+        /* スクリーンショット撮影時に::before疑似要素のボーダーを非表示にする */
+        #pyramid-container.screenshot-mode::before {
+          border: none;
+        }
+
         /* ローディングスピナーアニメーション */
         @keyframes spin {
           0% {
@@ -1092,7 +1100,7 @@
           >
         </div>
 
-        <h1 id="h1">横浜市の人口ピラミッド</h1>
+        <h1 id="h1" data-html2canvas-ignore="true">横浜市の人口ピラミッド</h1>
         <br />
 
         <!-- データ読み込み中の表示 -->
@@ -1131,71 +1139,156 @@
         <div id="container-flex" style="display: none">
           <div id="pyramid-block">
             <!-- 上部コントロール -->
-            <div id="top-controls">
+            <div id="top-controls" data-html2canvas-ignore="true">
               <!-- アニメーション用コントロール（通常は非表示） -->
               <div id="animation-controls">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 20px;
+                  "
+                >
                   <!-- 左側: アニメーション設定ブロック -->
-                  <div id="animation-settings-block" style="display: flex; flex-direction: column; gap: 0; min-width: 200px;">
+                  <div
+                    id="animation-settings-block"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      gap: 0;
+                      min-width: 200px;
+                    "
+                  >
                     <!-- アニメーションタイプ選択 -->
                     <div id="animation-type-controls">
-                      <span style="margin-right: 10px; font-weight: bold;">アニメーション</span>
-                      <label style="margin-right: 10px;">
-                    <input type="radio" name="animation-type-inline" value="direct" checked>
-                    <span>タイプ１</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="animation-type-inline" value="interpolation">
-                    <span>タイプ２</span>
-                  </label>
-                </div>
-                
+                      <span style="margin-right: 10px; font-weight: bold"
+                        >アニメーション</span
+                      >
+                      <label style="margin-right: 10px">
+                        <input
+                          type="radio"
+                          name="animation-type-inline"
+                          value="direct"
+                          checked
+                        />
+                        <span>タイプ１</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="animation-type-inline"
+                          value="interpolation"
+                        />
+                        <span>タイプ２</span>
+                      </label>
+                    </div>
+
                     <!-- 速度調節 -->
-                  <div style="display: flex; align-items: center; gap: 10px;">
-                      <span style="font-weight: bold;">速度:</span>
-                    <span>ゆっくり</span>
-                    <input type="range" id="animation-speed" min="50" max="500" value="200" style="width: 100px;">
-                    <span>早く</span>
-                  </div>
-                    
+                    <div style="display: flex; align-items: center; gap: 10px">
+                      <span style="font-weight: bold">速度:</span>
+                      <span>ゆっくり</span>
+                      <input
+                        type="range"
+                        id="animation-speed"
+                        min="50"
+                        max="500"
+                        value="200"
+                        style="width: 100px"
+                      />
+                      <span>早く</span>
+                    </div>
+
                     <!-- 進捗スライダー -->
-                    <div id="animation-progress-controls" style="display: flex; align-items: center; gap: 10px; position: relative;">
-                      <span style="font-weight: bold;">進行状況:</span>
-                      <input type="range" id="animation-progress" min="0" max="100" value="0" style="width: 150px;">
+                    <div
+                      id="animation-progress-controls"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        position: relative;
+                      "
+                    >
+                      <span style="font-weight: bold">進行状況:</span>
+                      <input
+                        type="range"
+                        id="animation-progress"
+                        min="0"
+                        max="100"
+                        value="0"
+                        style="width: 150px"
+                      />
                       <span id="progress-display">0%</span>
                       <!-- ツールチップ -->
-                      <div id="slider-tooltip" style="
-                        position: absolute;
-                        top: -40px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        background: rgba(0, 0, 0, 0.8);
-                        color: white;
-                        padding: 5px 10px;
-                        border-radius: 4px;
-                        font-size: 12px;
-                        white-space: nowrap;
-                        display: none;
-                        z-index: 1000;
-                        pointer-events: none;
-                      ">
+                      <div
+                        id="slider-tooltip"
+                        style="
+                          position: absolute;
+                          top: -40px;
+                          left: 50%;
+                          transform: translateX(-50%);
+                          background: rgba(0, 0, 0, 0.8);
+                          color: white;
+                          padding: 5px 10px;
+                          border-radius: 4px;
+                          font-size: 12px;
+                          white-space: nowrap;
+                          display: none;
+                          z-index: 1000;
+                          pointer-events: none;
+                        "
+                      >
                         基準日: 準備中
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- 右側: ボタン -->
-                  <div style="display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: center; height: 100%;">
-                  <button type="button" id="start-animation-btn" onclick="startAnimationFromControls()">開始</button>
-                    <button type="button" id="pause-animation-btn" onclick="pauseAnimationFromControls()">一時停止</button>
-                    <button type="button" id="resume-animation-btn" onclick="resumeAnimationFromControls()">再開</button>
-                    <button type="button" id="stop-animation-btn" onclick="stopAnimationFromControls()">終了</button>
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: row;
+                      gap: 10px;
+                      align-items: center;
+                      justify-content: center;
+                      height: 100%;
+                    "
+                  >
+                    <button
+                      type="button"
+                      id="start-animation-btn"
+                      onclick="startAnimationFromControls()"
+                    >
+                      開始
+                    </button>
+                    <button
+                      type="button"
+                      id="pause-animation-btn"
+                      onclick="pauseAnimationFromControls()"
+                    >
+                      一時停止
+                    </button>
+                    <button
+                      type="button"
+                      id="resume-animation-btn"
+                      onclick="resumeAnimationFromControls()"
+                    >
+                      再開
+                    </button>
+                    <button
+                      type="button"
+                      id="stop-animation-btn"
+                      onclick="stopAnimationFromControls()"
+                    >
+                      終了
+                    </button>
                   </div>
                 </div>
               </div>
+              <!-- #animation-controls ここまで -->
 
               <!-- 地域別人口ピラミッドの町丁名指定へのリンク -->
-              <div id="link" data-html2canvas-ignore="true">
+              <div id="link">
                 <a href="#cho"> 地域別人口ピラミッドのための町丁名の指定 </a>
                 <span
                   class="info-icon-right"
@@ -1206,6 +1299,7 @@
                 /></span>
               </div>
               <br />
+              <!-- #link ここまで -->
 
               <!-- #市区、年月セレクトボックス -->
               <div id="select-controls">
@@ -1217,8 +1311,16 @@
                 </div>
                 <div id="caption" data-html2canvas-ignore="true">
                   <form name="Form" id="form0">
-                    <!-- すべての要素を右寄せで横並びに配置 -->
-                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+                    <!-- 市区・年月セレクトボックス、動画ボタン -->
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        gap: 10px;
+                        flex-wrap: wrap;
+                      "
+                    >
                       <!-- 市区セレクトボックス -->
                       <select onChange="change_shiku()" name="shiku" id="shiku">
                         <option selected="selected" value="age">横浜市</option>
@@ -1258,7 +1360,10 @@
                         name="cho_year"
                         id="cho_year"
                       >
-                        <option value="202109">令和３年9月30日現在</option>
+                      <option value="202109">令和６年9月30日現在</option>
+                      <option value="202109">令和５年9月30日現在</option>
+                      <option value="202109">令和４年9月30日現在</option>
+                      <option value="202109">令和３年9月30日現在</option>
                         <option value="202009">令和２年9月30日現在</option>
                         <option value="201909">
                           平成31・令和元年9月30日現在
@@ -1285,7 +1390,7 @@
                         <option value="199909">平成11年9月30日現在</option>
                         <option value="199809">平成10年9月30日現在</option>
                       </select>
-                      
+
                       <!-- 動画ボタン -->
                       <button
                         onClick="toggleAnimationPanel()"
@@ -1304,28 +1409,75 @@
                         ><img src="./image/tooltip-icon.png" class="small-icon"
                       /></a>
                     </div>
-                    
-                    <!-- スライドバー（市区ピラミッド用） -->
-                    <div id="shiku-year-slider-container" style="display: none; margin-top: 5px; text-align: right;">
-                      <div style="display: inline-flex; align-items: center; gap: 10px; font-size: 12px;">
+
+                    <!-- スライドバー1（市区ピラミッド用） -->
+                    <div
+                      id="shiku-year-slider-container"
+                      style="display: none; 
+                             margin-top: 5px;
+                             text-align: right;
+                             margin-right: 90px;"
+                    >
+                      <div
+                        style="
+                          display: inline-flex;
+                          align-items: center;
+                          gap: 10px;
+                          font-size: 12px;
+                        "
+                      >
                         <span>過去</span>
-                        <input type="range" id="shiku-year-slider" min="0" max="100" value="0" style="width: 200px;">
-                        <span>最新</span>
-                        <span id="shiku-year-slider-display">最新</span>
+                        <input
+                          type="range"
+                          id="shiku-year-slider"
+                          min="0"
+                          max="100"
+                          value="0"
+                          style="width: 200px"
+                        />
+                        <span>将来</span>
+                        <!-- 機能的に必要：削除しないでください -->
+                        <span
+                          id="shiku-year-slider-display"
+                          style="display: none;"
+                          >将来</span
+                        >
                       </div>
                     </div>
 
-                    <!-- スライドバー（町丁別ピラミッド用） -->
-                    <div id="cho-year-slider-container" style="display: none; margin-top: 5px; text-align: right;">
-                      <div style="display: inline-flex; align-items: center; gap: 10px; font-size: 12px;">
+                    <!-- スライドバー2（町丁別ピラミッド用） -->
+                    <div
+                      id="cho-year-slider-container"
+                      style="display: none; 
+                             margin-top: 5px;
+                             text-align: right;
+                             margin-right: 90px;"
+                    >
+                      <div
+                        style="
+                          display: inline-flex;
+                          align-items: center;
+                          gap: 10px;
+                          font-size: 12px;
+                        "
+                      >
                         <span>過去</span>
-                        <input type="range" id="cho-year-slider" min="0" max="100" value="0" style="width: 200px;">
+                        <input
+                          type="range"
+                          id="cho-year-slider"
+                          min="0"
+                          max="100"
+                          value="0"
+                          style="width: 200px"
+                        />
                         <span>最新</span>
-                        <span id="cho-year-slider-display">最新</span>
+                        <!-- 機能的に必要：削除しないでください -->
+                        <span id="cho-year-slider-display" style="display: none"
+                          >最新</span
+                        >
                       </div>
                     </div>
-                    
-                    <input id="unit_size" value="0.1398" type="hidden" />
+
                   </form>
                 </div>
               </div>
@@ -1336,7 +1488,6 @@
             <!-- #SVG描画領域 -->
             <div id="pyramid-container"></div>
             <!-- #pyramid-container ここまで -->
-
 
             <!-- 現在の年次表示 -->
             <div
@@ -1407,7 +1558,7 @@
           <!-- pyramid-block ここまで -->
 
           <!-- 左端に縦に並ぶコントロール -->
-          <div class="left-controls">
+          <div class="left-controls" data-html2canvas-ignore="true">
             <div
               id="option"
               class="control-group"
@@ -1470,10 +1621,10 @@
             </div>
 
             <div class="control-group">
-              <h3>オプション</h3>
+              <h3>表示切替え</h3>
               <div class="button-group">
-                <button onclick="toggleNumbers()">人数表示切替</button>
-                <button onclick="toggleGrid()">グリッド切替</button>
+                <button onclick="toggleNumbers()">人数表示ON/OFF</button>
+                <button onclick="toggleGrid()">グリッド表示ON/OFF</button>
                 <button onclick="toggleAgeGroup()" id="age_group_toggle">
                   年齢３区分を非表示
                 </button>
@@ -1653,7 +1804,7 @@
         document.addEventListener("DOMContentLoaded", function () {
           // アニメーション進行スライダーの初期化
           setupAnimationProgressSlider();
-          
+
           // セレクトボックスのイベントリスナーを設定
           //const demoDataSelect = document.getElementById("demoData");
           //demoDataSelect.addEventListener("change", changeDemoData);
@@ -1664,12 +1815,12 @@
           //barHeightSlider.addEventListener('input', updateBarHeightValue);
         });
 
-        // ユニットサイズの変更
+        // 縦横サイズの変更
         const uin = document.getElementById("uin");
         const uout = document.getElementById("uout");
         const radio = document.getElementById("unitsize");
         uin.addEventListener("click", () => {
-            if (radio.checked) {
+          if (radio.checked) {
             let unitSize = window.pyramidRenderer.options.unitSize * 1.01;
             window.pyramidRenderer.resize({ unitSize: unitSize });
           } else {
@@ -1751,56 +1902,27 @@
         }
 
         // ハイブリッドリサイズの適用
-        function applyHybridResize() {
-          if (!window.pyramidRenderer) return;
-
-          const barHeight = parseFloat(
-            document.getElementById("barHeightSlider").value
-          );
-          const newHeight = Math.floor(101 * barHeight + 100); // 101年齢 × barHeight + 100pxマージン
-
-          window.pyramidRenderer.resize({ barHeight: barHeight, height: newHeight });
-        }
-
-        // データの読み込み
-        function loadDemoData() {
-          console.log("loadDemoData 関数定義完了");
-          const selectedData = document.getElementById("demoData").value;
-          const dataScript = document.getElementById(selectedData + "-data");
-          console.log("rout1");
-
-          if (!dataScript) {
-            console.error("データが見つかりません:", selectedData);
-            return;
-          }
-          console.log("rout2");
-          try {
-            console.log("dataScript", dataScript.textContent);
-            const data = JSON.parse(dataScript.textContent);
-            console.log("data", data["kakusai_betsu"][0]);
-            renderPyramid(data);
-          } catch (error) {
-            console.error("データの解析に失敗しました:", error);
-          }
-        }
-
-        // データの切り替え　共通描画部分は変更ないのでupdateDataメソッドを使用
-        function changeDemoData() {
-          console.log("changeDemoData 関数定義完了");
-          const selectedData = document.getElementById("demoData").value;
-          const dataScript = document.getElementById(selectedData + "-data");
-          const data = JSON.parse(dataScript.textContent);
-          currentRenderer.updateData(data);
-
-          // データ更新後に#basic_dataの位置を再計算
-          setTimeout(() => {
-            centerContents();
-          }, 100);
-        }
+        //function applyHybridResize() {
+        //  if (!window.pyramidRenderer) return;
+        // 
+        //  const barHeight = parseFloat(
+        //    document.getElementById("barHeightSlider").value
+        //  );
+        //  const newHeight = Math.floor(101 * barHeight + 100); // 101年齢 × barHeight + 100pxマージン
+        // 
+        //  window.pyramidRenderer.resize({
+        //    barHeight: barHeight,
+        //    height: newHeight,
+        //  });
+        //}
 
         // ピラミッドの描画
         function renderPyramid(data, isAnimation = false) {
-          console.log("renderPyramid 関数定義完了", "isAnimation:", isAnimation);
+          console.log(
+            "renderPyramid 関数定義完了",
+            "isAnimation:",
+            isAnimation
+          );
           if (!isSVGMode) {
             document.getElementById("pyramid-container").innerHTML =
               '<p style="text-align: center; padding: 50px;">このデモではSVG描画のみ対応しています</p>';
@@ -1816,13 +1938,22 @@
             if (window.pyramidRenderer) {
               // 既存のレンダラーがある場合は更新（zoomScaleを保持）
               console.log("既存レンダラーを更新（zoomScale保持）");
-              console.log("更新前のzoomScale:", window.pyramidRenderer.options.zoomScale);
+              console.log(
+                "更新前のzoomScale:",
+                window.pyramidRenderer.options.zoomScale
+              );
               window.pyramidRenderer.updateData(data, isAnimation);
-              console.log("更新後のzoomScale:", window.pyramidRenderer.options.zoomScale);
+              console.log(
+                "更新後のzoomScale:",
+                window.pyramidRenderer.options.zoomScale
+              );
             } else {
               // レンダラーが存在しない場合は新しいレンダラーを作成
               console.log("新しいレンダラーを作成");
-              window.pyramidRenderer = new PyramidSVGRenderer("pyramid-container", data);
+              window.pyramidRenderer = new PyramidSVGRenderer(
+                "pyramid-container",
+                data
+              );
             }
             //document.getElementById('status').textContent =
             //    `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
@@ -1831,7 +1962,8 @@
             if (!isAnimation) {
               setTimeout(() => {
                 // ローディング表示を非表示に
-                const loadingContainer = document.getElementById("loading-container");
+                const loadingContainer =
+                  document.getElementById("loading-container");
                 if (loadingContainer) {
                   loadingContainer.style.display = "none";
                 }
@@ -1934,28 +2066,37 @@
         // 年月選択スライドバーの初期化とイベントリスナー
         function setupYearSliders() {
           // 市区ピラミッド用スライドバー
-          const shikuSlider = document.getElementById('shiku-year-slider');
-          const shikuSliderDisplay = document.getElementById('shiku-year-slider-display');
-          const shikuSliderContainer = document.getElementById('shiku-year-slider-container');
-          
+          const shikuSlider = document.getElementById("shiku-year-slider");
+          const shikuSliderDisplay = document.getElementById(
+            "shiku-year-slider-display"
+          );
+          const shikuSliderContainer = document.getElementById(
+            "shiku-year-slider-container"
+          );
+
           if (shikuSlider && shikuSliderDisplay && shikuSliderContainer) {
             let isDragging = false;
-            
-            shikuSlider.addEventListener('input', function() {
+
+            shikuSlider.addEventListener("input", function () {
               const progress = parseInt(this.value);
               const pyramode = get_pyramid_mode();
-              
-              if (pyramode === 'shiku' || pyramode === 'age') {
-                const selectElement = document.getElementById('shiku_year');
+
+              if (pyramode === "shiku" || pyramode === "age") {
+                const selectElement = document.getElementById("shiku_year");
                 if (selectElement && selectElement.options.length > 0) {
                   // 方向を逆転：0%が過去、100%が最新
-                  const targetIndex = Math.floor(((100 - progress) / 100) * (selectElement.options.length - 1));
-                  const clampedIndex = Math.max(0, Math.min(targetIndex, selectElement.options.length - 1));
+                  const targetIndex = Math.floor(
+                    ((100 - progress) / 100) *
+                      (selectElement.options.length - 1)
+                  );
+                  const clampedIndex = Math.max(
+                    0,
+                    Math.min(targetIndex, selectElement.options.length - 1)
+                  );
                   const targetOption = selectElement.options[clampedIndex];
-                  
-                  // 表示を更新
+
+                  // 機能的に必要：削除しないでください
                   shikuSliderDisplay.textContent = targetOption.text;
-                  
                   if (isDragging) {
                     // ドラッグ中は表示のみ更新
                     selectElement.value = targetOption.value;
@@ -1963,57 +2104,71 @@
                 }
               }
             });
-            
-            shikuSlider.addEventListener('mousedown', function() {
+
+            shikuSlider.addEventListener("mousedown", function () {
               isDragging = true;
             });
-            
-            shikuSlider.addEventListener('mouseup', function() {
+
+            shikuSlider.addEventListener("mouseup", function () {
               isDragging = false;
               // ドラッグ終了時に描画
-              const selectElement = document.getElementById('shiku_year');
+              const selectElement = document.getElementById("shiku_year");
               if (selectElement) {
-                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                selectElement.dispatchEvent(
+                  new Event("change", { bubbles: true })
+                );
               }
             });
-            
-            shikuSlider.addEventListener('touchstart', function() {
+
+            shikuSlider.addEventListener("touchstart", function () {
               isDragging = true;
             });
-            
-            shikuSlider.addEventListener('touchend', function() {
+
+            shikuSlider.addEventListener("touchend", function () {
               isDragging = false;
               // ドラッグ終了時に描画
-              const selectElement = document.getElementById('shiku_year');
+              const selectElement = document.getElementById("shiku_year");
               if (selectElement) {
-                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                selectElement.dispatchEvent(
+                  new Event("change", { bubbles: true })
+                );
               }
             });
           }
-          
+
           // 町丁別ピラミッド用スライドバー
-          const choSlider = document.getElementById('cho-year-slider');
-          const choSliderDisplay = document.getElementById('cho-year-slider-display');
-          const choSliderContainer = document.getElementById('cho-year-slider-container');
-          
+          const choSlider = document.getElementById("cho-year-slider");
+          const choSliderDisplay = document.getElementById(
+            "cho-year-slider-display"
+          );
+          const choSliderContainer = document.getElementById(
+            "cho-year-slider-container"
+          );
+
           if (choSlider && choSliderDisplay && choSliderContainer) {
             let isDragging = false;
-            
-            choSlider.addEventListener('input', function() {
+
+            choSlider.addEventListener("input", function () {
               const progress = parseInt(this.value);
               const pyramode = get_pyramid_mode();
-              
-              if (pyramode === 'cho') {
-                const selectElement = document.getElementById('cho_year');
+
+              if (pyramode === "cho") {
+                const selectElement = document.getElementById("cho_year");
                 if (selectElement && selectElement.options.length > 0) {
                   // 方向を逆転：0%が過去、100%が最新
-                  const targetIndex = Math.floor(((100 - progress) / 100) * (selectElement.options.length - 1));
-                  const clampedIndex = Math.max(0, Math.min(targetIndex, selectElement.options.length - 1));
+                  const targetIndex = Math.floor(
+                    ((100 - progress) / 100) *
+                      (selectElement.options.length - 1)
+                  );
+                  const clampedIndex = Math.max(
+                    0,
+                    Math.min(targetIndex, selectElement.options.length - 1)
+                  );
                   const targetOption = selectElement.options[clampedIndex];
-                  
-                  // 表示を更新
+
+                  // 機能的に必要：削除しないでください
                   choSliderDisplay.textContent = targetOption.text;
-                  
+
                   if (isDragging) {
                     // ドラッグ中は表示のみ更新
                     selectElement.value = targetOption.value;
@@ -2021,30 +2176,34 @@
                 }
               }
             });
-            
-            choSlider.addEventListener('mousedown', function() {
+
+            choSlider.addEventListener("mousedown", function () {
               isDragging = true;
             });
-            
-            choSlider.addEventListener('mouseup', function() {
+
+            choSlider.addEventListener("mouseup", function () {
               isDragging = false;
               // ドラッグ終了時に描画
-              const selectElement = document.getElementById('cho_year');
+              const selectElement = document.getElementById("cho_year");
               if (selectElement) {
-                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                selectElement.dispatchEvent(
+                  new Event("change", { bubbles: true })
+                );
               }
             });
-            
-            choSlider.addEventListener('touchstart', function() {
+
+            choSlider.addEventListener("touchstart", function () {
               isDragging = true;
             });
-            
-            choSlider.addEventListener('touchend', function() {
+
+            choSlider.addEventListener("touchend", function () {
               isDragging = false;
               // ドラッグ終了時に描画
-              const selectElement = document.getElementById('cho_year');
+              const selectElement = document.getElementById("cho_year");
               if (selectElement) {
-                selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                selectElement.dispatchEvent(
+                  new Event("change", { bubbles: true })
+                );
               }
             });
           }
@@ -2054,7 +2213,7 @@
         document.addEventListener("DOMContentLoaded", function () {
           // 年月選択スライドバーを初期化
           setupYearSliders();
-          
+
           const speedSlider = document.getElementById("animation-speed");
           const barDurationSlider = document.getElementById(
             "bar-animation-duration"
@@ -2065,18 +2224,25 @@
               const sliderValue = parseInt(this.value);
               // スライダー値を逆転（50-500 → 500-50）
               const actualSpeed = 550 - sliderValue; // 50+500-sliderValue
-              
+
               const speedDisplay = document.getElementById("speed-display");
               if (speedDisplay) {
                 speedDisplay.textContent = actualSpeed + "ms";
               }
-              
+
               // アニメーションが初期化されている場合のみ速度を設定
-              if (window.streamingAnimation && window.streamingAnimation.setAnimationSpeed) {
+              if (
+                window.streamingAnimation &&
+                window.streamingAnimation.setAnimationSpeed
+              ) {
                 window.streamingAnimation.setAnimationSpeed(actualSpeed);
-                console.log(`アニメーション速度を設定: スライダー値=${sliderValue} → 実際の速度=${actualSpeed}ms`);
+                console.log(
+                  `アニメーション速度を設定: スライダー値=${sliderValue} → 実際の速度=${actualSpeed}ms`
+                );
               } else {
-                console.log(`アニメーション未初期化: 速度設定をスキップ (スライダー値=${sliderValue} → 実際の速度=${actualSpeed}ms)`);
+                console.log(
+                  `アニメーション未初期化: 速度設定をスキップ (スライダー値=${sliderValue} → 実際の速度=${actualSpeed}ms)`
+                );
               }
             });
           }
@@ -2084,99 +2250,124 @@
           if (barDurationSlider) {
             barDurationSlider.addEventListener("input", function () {
               const duration = parseInt(this.value);
-              const barDurationDisplay = document.getElementById("bar-duration-display");
+              const barDurationDisplay = document.getElementById(
+                "bar-duration-display"
+              );
               if (barDurationDisplay) {
                 barDurationDisplay.textContent = duration + "ms";
               }
-              
+
               // アニメーションが初期化されている場合のみ期間を設定
-              if (window.streamingAnimation && window.streamingAnimation.setBarAnimationDuration) {
+              if (
+                window.streamingAnimation &&
+                window.streamingAnimation.setBarAnimationDuration
+              ) {
                 window.streamingAnimation.setBarAnimationDuration(duration);
                 console.log(`バーアニメーション期間を設定: ${duration}ms`);
               } else {
-                console.log(`アニメーション未初期化: バーアニメーション期間設定をスキップ (${duration}ms)`);
+                console.log(
+                  `アニメーション未初期化: バーアニメーション期間設定をスキップ (${duration}ms)`
+                );
               }
             });
           }
         });
 
-
-
         // グローバルエラーハンドラー
-        window.addEventListener('error', function(event) {
-          console.error('グローバルエラーが発生しました:', event.error);
-          console.error('エラー詳細:', {
+        window.addEventListener("error", function (event) {
+          console.error("グローバルエラーが発生しました:", event.error);
+          console.error("エラー詳細:", {
             message: event.message,
             filename: event.filename,
             lineno: event.lineno,
             colno: event.colno,
-            error: event.error
+            error: event.error,
           });
-          alert('予期しないエラーが発生しました: ' + event.message);
+          alert("予期しないエラーが発生しました: " + event.message);
         });
 
         // 未処理のPromise拒否をキャッチ
-        window.addEventListener('unhandledrejection', function(event) {
-          console.error('未処理のPromise拒否が発生しました:', event.reason);
-          alert('非同期処理でエラーが発生しました: ' + event.reason);
+        window.addEventListener("unhandledrejection", function (event) {
+          console.error("未処理のPromise拒否が発生しました:", event.reason);
+          alert("非同期処理でエラーが発生しました: " + event.reason);
         });
 
         // アニメーションコントロールの表示切り替え
         function showAnimationControls() {
-          document.getElementById('link').style.display = 'none';
-          document.getElementById('select-controls').style.display = 'none';
-          document.getElementById('animation-controls').style.display = 'block';
-          
+          document.getElementById("link").style.display = "none";
+          document.getElementById("select-controls").style.display = "none";
+          document.getElementById("animation-controls").style.display = "block";
+
           // 進捗スライダーを初期化
           setupAnimationProgressSlider();
         }
 
         function hideAnimationControls() {
-          document.getElementById('link').style.display = 'block';
-          document.getElementById('select-controls').style.display = 'block';
-          document.getElementById('animation-controls').style.display = 'none';
+          document.getElementById("link").style.display = "block";
+          document.getElementById("select-controls").style.display = "block";
+          document.getElementById("animation-controls").style.display = "none";
         }
 
         // アニメーション開始
         async function startAnimationFromControls() {
-          const animationType = document.querySelector('input[name="animation-type-inline"]:checked').value;
+          const animationType = document.querySelector(
+            'input[name="animation-type-inline"]:checked'
+          ).value;
           // 速度は後でアニメーション設定時に確実に読み取る
-          
+
           // デバッグ: 現在のモードを確認
           const currentMode = get_pyramid_mode();
-          console.log('startAnimationFromControls: 現在のモード =', currentMode);
-          console.log('startAnimationFromControls: mode要素の値 =', document.getElementById('mode').value);
-          console.log('startAnimationFromControls: animationType =', animationType);
-          
+          console.log(
+            "startAnimationFromControls: 現在のモード =",
+            currentMode
+          );
+          console.log(
+            "startAnimationFromControls: mode要素の値 =",
+            document.getElementById("mode").value
+          );
+          console.log(
+            "startAnimationFromControls: animationType =",
+            animationType
+          );
+
           // 総人口変化反映の選択ダイアログを表示
           const useFixedUnitSize = await showPopulationSizeDialog();
-          console.log('ユーザー選択: 総人口変化反映 =', useFixedUnitSize);
-          
+          console.log("ユーザー選択: 総人口変化反映 =", useFixedUnitSize);
+
           // キャンセルされた場合はアニメーションを開始しない
           if (useFixedUnitSize === null) {
-            console.log('アニメーション開始がキャンセルされました');
+            console.log("アニメーション開始がキャンセルされました");
             return;
           }
-          
+
           // アニメーション設定を更新
           if (window.streamingAnimation) {
             // 速度設定（スライダーの現在値を確実に読み取り）
-            const sliderValue = parseInt(document.getElementById('animation-speed').value);
+            const sliderValue = parseInt(
+              document.getElementById("animation-speed").value
+            );
             const currentSpeed = 550 - sliderValue; // スライダー値を逆転
             window.streamingAnimation.animationSpeed = currentSpeed;
-            window.streamingAnimation.useInterpolation = (animationType === 'interpolation');
+            window.streamingAnimation.useInterpolation =
+              animationType === "interpolation";
             window.streamingAnimation.interpolationDuration = 1000;
             window.streamingAnimation.useFixedUnitSize = useFixedUnitSize;
-            
+
             // デバッグ: 設定値を確認
-            console.log('アニメーション設定更新:');
-            console.log('  - animationType:', animationType);
-            console.log('  - sliderValue:', sliderValue);
-            console.log('  - animationSpeed:', currentSpeed);
-            console.log('  - useInterpolation:', window.streamingAnimation.useInterpolation);
-            console.log('  - useFixedUnitSize:', window.streamingAnimation.useFixedUnitSize);
+            console.log("アニメーション設定更新:");
+            console.log("  - animationType:", animationType);
+            console.log("  - sliderValue:", sliderValue);
+            console.log("  - animationSpeed:", currentSpeed);
+            console.log(
+              "  - useInterpolation:",
+              window.streamingAnimation.useInterpolation
+            );
+            console.log(
+              "  - useFixedUnitSize:",
+              window.streamingAnimation.useFixedUnitSize
+            );
           }
-          
+
           // アニメーション開始
           if (useFixedUnitSize) {
             // 総人口変化反映モード: 事前に全データを取得してunitSizeを計算
@@ -2188,11 +2379,11 @@
             if (window.streamingAnimation) {
               await window.streamingAnimation.startStreamingAnimation();
             } else {
-              console.error('ストリーミングアニメーションが利用できません');
-              alert('ストリーミングアニメーションが利用できません');
+              console.error("ストリーミングアニメーションが利用できません");
+              alert("ストリーミングアニメーションが利用できません");
             }
           }
-          
+
           // アニメーション開始後にスライダーを有効化
           updateSliderState();
         }
@@ -2200,7 +2391,7 @@
         // 総人口変化反映の選択ダイアログを表示
         function showPopulationSizeDialog() {
           return new Promise((resolve) => {
-            const dialog = document.createElement('div');
+            const dialog = document.createElement("div");
             dialog.style.cssText = `
               position: fixed;
               top: 0;
@@ -2213,8 +2404,8 @@
               align-items: center;
               z-index: 10000;
             `;
-            
-            const content = document.createElement('div');
+
+            const content = document.createElement("div");
             content.style.cssText = `
               background: white;
               padding: 30px;
@@ -2223,22 +2414,22 @@
               max-width: 500px;
               text-align: center;
             `;
-            
+
             content.innerHTML = `
               <h3 style="margin-top: 0; color: #333;">アニメーション設定</h3>
               <p style="margin: 20px 0; color: #666;">
-                人口変化をピラミッドの大きさに反映させますか？
+                総人口の増減によってグラフの大きさを変えますか？
               </p>
               <div style="margin: 30px 0;">
                 <label style="display: block; margin: 15px 0; cursor: pointer;">
                   <input type="radio" name="population-size" value="true" checked style="margin-right: 10px;">
-                  <strong>反映させる</strong><br>
-                  <small style="color: #888;">人口の増減がピラミッドの大きさに反映されます</small>
+                  <strong>グラフの大きさを変化させる</strong><br>
+                  <small style="color: #888;">人口の増減に比例してピラミッドの大きさ(面積)が変化します。<br>年齢構成の変化と人口の増減の両方を見ることができます。</small>
                 </label>
                 <label style="display: block; margin: 15px 0; cursor: pointer;">
                   <input type="radio" name="population-size" value="false" style="margin-right: 10px;">
-                  <strong>反映させない</strong><br>
-                  <small style="color: #888;">ピラミッドの大きさは一定で、人口の変化は形状のみに反映されます</small>
+                  <strong>グラフの大きさを一定にする</strong><br>
+                  <small style="color: #888;">ピラミッドの大きさ(面積)を固定します。<br>年齢構成の変化だけを集中して見ることができます。</small>
                 </label>
               </div>
               <div>
@@ -2261,18 +2452,20 @@
                 ">キャンセル</button>
               </div>
             `;
-            
+
             dialog.appendChild(content);
             document.body.appendChild(dialog);
-            
+
             // イベントリスナー
-            document.getElementById('dialog-ok').onclick = () => {
-              const selected = document.querySelector('input[name="population-size"]:checked').value === 'true';
+            document.getElementById("dialog-ok").onclick = () => {
+              const selected =
+                document.querySelector('input[name="population-size"]:checked')
+                  .value === "true";
               document.body.removeChild(dialog);
               resolve(selected);
             };
-            
-            document.getElementById('dialog-cancel').onclick = () => {
+
+            document.getElementById("dialog-cancel").onclick = () => {
               document.body.removeChild(dialog);
               resolve(null); // キャンセル時はnullを返す
             };
@@ -2284,41 +2477,42 @@
           try {
             // データ取得中の表示
             showDataLoadingMessage();
-            
+
             const shiku = get_selected_shiku();
-            console.log('人口変化反映アニメーション開始: shiku =', shiku);
-            
+            console.log("人口変化反映アニメーション開始: shiku =", shiku);
+
             // 新しいzoomScaleモードを有効化
             window.streamingAnimation.useZoomScaleMode = true;
             window.streamingAnimation.useFixedUnitSize = false; // 旧方式を無効化
-            
+
             // データ取得完了の表示を非表示
             hideDataLoadingMessage();
-            
+
             // アニメーション開始（StreamingAnimationManager内で全年次データ取得と最大総人口算出を行う）
             if (window.streamingAnimation) {
               await window.streamingAnimation.startStreamingAnimation();
             } else {
-              console.error('ストリーミングアニメーションが利用できません');
-              alert('ストリーミングアニメーションが利用できません');
+              console.error("ストリーミングアニメーションが利用できません");
+              alert("ストリーミングアニメーションが利用できません");
             }
-            
+
             // アニメーション開始後にスライダーを有効化
             updateSliderState();
-            
           } catch (error) {
-            console.error('人口変化反映アニメーション開始エラー:', error);
+            console.error("人口変化反映アニメーション開始エラー:", error);
             hideDataLoadingMessage();
-            alert('データの取得に失敗しました。通常モードでアニメーションを開始します。');
+            alert(
+              "データの取得に失敗しました。通常モードでアニメーションを開始します。"
+            );
             // エラー時はzoomScaleモードを無効にして通常モードで開始
             window.streamingAnimation.useZoomScaleMode = false;
             if (window.streamingAnimation) {
               await window.streamingAnimation.startStreamingAnimation();
             } else {
-              console.error('ストリーミングアニメーションが利用できません');
-              alert('ストリーミングアニメーションが利用できません');
+              console.error("ストリーミングアニメーションが利用できません");
+              alert("ストリーミングアニメーションが利用できません");
             }
-            
+
             // エラー時でもアニメーション開始後にスライダーを有効化
             updateSliderState();
           }
@@ -2326,8 +2520,8 @@
 
         // データ取得中の表示
         function showDataLoadingMessage() {
-          const loadingDiv = document.createElement('div');
-          loadingDiv.id = 'data-loading-message';
+          const loadingDiv = document.createElement("div");
+          loadingDiv.id = "data-loading-message";
           loadingDiv.style.cssText = `
             position: fixed;
             top: 50%;
@@ -2357,9 +2551,9 @@
               全年次のデータを取得して、ピラミッドのサイズを計算しています
             </div>
           `;
-          
+
           // CSS アニメーションを追加
-          const style = document.createElement('style');
+          const style = document.createElement("style");
           style.textContent = `
             @keyframes spin {
               0% { transform: rotate(0deg); }
@@ -2367,13 +2561,13 @@
             }
           `;
           document.head.appendChild(style);
-          
+
           document.body.appendChild(loadingDiv);
         }
 
         // データ取得中の表示を非表示
         function hideDataLoadingMessage() {
-          const loadingDiv = document.getElementById('data-loading-message');
+          const loadingDiv = document.getElementById("data-loading-message");
           if (loadingDiv) {
             document.body.removeChild(loadingDiv);
           }
@@ -2398,74 +2592,79 @@
           // 元の選択状態を保存
           const originalNengetsu = get_selected_nengetsu();
           const originalPyramode = get_pyramid_mode();
-          console.log(`終了ボタン: 元の選択状態を保存 - 年次: ${originalNengetsu}, モード: ${originalPyramode}`);
-          
+          console.log(
+            `終了ボタン: 元の選択状態を保存 - 年次: ${originalNengetsu}, モード: ${originalPyramode}`
+          );
+
           // ストリーミングアニメーションの停止
           if (window.streamingAnimation) {
             window.streamingAnimation.stopAnimation();
           }
-          
+
           // スライダーを無効化
           updateSliderState();
-          
+
           // スライドバーの進捗度情報をクリア
-          const progressSlider = document.getElementById('animation-progress');
-          const progressDisplay = document.getElementById('progress-display');
+          const progressSlider = document.getElementById("animation-progress");
+          const progressDisplay = document.getElementById("progress-display");
           if (progressSlider) {
             progressSlider.value = 0;
           }
           if (progressDisplay) {
-            progressDisplay.textContent = '0%';
+            progressDisplay.textContent = "0%";
           }
-          
+
           // 元の選択状態を復元
           if (originalNengetsu && originalNengetsu !== undefined) {
-            console.log(`終了ボタン: 元の選択状態を復元 - 年次: ${originalNengetsu}`);
+            console.log(
+              `終了ボタン: 元の選択状態を復元 - 年次: ${originalNengetsu}`
+            );
             select_nengetsu(originalNengetsu, originalPyramode);
           }
         }
 
         // スライダーの操作可否を制御する関数
         function updateSliderState() {
-          const progressSlider = document.getElementById('animation-progress');
+          const progressSlider = document.getElementById("animation-progress");
           if (!progressSlider) return;
-          
+
           // アニメーションが初期化されているかチェック
-          const isReady = window.streamingAnimation && 
-                         window.streamingAnimation.allYears && 
-                         window.streamingAnimation.allYears.length > 0 &&
-                         window.streamingAnimation.dataCache &&
-                         Object.keys(window.streamingAnimation.dataCache).length > 0;
-          
+          const isReady =
+            window.streamingAnimation &&
+            window.streamingAnimation.allYears &&
+            window.streamingAnimation.allYears.length > 0 &&
+            window.streamingAnimation.dataCache &&
+            Object.keys(window.streamingAnimation.dataCache).length > 0;
+
           if (isReady) {
-            progressSlider.style.pointerEvents = 'auto';  // 操作可能
-            console.log('スライダーを有効化しました（pointer-events: auto）');
+            progressSlider.style.pointerEvents = "auto"; // 操作可能
+            console.log("スライダーを有効化しました（pointer-events: auto）");
           } else {
-            progressSlider.style.pointerEvents = 'none';  // 操作不可
-            console.log('スライダーを無効化しました（pointer-events: none）');
+            progressSlider.style.pointerEvents = "none"; // 操作不可
+            console.log("スライダーを無効化しました（pointer-events: none）");
           }
         }
 
         // アニメーション進行スライダーのイベントハンドラー
         function setupAnimationProgressSlider() {
-          const progressSlider = document.getElementById('animation-progress');
-          const progressDisplay = document.getElementById('progress-display');
-          
+          const progressSlider = document.getElementById("animation-progress");
+          const progressDisplay = document.getElementById("progress-display");
+
           if (!progressSlider || !progressDisplay) return;
-          
+
           let isDragging = false;
-          
+
           // スライダーを100%の長さで表示（最大値を100に設定）
           progressSlider.max = 100;
-          
+
           // 初期状態では無効化
           updateSliderState();
-          
+
           // スライダーの値変更時
-          progressSlider.addEventListener('input', function() {
+          progressSlider.addEventListener("input", function () {
             const progress = parseInt(this.value);
-            progressDisplay.textContent = progress + '%';
-            
+            progressDisplay.textContent = progress + "%";
+
             if (isDragging) {
               // ドラッグ中はツールチップのみ表示
               showSliderTooltip(progress);
@@ -2474,20 +2673,20 @@
               window.streamingAnimation.seekToProgress(progress);
             }
           });
-          
+
           // ドラッグ開始
-          progressSlider.addEventListener('mousedown', function() {
+          progressSlider.addEventListener("mousedown", function () {
             isDragging = true;
             if (window.streamingAnimation) {
               window.streamingAnimation.pauseAnimation();
             }
           });
-          
+
           // ドラッグ終了
-          progressSlider.addEventListener('mouseup', function() {
+          progressSlider.addEventListener("mouseup", function () {
             isDragging = false;
             hideSliderTooltip();
-            
+
             if (window.streamingAnimation) {
               const progress = parseInt(this.value);
               // ドラッグ停止時にピラミッドを描画
@@ -2495,19 +2694,19 @@
               // 一時停止状態を維持（再開ボタンで手動再開）
             }
           });
-          
+
           // タッチイベント対応
-          progressSlider.addEventListener('touchstart', function() {
+          progressSlider.addEventListener("touchstart", function () {
             isDragging = true;
             if (window.streamingAnimation) {
               window.streamingAnimation.pauseAnimation();
             }
           });
-          
-          progressSlider.addEventListener('touchend', function() {
+
+          progressSlider.addEventListener("touchend", function () {
             isDragging = false;
             hideSliderTooltip();
-            
+
             if (window.streamingAnimation) {
               const progress = parseInt(this.value);
               // ドラッグ停止時にピラミッドを描画
@@ -2519,27 +2718,33 @@
 
         // スライダーツールチップ表示
         function showSliderTooltip(progress) {
-          const tooltip = document.getElementById('slider-tooltip');
+          const tooltip = document.getElementById("slider-tooltip");
           if (!tooltip || !window.streamingAnimation) return;
-          
+
           // 進行度から年次を計算
-          const targetIndex = Math.floor((progress / 100) * (window.streamingAnimation.allYears.length - 1));
-          const clampedIndex = Math.max(0, Math.min(targetIndex, window.streamingAnimation.allYears.length - 1));
+          const targetIndex = Math.floor(
+            (progress / 100) * (window.streamingAnimation.allYears.length - 1)
+          );
+          const clampedIndex = Math.max(
+            0,
+            Math.min(targetIndex, window.streamingAnimation.allYears.length - 1)
+          );
           const targetYear = window.streamingAnimation.allYears[clampedIndex];
-          
+
           // 年次をフォーマット
-          const formattedYear = window.streamingAnimation.formatYear(targetYear);
-          
+          const formattedYear =
+            window.streamingAnimation.formatYear(targetYear);
+
           // ツールチップを表示
           tooltip.textContent = `基準日: ${formattedYear}`;
-          tooltip.style.display = 'block';
+          tooltip.style.display = "block";
         }
 
         // スライダーツールチップ非表示
         function hideSliderTooltip() {
-          const tooltip = document.getElementById('slider-tooltip');
+          const tooltip = document.getElementById("slider-tooltip");
           if (tooltip) {
-            tooltip.style.display = 'none';
+            tooltip.style.display = "none";
           }
         }
 
@@ -2553,42 +2758,49 @@
         // 市区・年次変更検知とキャッシュクリア
         function checkAndClearCacheIfShikuChanged() {
           if (!window.streamingAnimation) {
-            console.log('StreamingAnimationManagerが存在しません');
+            console.log("StreamingAnimationManagerが存在しません");
             return;
           }
 
           // 現在選択されている市区を取得（日本語表記）
           const currentShiku = get_selected_shiku_japanese();
-          console.log('現在選択されている市区:', currentShiku);
+          console.log("現在選択されている市区:", currentShiku);
 
           // 現在選択されている年次を取得
           const currentNengetsu = get_selected_nengetsu();
-          console.log('現在選択されている年次:', currentNengetsu);
+          console.log("現在選択されている年次:", currentNengetsu);
 
           // キャッシュされている市区と年次を取得
           let cachedShiku = null;
           let cachedYear = null;
-          if (window.streamingAnimation.dataCache && Object.keys(window.streamingAnimation.dataCache).length > 0) {
-            const firstYear = Object.keys(window.streamingAnimation.dataCache)[0];
+          if (
+            window.streamingAnimation.dataCache &&
+            Object.keys(window.streamingAnimation.dataCache).length > 0
+          ) {
+            const firstYear = Object.keys(
+              window.streamingAnimation.dataCache
+            )[0];
             cachedShiku = window.streamingAnimation.dataCache[firstYear]?.shiku;
             cachedYear = firstYear;
-            console.log('キャッシュされている市区:', cachedShiku);
-            console.log('キャッシュされている年次:', cachedYear);
+            console.log("キャッシュされている市区:", cachedShiku);
+            console.log("キャッシュされている年次:", cachedYear);
           }
 
           // 年次の下2桁を取得する関数
           function getLastTwoDigits(nengetsu) {
-            if (!nengetsu || typeof nengetsu !== 'string') return '';
+            if (!nengetsu || typeof nengetsu !== "string") return "";
             return nengetsu.slice(-2);
           }
 
           // 判定条件
           let shouldClearCache = false;
-          let reason = '';
+          let reason = "";
 
           if (!cachedShiku) {
             // キャッシュが存在しない場合
-            console.log('キャッシュが存在しません（初回またはキャッシュクリア済み）');
+            console.log(
+              "キャッシュが存在しません（初回またはキャッシュクリア済み）"
+            );
             return;
           }
 
@@ -2601,14 +2813,14 @@
           else {
             const currentLastTwo = getLastTwoDigits(currentNengetsu);
             const cachedLastTwo = getLastTwoDigits(cachedYear);
-            
-            const currentIsCho = currentLastTwo === '09';
-            const cachedIsCho = cachedLastTwo === '09';
-            
+
+            const currentIsCho = currentLastTwo === "09";
+            const cachedIsCho = cachedLastTwo === "09";
+
             if (currentIsCho !== cachedIsCho) {
               shouldClearCache = true;
-              const currentType = currentIsCho ? '町丁別' : '市区';
-              const cachedType = cachedIsCho ? '町丁別' : '市区';
+              const currentType = currentIsCho ? "町丁別" : "市区";
+              const cachedType = cachedIsCho ? "町丁別" : "市区";
               reason = `ピラミッドタイプが変更されました: ${cachedType} → ${currentType} (${cachedYear} → ${currentNengetsu})`;
             }
           }
@@ -2617,7 +2829,7 @@
             console.log(reason);
             clearAnimationCache();
           } else {
-            console.log('市区・年次ともに変更されていません');
+            console.log("市区・年次ともに変更されていません");
           }
         }
 
@@ -2625,7 +2837,7 @@
         function clearAnimationCache() {
           if (!window.streamingAnimation) return;
 
-          console.log('アニメーションキャッシュをクリアします');
+          console.log("アニメーションキャッシュをクリアします");
 
           // キャッシュデータをクリア
           window.streamingAnimation.dataCache = {};
@@ -2633,7 +2845,7 @@
           window.streamingAnimation.currentYearIndex = 0;
           window.streamingAnimation.maxTotalPopulation = null;
           window.streamingAnimation.baseZoomScale = null;
-          
+
           // アニメーション状態は保持（市区変更時は新しいアニメーションを開始するため）
           // window.streamingAnimation.isAnimating = false; // 削除
 
@@ -2644,23 +2856,23 @@
           }
 
           // スライドバーの状態をリセット
-          const progressSlider = document.getElementById('animation-progress');
-          const progressDisplay = document.getElementById('progress-display');
+          const progressSlider = document.getElementById("animation-progress");
+          const progressDisplay = document.getElementById("progress-display");
           if (progressSlider) {
             progressSlider.value = 0;
           }
           if (progressDisplay) {
-            progressDisplay.textContent = '0%';
+            progressDisplay.textContent = "0%";
           }
 
-          console.log('アニメーションキャッシュのクリアが完了しました');
+          console.log("アニメーションキャッシュのクリアが完了しました");
         }
 
         // 動画ボタンのクリック処理
         function toggleAnimationPanel() {
           // 市区変更検知とキャッシュクリア
           checkAndClearCacheIfShikuChanged();
-          
+
           showAnimationControls();
         }
       </script>

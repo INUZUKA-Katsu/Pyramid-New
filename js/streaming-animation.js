@@ -545,7 +545,7 @@ class StreamingAnimationManager {
       const originalAjax = window.ajax;
       
       // 一時的にajax関数をオーバーライド
-      window.ajax = function(mode, nengetsu, i, unit_size) {
+      window.ajax = function(mode, nengetsu, i,) {
         if (nengetsu === year) {
           // 成功時のコールバック
           const originalOnReadyStateChange = arguments.callee;
@@ -567,7 +567,7 @@ class StreamingAnimationManager {
       };
       
       // 既存のchange_display関数を呼び出し
-      change_display("shiku_not_refresh_cholist", year, get_UnitSize());
+      change_display("shiku_not_refresh_cholist", year);
       
       // タイムアウト設定
       setTimeout(() => {
@@ -680,7 +680,6 @@ class StreamingAnimationManager {
   async startAnimation() {
     this.isAnimating = true;
     console.log(`🎬 アニメーション開始: 総年数=${this.allYears.length}, 現在年次インデックス=${this.currentYearIndex}`);
-    console.log(`🎬 固定unitSize使用: ${this.useFixedUnitSize}, unitSize: ${this.fixedUnitSize}`);
     console.log(`🎬 補間アニメーション使用: ${this.useInterpolation}`);
     console.warn(`🎬 startAnimation呼び出し: 総年数=${this.allYears.length}, 現在年次インデックス=${this.currentYearIndex}, 補間アニメーション=${this.useInterpolation}`);
     
