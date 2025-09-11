@@ -1283,6 +1283,14 @@
                       終了
                     </button>
                   </div>
+                  <!-- ツールチップアイコン -->
+                  <a
+                  href="#"
+                  class="info-icon-right"
+                  data-tooltip="\1. アニメーションの種類について<br>　タイプ１は紙芝居のように人口ピラミッドを年を追って切り替えて表示します。<br>　タイプ２は各歳の棒の長さが伸び縮みして年々の変化をおもしろく表示します。<br>\
+                                2. 進行状況スライダーバーについて<br>　[一時停止]してからスライダーバーを動かすことで、見返したい年次に戻ることができます。[再開]ボタンでその年次からのアニメーションを再開します。"
+                  ><img src="./image/tooltip-icon.png" class="small-icon"
+                  /></a>
                 </div>
               </div>
               <!-- #animation-controls ここまで -->
@@ -1405,7 +1413,8 @@
                       <a
                         href="#"
                         class="info-icon-right"
-                        data-tooltip="動画をクリックするとアニメーション設定パネルが表示されます。従来の動画機能と新しいストリーミングアニメーション機能を選択できます。"
+                        data-tooltip="\1. [動画]ボタンについて<br>　表示中の市区・地域の人口ピラミッドの変化(=年齢構成の移り変わり)をアニメーションのように見ることができます。<br>　クリックするとアニメーションのための操作ボタンなどが表示されます。<br>\
+                                      2. スライダーバーについて<br>　スライドバーを左右に動かすことによって素早くセレクトボックスの年次を変えることができます。"
                         ><img src="./image/tooltip-icon.png" class="small-icon"
                       /></a>
                     </div>
@@ -1544,7 +1553,8 @@
                   <a
                     href="#here"
                     class="info-icon-bottom"
-                    data-tooltip="地域の人口ピラミッドを表示するには、町丁名をチェックしてから[町丁別人口ピラミッド]をクリックしてください。複数選択が可能です。"
+                    data-tooltip="\1. 地域の人口ピラミッドを描く方法<br>　町丁名をチェックしてから[町丁別人口ピラミッド]ボタンをクリックしてください。<br>　隣接する複数の町丁を選択してその地域の人口ピラミッドを描くことができます。<br>\
+                                  2. 区全体の人口ピラミッドに戻るときは[区全体の人口ピラミッド]ボタンをクリックしてください。"
                     ><img src="./image/tooltip-icon.png" class="small-icon"
                   /></a>
                 </div>
@@ -1626,7 +1636,7 @@
                 <button onclick="toggleNumbers()">人数表示ON/OFF</button>
                 <button onclick="toggleGrid()">グリッド表示ON/OFF</button>
                 <button onclick="toggleAgeGroup()" id="age_group_toggle">
-                  年齢３区分を非表示
+                  年齢３区分別等表示ON/OFF
                 </button>
               </div>
             </div>
@@ -1667,7 +1677,10 @@
               <span
                 id="info_3kubun"
                 class="info-icon-3kubun"
-                data-tooltip="年齢3区分の中位の年齢を自由に変更することができます。例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を見ることができます。<br>ピラミッドと重なってしまうときは非表示にしてください。"
+                data-tooltip="\1. セレクトボックスで年齢3区分別の人口と構成比を切替えることができます。非表示にもできます。<br>\
+                             2. 中段の年齢区分「15〜64歳」の「15」と「64」の部分を別の年齢に変更することができます。<br>\
+                             　例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を見ることができます。<br>\
+                             3. ピラミッドと重なって見にくいときは左側の一番下のボタンで非表示にするか、ズームの縮小ボタンで適宜縮小してください。"
                 style="cursor: pointer"
                 ><img src="./image/tooltip-icon.png" class="small-icon"
               /></span>
@@ -1893,11 +1906,11 @@
           if (basicData.style.display === "none") {
             // 非表示の場合は表示に
             basicData.style.display = "block";
-            toggleButton.textContent = "年齢３区分を非表示";
+            toggleButton.textContent = "年齢３区分別等表示ON/OFF";
           } else {
             // 表示の場合は非表示に
             basicData.style.display = "none";
-            toggleButton.textContent = "年齢３区分を表示";
+            toggleButton.textContent = "年齢３区分別等表示ON/OFF";
           }
         }
 

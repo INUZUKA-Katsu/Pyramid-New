@@ -2189,16 +2189,16 @@ function screen_shot() {
   const canvas_height = 600 + 150;
 
   // html2canvas用の固定配置（ブラウザレンダリングとの差異を考慮）
-  const h2_left = 25;  // 左端から25px
+  const h2_left = 60;  // 左端から25px
   const h2_top = 45;   // 上端から35px
 
   // ピラミッドをキャンバス中央に配置（固定値で調整）
-  const pyramid_svg_left = 10;
-  const pyramid_svg_top = 150;  // h2の下に固定配置
+  const pyramid_svg_left = 0;
+  const pyramid_svg_top = 300;  // h2の下に固定配置
 
   // basic_dataをピラミッドの右下角に配置（固定値で調整）
   const basic_data_left = 700;  // 右寄せの固定位置
-  const basic_data_top = 570;   // 下寄せの固定位置
+  const basic_data_top = 540;   // 下寄せの固定位置
 
   // 対象要素を絶対位置に移動
   elm_h2.style.position = "absolute";
