@@ -54,6 +54,41 @@
         });
 
         function initializeTooltips() {
+          // ツールチップコンテンツの定義（複数行で自然に記述）
+          // placement: 
+          //   top, top-start, top-end
+          //   bottom, bottom-start, bottom-end
+          //   left, left-start, left-end
+          //   right, right-start, right-end
+          //   自動調整: auto, auto-start, auto-end
+          const tooltipContents = {
+            info_3kubun_tooltip: {
+              content: `
+                <p>1. セレクトボックスで年齢3区分別の人口と構成比を切替えることができます。非表示にもできます。</p>
+                <p>2. 中段の年齢区分「15〜64歳」の「15」と「64」の部分を別の年齢に変更することができます。<br>
+                　例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を見ることができます。</p>
+                <p>3. ピラミッドと重なって見にくいときは左側の一番下のボタンで非表示にするか、ズームの縮小ボタンで適宜縮小してください。</p>
+              `,
+              placement: "top-start",
+              maxWidth: 450,
+              interactive: false
+            },
+            info_animation_tooltip: { 
+              content: `
+                <p>1. アニメーションの種類について<br>
+                    　通常タイプは紙芝居のように人口ピラミッドを年を追って切り替えて表示します。<br>
+                    　伸び縮みタイプは各歳の棒の長さが伸び縮みして年々の変化をおもしろく表示します。</p>
+                <p>2. [開始]ボタンをクリックすると、アニメーションが開始されます。</p>
+                <p>3. 進行状況スライダーバーについて<br>
+                    　[一時停止]してからスライダーバーを動かすことで、見返したい年次に戻ることができます。<br>
+                    　[再開]ボタンでその年次からのアニメーションを再開します。</p>
+            `,
+              placement: "bottom-start",
+              maxWidth: 450,
+              interactive: false
+          },
+          };
+
           // スクリーンショットツールチップ（クリック表示）
           tippy("#screen_shot_tooltip", {
             content:
@@ -82,6 +117,10 @@
                 allowHTML: true,
                 arrow: true,
                 offset: [0, 10],
+                onShow(instance) {
+                  // HTMLタグが正しく表示されるように再設定
+                  instance.setContent(tooltipText);
+                }
               });
             }
           });
@@ -90,27 +129,75 @@
           $(
             ".info-icon-left, .info-icon-right, .info-icon-bottom, .info-icon-3kubun"
           ).each(function () {
-            const tooltipText = $(this).attr("data-tooltip");
-            if (tooltipText) {
-              const placement = $(this).hasClass("info-icon-bottom")
-                ? "top"
-                : $(this).hasClass("info-icon-right")
-                ? "left"
-                : "bottom";
-              tippy(this, {
-                content: tooltipText,
+            // data-tooltip-id属性がある場合は、定義されたコンテンツを使用
+            const tooltipId = $(this).attr("data-tooltip-id");
+            let tooltipConfig;
+            
+            if (tooltipId && tooltipContents[tooltipId]) {
+              const config = tooltipContents[tooltipId];
+              // 新しいオブジェクト構造か従来の文字列かを判定
+              if (typeof config === 'object' && config.content) {
+                tooltipConfig = config;
+              } else {
+                // 従来の文字列形式
+                tooltipConfig = { content: config };
+              }
+            } else {
+              // 従来のdata-tooltip属性を使用
+              const tooltipText = $(this).attr("data-tooltip");
+              tooltipConfig = { content: tooltipText };
+            }
+            
+            if (tooltipConfig && tooltipConfig.content) {
+              // 表示方向の決定（優先順位: オブジェクト設定 > data-placement > クラス名 > デフォルト）
+              let placement = tooltipConfig.placement || "bottom"; // デフォルト
+              
+              // data-placement属性をチェック（オブジェクト設定がない場合のみ）
+              if (!tooltipConfig.placement) {
+                const dataPlacement = $(this).attr("data-placement");
+                if (dataPlacement) {
+                  placement = dataPlacement;
+                } else {
+                  // クラス名で判定
+                  if ($(this).hasClass("tooltip-top")) {
+                    placement = "top";
+                  } else if ($(this).hasClass("tooltip-bottom")) {
+                    placement = "bottom";
+                  } else if ($(this).hasClass("tooltip-left")) {
+                    placement = "left";
+                  } else if ($(this).hasClass("tooltip-right")) {
+                    placement = "right";
+                  } else if ($(this).hasClass("info-icon-bottom")) {
+                    placement = "top";
+                  } else if ($(this).hasClass("info-icon-right")) {
+                    placement = "left";
+                  }
+                }
+              }
+              
+              // Tippy.jsの設定を構築
+              const tippyOptions = {
+                content: tooltipConfig.content,
                 placement: placement,
                 theme: "light",
                 trigger: "click",
-                interactive: false,
-                maxWidth: 300,
+                interactive: tooltipConfig.interactive || false,
+                maxWidth: tooltipConfig.maxWidth || 400,
                 allowHTML: true,
                 arrow: true,
                 offset: [0, 10],
-              });
+                onShow(instance) {
+                  // HTMLタグが正しく表示されるように再設定
+                  instance.setContent(tooltipConfig.content);
+                }
+              };
+              
+              tippy(this, tippyOptions);
             }
           });
+
         }
+
         function device(pc, mobile) {
           if (w > 1800) {
             return direction(pc);
@@ -1346,10 +1433,7 @@
                   <a
                     href="#"
                     class="info-icon-right"
-                    data-tooltip="\1. アニメーションの種類について<br>　通常タイプは紙芝居のように人口ピラミッドを年を追って切り替えて表示します。<br>　伸び縮みタイプは各歳の棒の長さが伸び縮みして年々の変化をおもしろく表示します。<br>\
-                                     2. [開始]ボタンをクリックすると、アニメーションが開始されます。<br>\
-                                     3. 進行状況スライダーバーについて<br>　[一時停止]してからスライダーバーを動かすことで、見返したい年次に戻ることができます。[再開]ボタンでその年次からのアニメーションを再開します。\
-                                    "
+                    data-tooltip-id="info_animation_tooltip"
                     ><img src="./image/tooltip-icon.png" class="small-icon"
                     /></a>
                 </div>
@@ -1361,7 +1445,16 @@
                 <a href="#cho"> 地域別人口ピラミッドのための町丁名の指定 </a>
                 <span
                   class="info-icon-right"
-                  data-tooltip="区のピラミッドを表示するとグラフの下部にその区内の町丁名のチェックボックスが表示されます。町丁名を指定して[町丁別人口ピラミッド]ボタンをクリックすると指定した地域のグラフを表示します。町丁名は複数の指定が可能で、複数の町丁からなる任意の地域の人口ピラミッドを表示することができます。"
+                  data-tooltip="\1. 町丁選択パネルの表示<br>\
+                                 　左のリンクをクリックすると人口ピラミッドの下にある町丁選択パネルをスクロール表示します。<br><br>\
+                                2. 地域の人口ピラミッドの表示方法<br>\
+                                (1) 町丁選択パネルで、人口ピラミッドを見たいと思う地域に含まれる町丁のチェックボックスをチェックしてください。<br>\
+                                (2) 町丁のチェックを終えたら、[町丁別人口ピラミッド]ボタンをクリックしてください。<br>\
+                                (3) 指定した町丁を合わせた地域の人口ピラミッドが表示されます。<br>\
+                                (4) 人口ピラミッドの上の年月セレクトボックスで別の年次を選択すると、同じ地域の別に年の人口ピラミッドを見ることができます。<br><br>\
+                                3. 区や市のピラミッドへの戻り方<br>\
+                                　町丁選択パネル上部にある[市区全体の人口ピラミッド]ボタンをクリックすると表示中の地域を含む区全体の人口ピラミッドを表示します。<br>\
+                                　人口ピラミッド上部の市区選択セレクトボックスで横浜市や他の区を選択しても、市または区の人口ピラミッドに戻ることができます。"
                   style="cursor: pointer"
                 >
                   <img src="./image/tooltip-icon.png" class="small-icon"
@@ -1474,7 +1567,7 @@
                       <a
                         href="#"
                         class="info-icon-right"
-                        data-tooltip="\1. [動画]ボタンについて<br>　表示中の市区・地域の人口ピラミッドの変化(=年齢構成の移り変わり)をアニメーションのように見ることができます。<br>　クリックするとアニメーションのための操作ボタンなどが表示されます。<br>\
+                        data-tooltip="\1. [動画]ボタンについて<br>　表示中の市区・地域の人口ピラミッドの変化(=年齢構成の移り変わり)をアニメーションのように見ることができます。<br>　クリックするとアニメーションのための操作ボタンなどが表示されます。<br><br>\
                                       2. スライダーバーについて<br>　スライドバーを左右に動かすことによって素早くセレクトボックスの年次を変えることができます。"
                         ><img src="./image/tooltip-icon.png" class="small-icon"
                       /></a>
@@ -1738,10 +1831,7 @@
               <span
                 id="info_3kubun"
                 class="info-icon-3kubun"
-                data-tooltip="\1. セレクトボックスで年齢3区分別の人口と構成比を切替えることができます。非表示にもできます。<br>\
-                             2. 中段の年齢区分「15〜64歳」の「15」と「64」の部分を別の年齢に変更することができます。<br>\
-                             　例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を見ることができます。<br>\
-                             3. ピラミッドと重なって見にくいときは左側の一番下のボタンで非表示にするか、ズームの縮小ボタンで適宜縮小してください。"
+                data-tooltip-id="info_3kubun_tooltip"
                 style="cursor: pointer"
                 ><img src="./image/tooltip-icon.png" class="small-icon"
               /></span>
