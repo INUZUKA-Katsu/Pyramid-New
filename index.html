@@ -1141,52 +1141,110 @@
             <!-- 上部コントロール -->
             <div id="top-controls" data-html2canvas-ignore="true">
               <!-- アニメーション用コントロール（通常は非表示） -->
-              <div id="animation-controls">
+              <div id="animation-controls" 
+                   style="
+                      width: 800px; 
+                      margin: 0 auto;
+                      padding-left:100px;"
+                   >
+                <!-- 上段: アニメーションの種類ブロック -->
                 <div
+                  id="animation-type-section"
                   style="
                     display: flex;
                     align-items: center;
-                    justify-content: center;
+                    justify-content: flex-start;
+                    gap: 30px;
+                    margin-bottom: 10px;
+                    padding: 5px 5px 5px 0;
+                  "
+                >
+                  <span style="font-weight: bold; min-width: 2em; text-align: center">種類</span>
+                  
+                  <!-- 左側のラジオボタングループ -->
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 15px;
+                      padding: 5px 10px;
+                      border: 1px solid #ced4da;
+                      border-radius: 4px;
+                    "
+                  >
+                    <label style="margin-right: 15px">
+                      <input
+                        type="radio"
+                        name="animation-type-inline"
+                        value="direct"
+                        checked
+                      />
+                      <span>通常タイプ</span>
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="animation-type-inline"
+                        value="interpolation"
+                      />
+                      <span>伸び縮みタイプ</span>
+                    </label>
+                  </div>
+
+                  <!-- 右側のラジオボタングループ（新設） -->
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 15px;
+                      padding: 5px 10px;
+                      border: 1px solid #ced4da;
+                      border-radius: 4px;
+                    "
+                  >
+                    <label style="margin-right: 15px">
+                      <input
+                        type="radio"
+                        name="animation-mode"
+                        value="age-composition"
+                        checked
+                      />
+                      <span>年齢構成</span>
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="animation-mode"
+                        value="age-composition-population"
+                      />
+                      <span>年齢構成 + 人口増減</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 下段: スライドバー・ボタンブロック -->
+                <div
+                  style="
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: flex-start;
                     gap: 20px;
                   "
                 >
-                  <!-- 左側: アニメーション設定ブロック -->
+                  <!-- 左側: スライドバーブロック（上下2段） -->
                   <div
                     id="animation-settings-block"
                     style="
                       display: flex;
                       flex-direction: column;
-                      gap: 0;
-                      min-width: 200px;
+                      gap: 8px;
+                      min-width: 300px;
+                      align-items: flex-start;
                     "
                   >
-                    <!-- アニメーションタイプ選択 -->
-                    <div id="animation-type-controls">
-                      <span style="margin-right: 10px; font-weight: bold"
-                        >アニメーション</span
-                      >
-                      <label style="margin-right: 10px">
-                        <input
-                          type="radio"
-                          name="animation-type-inline"
-                          value="direct"
-                          checked
-                        />
-                        <span>タイプ１</span>
-                      </label>
-                      <label>
-                        <input
-                          type="radio"
-                          name="animation-type-inline"
-                          value="interpolation"
-                        />
-                        <span>タイプ２</span>
-                      </label>
-                    </div>
-
-                    <!-- 速度調節 -->
+                    <!-- 上段: 速度調節 -->
                     <div style="display: flex; align-items: center; gap: 10px">
-                      <span style="font-weight: bold">速度:</span>
+                      <span style="font-weight: bold; min-width: 2em; text-align: center">速度:</span>
                       <span>ゆっくり</span>
                       <input
                         type="range"
@@ -1194,12 +1252,12 @@
                         min="50"
                         max="500"
                         value="200"
-                        style="width: 100px"
+                        style="width: 120px"
                       />
                       <span>早く</span>
                     </div>
 
-                    <!-- 進捗スライダー -->
+                    <!-- 下段: 進捗スライダー -->
                     <div
                       id="animation-progress-controls"
                       style="
@@ -1209,7 +1267,7 @@
                         position: relative;
                       "
                     >
-                      <span style="font-weight: bold">進行状況:</span>
+                      <span style="font-weight: bold; min-width: 2em; text-align: center">進行状況:</span>
                       <input
                         type="range"
                         id="animation-progress"
@@ -1243,7 +1301,7 @@
                     </div>
                   </div>
 
-                  <!-- 右側: ボタン -->
+                  <!-- 右側: ボタンブロック -->
                   <div
                     style="
                       display: flex;
@@ -1283,14 +1341,17 @@
                       終了
                     </button>
                   </div>
+                  
                   <!-- ツールチップアイコン -->
                   <a
-                  href="#"
-                  class="info-icon-right"
-                  data-tooltip="\1. アニメーションの種類について<br>　タイプ１は紙芝居のように人口ピラミッドを年を追って切り替えて表示します。<br>　タイプ２は各歳の棒の長さが伸び縮みして年々の変化をおもしろく表示します。<br>\
-                                2. 進行状況スライダーバーについて<br>　[一時停止]してからスライダーバーを動かすことで、見返したい年次に戻ることができます。[再開]ボタンでその年次からのアニメーションを再開します。"
-                  ><img src="./image/tooltip-icon.png" class="small-icon"
-                  /></a>
+                    href="#"
+                    class="info-icon-right"
+                    data-tooltip="\1. アニメーションの種類について<br>　通常タイプは紙芝居のように人口ピラミッドを年を追って切り替えて表示します。<br>　伸び縮みタイプは各歳の棒の長さが伸び縮みして年々の変化をおもしろく表示します。<br>\
+                                     2. [開始]ボタンをクリックすると、アニメーションが開始されます。<br>\
+                                     3. 進行状況スライダーバーについて<br>　[一時停止]してからスライダーバーを動かすことで、見返したい年次に戻ることができます。[再開]ボタンでその年次からのアニメーションを再開します。\
+                                    "
+                    ><img src="./image/tooltip-icon.png" class="small-icon"
+                    /></a>
                 </div>
               </div>
               <!-- #animation-controls ここまで -->
@@ -2307,18 +2368,47 @@
 
         // アニメーションコントロールの表示切り替え
         function showAnimationControls() {
-          document.getElementById("link").style.display = "none";
-          document.getElementById("select-controls").style.display = "none";
-          document.getElementById("animation-controls").style.display = "block";
+          const linkElement = document.getElementById("link");
+          const selectControlsElement = document.getElementById("select-controls");
+          const animationControlsElement = document.getElementById("animation-controls");
+          const topControlsElement = document.getElementById("top-controls");
+          
+          // 要素を非表示にするが、レイアウト上の高さは保持
+          // hiddenでは一瞬の間が空くため、opacity=0で即時に非表示にする
+          selectControlsElement.style.opacity = "0"; 
+          linkElement.style.opacity = "0";
+          selectControlsElement.style.visibility = "hidden";
+          linkElement.style.visibility = "hidden";
+          
+          // アニメーションコントロールの高さを0にする
+          animationControlsElement.style.height = "0";
 
+          // アニメーションコントロールを表示
+          animationControlsElement.style.display = "block";
+          
           // 進捗スライダーを初期化
           setupAnimationProgressSlider();
         }
 
         function hideAnimationControls() {
-          document.getElementById("link").style.display = "block";
-          document.getElementById("select-controls").style.display = "block";
-          document.getElementById("animation-controls").style.display = "none";
+          const linkElement = document.getElementById("link");
+          const selectControlsElement = document.getElementById("select-controls");
+          const animationControlsElement = document.getElementById("animation-controls");
+          const topControlsElement = document.getElementById("top-controls");
+          const shikuSelectControl = document.getElementById("shiku");
+          
+          // アニメーションコントロールの高さを元に戻す
+          animationControlsElement.style.height = "";
+          
+          // 元の状態に戻す
+          if (shikuSelectControl.value !="age"){
+            linkElement.style.visibility = "visible";
+          }
+          selectControlsElement.style.visibility = "visible";
+          linkElement.style.opacity = "1";
+          selectControlsElement.style.opacity = "1";
+          
+          animationControlsElement.style.display = "none";
         }
 
         // アニメーション開始
@@ -2343,15 +2433,13 @@
             animationType
           );
 
-          // 総人口変化反映の選択ダイアログを表示
-          const useFixedUnitSize = await showPopulationSizeDialog();
-          console.log("ユーザー選択: 総人口変化反映 =", useFixedUnitSize);
-
-          // キャンセルされた場合はアニメーションを開始しない
-          if (useFixedUnitSize === null) {
-            console.log("アニメーション開始がキャンセルされました");
-            return;
-          }
+          // 新設のラジオボタンの状態を読み取って面積モードを決定
+          const animationMode = document.querySelector(
+            'input[name="animation-mode"]:checked'
+          ).value;
+          const useVariableAreaMode = animationMode === "age-composition-population";
+          console.warn("ラジオボタン選択: アニメーションモード =", animationMode);
+          console.warn("可変面積モード =", useVariableAreaMode);
 
           // アニメーション設定を更新
           if (window.streamingAnimation) {
@@ -2364,31 +2452,31 @@
             window.streamingAnimation.useInterpolation =
               animationType === "interpolation";
             window.streamingAnimation.interpolationDuration = 1000;
-            window.streamingAnimation.useFixedUnitSize = useFixedUnitSize;
+            window.streamingAnimation.useVariableAreaMode = useVariableAreaMode;
 
             // デバッグ: 設定値を確認
-            console.log("アニメーション設定更新:");
-            console.log("  - animationType:", animationType);
-            console.log("  - sliderValue:", sliderValue);
-            console.log("  - animationSpeed:", currentSpeed);
-            console.log(
+            console.warn("アニメーション設定更新:");
+            console.warn("  - animationType:", animationType);
+            console.warn("  - sliderValue:", sliderValue);
+            console.warn("  - animationSpeed:", currentSpeed);
+            console.warn(
               "  - useInterpolation:",
               window.streamingAnimation.useInterpolation
             );
-            console.log(
-              "  - useFixedUnitSize:",
-              window.streamingAnimation.useFixedUnitSize
+            console.warn(
+              "  - useVariableAreaMode:",
+              window.streamingAnimation.useVariableAreaMode
             );
           }
 
           // アニメーション開始
-          if (useFixedUnitSize) {
-            // 総人口変化反映モード: 事前に全データを取得してunitSizeを計算
-            await startAnimationWithFixedUnitSize();
+          if (useVariableAreaMode) {
+            // 可変面積モード: 事前に全データを取得し最大総人口を計算。それを基準として各年のズームスケールを算出する。
+            await startAnimationWithVariableAreaMode();
           } else {
-            // 通常モード（補間・非補間共通）
-            // zoomScaleモードを無効化
-            window.streamingAnimation.useZoomScaleMode = false;
+            // 面積固定モード（補間・非補間共通）
+            // 面積固定モードを有効化
+            window.streamingAnimation.useVariableAreaMode = false;
             if (window.streamingAnimation) {
               await window.streamingAnimation.startStreamingAnimation();
             } else {
@@ -2402,101 +2490,100 @@
         }
 
         // 総人口変化反映の選択ダイアログを表示
-        function showPopulationSizeDialog() {
-          return new Promise((resolve) => {
-            const dialog = document.createElement("div");
-            dialog.style.cssText = `
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              background-color: rgba(0, 0, 0, 0.5);
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              z-index: 10000;
-            `;
+        //function showPopulationSizeDialog() {
+        //  return new Promise((resolve) => {
+        //    const dialog = document.createElement("div");
+        //    dialog.style.cssText = `
+        //      position: fixed;
+        //      top: 0;
+        //      left: 0;
+        //      width: 100%;
+        //      height: 100%;
+        //      background-color: rgba(0, 0, 0, 0.5);
+        //      display: flex;
+        //      justify-content: center;
+        //      align-items: center;
+        //      z-index: 10000;
+        //    `;
 
-            const content = document.createElement("div");
-            content.style.cssText = `
-              background: white;
-              padding: 30px;
-              border-radius: 10px;
-              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-              max-width: 500px;
-              text-align: center;
-            `;
+        //    const content = document.createElement("div");
+        //    content.style.cssText = `
+        //      background: white;
+        //      padding: 30px;
+        //      border-radius: 10px;
+        //      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        //      max-width: 500px;
+        //      text-align: center;
+        //    `;
 
-            content.innerHTML = `
-              <h3 style="margin-top: 0; color: #333;">アニメーション設定</h3>
-              <p style="margin: 20px 0; color: #666;">
-                総人口の増減によってグラフの大きさを変えますか？
-              </p>
-              <div style="margin: 30px 0;">
-                <label style="display: block; margin: 15px 0; cursor: pointer;">
-                  <input type="radio" name="population-size" value="true" checked style="margin-right: 10px;">
-                  <strong>グラフの大きさを変化させる</strong><br>
-                  <small style="color: #888;">人口の増減に比例してピラミッドの大きさ(面積)が変化します。<br>年齢構成の変化と人口の増減の両方を見ることができます。</small>
-                </label>
-                <label style="display: block; margin: 15px 0; cursor: pointer;">
-                  <input type="radio" name="population-size" value="false" style="margin-right: 10px;">
-                  <strong>グラフの大きさを一定にする</strong><br>
-                  <small style="color: #888;">ピラミッドの大きさ(面積)を固定します。<br>年齢構成の変化だけを集中して見ることができます。</small>
-                </label>
-              </div>
-              <div>
-                <button id="dialog-ok" style="
-                  background: #4a90e2;
-                  color: white;
-                  border: none;
-                  padding: 10px 20px;
-                  border-radius: 5px;
-                  cursor: pointer;
-                  margin-right: 10px;
-                ">OK</button>
-                <button id="dialog-cancel" style="
-                  background: #ccc;
-                  color: #333;
-                  border: none;
-                  padding: 10px 20px;
-                  border-radius: 5px;
-                  cursor: pointer;
-                ">キャンセル</button>
-              </div>
-            `;
+        //    content.innerHTML = `
+        //      <h3 style="margin-top: 0; color: #333;">アニメーション設定</h3>
+        //      <p style="margin: 20px 0; color: #666;">
+        //        総人口の増減によってグラフの大きさを変えますか？
+        //      </p>
+        //      <div style="margin: 30px 0;">
+        //        <label style="display: block; margin: 15px 0; cursor: pointer;">
+        //          <input type="radio" name="population-size" value="true" checked style="margin-right: 10px;">
+        //          <strong>グラフの大きさを変化させる</strong><br>
+        //          <small style="color: #888;">人口の増減に比例してピラミッドの大きさ(面積)が変化します。<br>年齢構成の変化と人口の増減の両方を見ることができます。</small>
+        //        </label>
+        //        <label style="display: block; margin: 15px 0; cursor: pointer;">
+        //          <input type="radio" name="population-size" value="false" style="margin-right: 10px;">
+        //          <strong>グラフの大きさを一定にする</strong><br>
+        //          <small style="color: #888;">ピラミッドの大きさ(面積)を固定します。<br>年齢構成の変化だけを集中して見ることができます。</small>
+        //        </label>
+        //      </div>
+        //      <div>
+        //        <button id="dialog-ok" style="
+        //          background: #4a90e2;
+        //          color: white;
+        //          border: none;
+        //          padding: 10px 20px;
+        //          border-radius: 5px;
+        //          cursor: pointer;
+        //          margin-right: 10px;
+        //        ">OK</button>
+        //        <button id="dialog-cancel" style="
+        //          background: #ccc;
+        //          color: #333;
+        //          border: none;
+        //          padding: 10px 20px;
+        //          border-radius: 5px;
+        //          cursor: pointer;
+        //        ">キャンセル</button>
+        //      </div>
+        //    `;
 
-            dialog.appendChild(content);
-            document.body.appendChild(dialog);
+        //    dialog.appendChild(content);
+        //    document.body.appendChild(dialog);
 
-            // イベントリスナー
-            document.getElementById("dialog-ok").onclick = () => {
-              const selected =
-                document.querySelector('input[name="population-size"]:checked')
-                  .value === "true";
-              document.body.removeChild(dialog);
-              resolve(selected);
-            };
+        //    // イベントリスナー
+        //    document.getElementById("dialog-ok").onclick = () => {
+        //      const selected =
+        //        document.querySelector('input[name="population-size"]:checked')
+        //          .value === "true";
+        //      document.body.removeChild(dialog);
+        //      resolve(selected);
+        //    };
 
-            document.getElementById("dialog-cancel").onclick = () => {
-              document.body.removeChild(dialog);
-              resolve(null); // キャンセル時はnullを返す
-            };
-          });
-        }
+        //    document.getElementById("dialog-cancel").onclick = () => {
+        //      document.body.removeChild(dialog);
+        //      resolve(null); // キャンセル時はnullを返す
+        //    };
+        //  });
+        //}
 
-        // 人口変化反映アニメーション開始（新しいzoomScaleモード）
-        async function startAnimationWithFixedUnitSize() {
+        // 可変面積モードアニメーション開始（新しいzoomScaleモード）
+        async function startAnimationWithVariableAreaMode() {
           try {
             // データ取得中の表示
             showDataLoadingMessage();
 
             const shiku = get_selected_shiku();
-            console.log("人口変化反映アニメーション開始: shiku =", shiku);
+            console.log("可変面積モードアニメーション開始: shiku =", shiku);
 
-            // 新しいzoomScaleモードを有効化
-            window.streamingAnimation.useZoomScaleMode = true;
-            window.streamingAnimation.useFixedUnitSize = false; // 旧方式を無効化
+            // 可変面積モードを有効化
+            window.streamingAnimation.useVariableAreaMode = true;
 
             // データ取得完了の表示を非表示
             hideDataLoadingMessage();
@@ -2517,8 +2604,8 @@
             alert(
               "データの取得に失敗しました。通常モードでアニメーションを開始します。"
             );
-            // エラー時はzoomScaleモードを無効にして通常モードで開始
-            window.streamingAnimation.useZoomScaleMode = false;
+            // エラー時は面積固定モードで開始
+            window.streamingAnimation.useVariableAreaMode = false;
             if (window.streamingAnimation) {
               await window.streamingAnimation.startStreamingAnimation();
             } else {

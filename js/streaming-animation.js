@@ -15,7 +15,7 @@ class StreamingAnimationManager {
     this.useInterpolation = false; // 補間アニメーションを使用するか
     this.interpolationDuration = 1000; // 補間アニメーション時間（ms）
     this.initialShowNumbers = null; // アニメーション開始前の人数表示状態
-    this.useZoomScaleMode = false; // zoomScaleモードを使用するか
+    this.useVariableAreaMode = false; // 可変面積モードを使用するか
     this.baseZoomScale = null; // 基準スケール
     this.maxTotalPopulation = null; // 最大総人口
   }
@@ -182,16 +182,16 @@ class StreamingAnimationManager {
     
     console.log(`総年数: ${this.allYears.length}, バッチ数: ${this.totalBatches}`);
     console.log('allYears:', this.allYears);
+    console.log('useVariableAreaMode:', this.useVariableAreaMode);
     
     if (this.allYears.length === 0) {
       console.error('年次リストが空です。アニメーションを開始できません。');
       alert('年次データが見つかりません。ページを再読み込みしてください。');
       return;
     }
-    
-    // 新しいzoomScaleモードの場合は、全年次データを事前取得して最大総人口を算出
-    if (this.useZoomScaleMode) {
-      console.log('新しいzoomScaleモード: 全年次データを事前取得');
+    // 可変面積モードの場合は、全年次データを事前取得して最大総人口を算出
+    if (this.useVariableAreaMode) {
+      console.log('可変面積モード: 全年次データを事前取得');
       
       // データ取得中の表示
       if (typeof showDataLoadingMessage === 'function') {
@@ -776,8 +776,8 @@ class StreamingAnimationManager {
       // 年次表示を更新（描画前に表示）
       this.updateYearDisplay(year);
       
-      // 新しいzoomScaleモードを使用する場合の処理（分岐前に実行）
-      if (this.useZoomScaleMode && window.pyramidRenderer && data && data.kakusai_betsu) {
+      // 可変面積モードを使用する場合の処理（分岐前に実行）
+      if (this.useVariableAreaMode && window.pyramidRenderer && data && data.kakusai_betsu) {
         // 当年の総人口を取得
         const currentYearTotalPopulation = parseInt(data.kakusai_betsu[0][1].replace(/,/g, ''));
         
@@ -1109,8 +1109,8 @@ class StreamingAnimationManager {
     const currentYear = this.getCurrentDisplayYear();
     this.syncSelectBoxToCurrentYear(currentYear);
     
-    // 新しいzoomScaleモードの場合は、基準スケールを復元
-    if (this.useZoomScaleMode && this.baseZoomScale && window.pyramidRenderer) {
+    // 可変面積モードの場合は、基準スケールを復元
+    if (this.useVariableAreaMode && this.baseZoomScale && window.pyramidRenderer) {
       window.pyramidRenderer.options.zoomScale = this.baseZoomScale;
       window.pyramidRenderer.resizeByScale(this.baseZoomScale);
       console.log('アニメーション停止: 基準スケールを復元:', this.baseZoomScale);
@@ -1160,8 +1160,8 @@ class StreamingAnimationManager {
       // 現在の年次表示を更新
       this.updateYearDisplay(targetYear);
       
-      // 新しいzoomScaleモードを使用する場合の処理（描画前に実行）
-      if (this.useZoomScaleMode && window.pyramidRenderer && this.dataCache && this.dataCache[targetYear] && this.dataCache[targetYear].kakusai_betsu) {
+      // 可変面積モードを使用する場合の処理（描画前に実行）
+      if (this.useVariableAreaMode && window.pyramidRenderer && this.dataCache && this.dataCache[targetYear] && this.dataCache[targetYear].kakusai_betsu) {
         // 当年の総人口を取得
         const currentYearTotalPopulation = parseInt(this.dataCache[targetYear].kakusai_betsu[0][1].replace(/,/g, ''));
         
