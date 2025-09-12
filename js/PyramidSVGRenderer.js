@@ -37,7 +37,7 @@ class PyramidSVGRenderer {
     //console.log('this.data', this.data);
     this.options.unitSize = this.calculateUnitSize(this.data);
     console.log('init this.options.unitSize', this.options.unitSize);
-    this.options.barHeight = this.options.height * 0.97 / 105; // 4/105は上余白
+    this.options.barHeight = this.options.height * 0.95 / 105; // 目盛ラベル用のスペースを確保
     this.init();
     this.render();
   }
@@ -111,6 +111,9 @@ class PyramidSVGRenderer {
     // 特別な年齢の横線とラベルを描画
     this.drawSpecialAgeLines();
     
+    // X軸と目盛を描画
+    this.drawXAxis();
+    
     // 男女ラベルを描画
     this.drawGenderLabels();
   }
@@ -132,7 +135,7 @@ class PyramidSVGRenderer {
     
     // 動的座標を使用
     const viewBoxWidth = this.options.width;
-    const viewBoxHeight = this.options.height * 0.97;
+    const viewBoxHeight = this.options.height * 0.95;
     
     // 男女の各棒の起点に縦線を引く
     const leftStartLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -189,7 +192,7 @@ class PyramidSVGRenderer {
     
     // 動的座標を使用
     const viewBoxWidth = this.options.width;
-    const viewBoxHeight = this.options.height * 0.97;
+    const viewBoxHeight = this.options.height * 0.95;
     
     // 5歳ごとに年齢ラベルを表示（0歳から100歳まで）
     for (let age = 0; age <= 100; age += 5) {
@@ -215,7 +218,7 @@ class PyramidSVGRenderer {
     
     // 動的座標を使用
     const viewBoxWidth = this.options.width;
-    const viewBoxHeight = this.options.height * 0.97;
+    const viewBoxHeight = this.options.height * 0.95;
     
     // 15歳、65歳、75歳の特別な横線とラベル
     const specialAges = [15, 65, 75];
@@ -253,10 +256,120 @@ class PyramidSVGRenderer {
     this.staticGroup.appendChild(specialLineGroup);
   }
 
+  drawXAxis() {
+    const xAxisGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    xAxisGroup.setAttribute('class', 'x-axis');
+    
+    // 動的座標を使用
+    const viewBoxWidth = this.options.width;
+    const viewBoxHeight = this.options.height * 0.95;
+    
+    // X軸の位置（0歳のラインの下）
+    const xAxisY = viewBoxHeight;
+    
+    // X軸の範囲（15歳、65歳、75歳のラインと同じ長さ）
+    const x1 = (viewBoxWidth / 2) - (this.options.unitSize * this.getMaxPopulation(this.data) + 100);
+    const x2 = (viewBoxWidth / 2) + (this.options.unitSize * this.getMaxPopulation(this.data) + 100);
+    
+    // X軸を描画（15歳、65歳、75歳のラインと同じ太さ・長さ）
+    const xAxisLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxisLine.setAttribute('x1', x1);
+    xAxisLine.setAttribute('y1', xAxisY);
+    xAxisLine.setAttribute('x2', x2);
+    xAxisLine.setAttribute('y2', xAxisY);
+    xAxisLine.setAttribute('stroke', '#adb5bd');
+    xAxisLine.setAttribute('stroke-width', '1');
+    xAxisGroup.appendChild(xAxisLine);
+    
+    // 目盛と目盛ラベルを描画
+    this.drawTicksAndLabels(xAxisGroup, x1, x2, xAxisY, viewBoxWidth);
+    
+    this.staticGroup.appendChild(xAxisGroup);
+  }
+
+  drawTicksAndLabels(xAxisGroup, x1, x2, xAxisY, viewBoxWidth) {
+    // 最大人口を取得
+    const maxPopulation = this.getMaxPopulation(this.data);
+    
+    // chooseTickSize関数で目盛サイズを決定
+    const tickInfo = this.chooseTickSize(maxPopulation);
+    
+    // 目盛の間隔（ピクセル）
+    const tickPixelInterval = tickInfo.tick * this.options.unitSize;
+    
+    // 中央線の位置
+    const centerX = viewBoxWidth / 2;
+    
+    // 目盛の起点（中央線から10px離す）
+    const femaleStartX = centerX + 10; // 女性側の起点
+    const maleStartX = centerX - 10;   // 男性側の起点
+    
+    // 目盛を描画（男性側と女性側の両方）
+    tickInfo.ticks.forEach((tickValue, index) => {
+      // 女性側の目盛位置を計算（起点から右側）
+      const femaleTickX = femaleStartX + (index * tickPixelInterval);
+      
+      // 男性側の目盛位置を計算（起点から左側）
+      const maleTickX = maleStartX - (index * tickPixelInterval);
+      
+      // 女性側の目盛を描画
+      if (femaleTickX >= femaleStartX && femaleTickX <= x2) {
+        // 目盛線を描画（X軸から上向きの短い線）
+        const tickLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        tickLine.setAttribute('x1', femaleTickX);
+        tickLine.setAttribute('y1', xAxisY);
+        tickLine.setAttribute('x2', femaleTickX);
+        tickLine.setAttribute('y2', xAxisY - 5); // 5px上向き
+        tickLine.setAttribute('stroke', '#adb5bd');
+        tickLine.setAttribute('stroke-width', '1');
+        xAxisGroup.appendChild(tickLine);
+        
+        // 目盛ラベルを描画（X軸の下に表示）
+        if (tickInfo.labels.includes(tickValue)) {
+          const tickLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tickLabel.textContent = tickValue.toLocaleString();
+          tickLabel.setAttribute('x', femaleTickX);
+          tickLabel.setAttribute('y', xAxisY + 15); // X軸の下15px
+          tickLabel.setAttribute('text-anchor', 'middle');
+          tickLabel.setAttribute('dominant-baseline', 'top');
+          tickLabel.setAttribute('font-size', '10');
+          tickLabel.setAttribute('fill', '#6c757d');
+          xAxisGroup.appendChild(tickLabel);
+        }
+      }
+      
+      // 男性側の目盛を描画（0以外の場合のみ）
+      if (index > 0 && maleTickX >= x1 && maleTickX <= maleStartX) {
+        // 目盛線を描画（X軸から上向きの短い線）
+        const tickLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        tickLine.setAttribute('x1', maleTickX);
+        tickLine.setAttribute('y1', xAxisY);
+        tickLine.setAttribute('x2', maleTickX);
+        tickLine.setAttribute('y2', xAxisY - 5); // 5px上向き
+        tickLine.setAttribute('stroke', '#adb5bd');
+        tickLine.setAttribute('stroke-width', '1');
+        xAxisGroup.appendChild(tickLine);
+        
+        // 目盛ラベルを描画（X軸の下に表示）
+        if (tickInfo.labels.includes(tickValue)) {
+          const tickLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tickLabel.textContent = tickValue.toLocaleString();
+          tickLabel.setAttribute('x', maleTickX);
+          tickLabel.setAttribute('y', xAxisY + 15); // X軸の下15px
+          tickLabel.setAttribute('text-anchor', 'middle');
+          tickLabel.setAttribute('dominant-baseline', 'top');
+          tickLabel.setAttribute('font-size', '10');
+          tickLabel.setAttribute('fill', '#6c757d');
+          xAxisGroup.appendChild(tickLabel);
+        }
+      }
+    });
+  }
+
   drawGenderLabels() {
     let cx = this.options.width / 2;
     let w = this.options.unitSize * this.getMaxPopulation(this.data);
-    let h = this.options.height * 0.97;
+    let h = this.options.height * 0.95;
     let mx = cx - w * 0.9;
     let fx = cx + w * 0.9;
     let y = h - this.options.barHeight * 96 ;
@@ -293,7 +406,7 @@ class PyramidSVGRenderer {
   // ユニットサイズの初期値を求める
   calculateUnitSize(data) {
     const totalPopulation = this.getTotalPopulation(data);
-    const pyramidHeight = this.options.height * 0.97;
+    const pyramidHeight = this.options.height * 0.95;
     const whRatio = 0.5;  //人口ピラミッドが完全な長方形だった場合の縦横比
 
     let pyramidWidth = pyramidHeight*whRatio;
@@ -353,7 +466,7 @@ class PyramidSVGRenderer {
 
     // 現在のviewBoxのサイズの棒の使用（動的に計算）
     const viewBoxWidth = this.options.width;
-    const viewBoxHeight = this.options.height * 0.97;
+    const viewBoxHeight = this.options.height * 0.95;
     
     // 年齢の位置を計算（0歳が下、100歳が上）
         const agePosition = viewBoxHeight - (age * barHeight) - barHeight;
@@ -623,7 +736,7 @@ class PyramidSVGRenderer {
       console.log('unitSizeScale', unitSizeScale);
     }
     if (options.barHeight !== null && options.barHeight !== undefined) {
-      let originalBarHeight = this.options.height * 0.97 / 105 ;
+      let originalBarHeight = this.options.height * 0.95 / 105 ;
       let barHeightScale = options.barHeight / originalBarHeight;
       this.options.barHeightScale = barHeightScale;
 
@@ -635,4 +748,70 @@ class PyramidSVGRenderer {
     console.log('this.options.unitSizeScale', this.options.unitSizeScale);
     console.log('this.options.barHeightScale', this.options.barHeightScale);
   }
+   /**
+   * 最大値に対して目盛サイズを決定し、ラベル位置を返す関数
+   * 
+   * @param {number} maxValue - 棒グラフの最大値（単位）
+   * @param {number} screenCm - 最大の棒の画面長（cm）, デフォルト 10
+   * @param {number} minTickCm - 1目盛の最小長（cm）, デフォルト 1
+   * @returns {{tick: number, ticksCount: number, tickCm: number, ticks: number[], labels: number[]}}
+   *
+   * ---- 使用例 ----
+   *console.log(chooseTickSize(123));
+   * => tick: 50, ticksCount: 3, ticks: [0,50,100,150], labels: [0,50,100,150]
+   *console.log(chooseTickSize(80));
+   * => tick: 10, ticksCount: 8, ticks: [0,10,...,80], labels: [0,20,40,60,80]  
+   *console.log(chooseTickSize(250));
+   * => tick: 50, ticksCount: 5, ticks: [0,50,100,150,200,250], labels: [0,50,100,150,200,250] (全部)
+   */
+  chooseTickSize(maxValue, screenCm = 10.0, minTickCm = 1.0) {
+    if (maxValue <= 0) {
+      throw new Error("maxValue must be positive");
+    }
+  
+    // 必要最小値（単位）
+    const required = maxValue * (minTickCm / screenCm);
+  
+    // 10^k の指数を推定
+    let k = Math.floor(Math.log10(required));
+    k = isFinite(k) ? k - 1 : -10;
+  
+    let tick = null;
+    while (tick === null) {
+      for (const base of [1, 5]) {
+        const candidate = base * Math.pow(10, k);
+        if (candidate >= required) {
+          tick = candidate;
+          break;
+        }
+      }
+      k++;
+      if (k > 100) throw new Error(`Failed to find tick (required=${required})`);
+    }
+  
+    const ticksCount = Math.ceil(maxValue / tick);
+    const tickCm = screenCm * tick / maxValue;
+  
+    // すべての目盛位置
+    const ticks = [];
+    for (let i = 0; i <= ticksCount; i++) {
+      ticks.push(i * tick);
+    }
+  
+    // ラベルを付ける間隔を決定
+    let labelStep = 1;
+    if (ticksCount > 4) {
+      // できれば5目盛ごとにラベル
+      if (ticksCount / 5 >= 2) {
+        labelStep = 5;
+      } else {
+        labelStep = 2;
+      }
+    }
+  
+    // ラベル位置
+    const labels = ticks.filter((_, i) => i % labelStep === 0);
+  
+    return { tick, ticksCount, tickCm, ticks, labels };
+  }  
 }
