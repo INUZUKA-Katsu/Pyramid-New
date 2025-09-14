@@ -195,8 +195,12 @@ class PyramidApp
     case level
     when :shiku_json
       p nengetsu[0,4]
-      if nengetsu != "new" && nengetsu[0,4] <= "1992"
-        :ayumi_json
+      if nengetsu != "new" && nengetsu[0,4] <= "1992" 
+        if shiku == "age"
+          :ayumi_json
+        else
+          :ayumi_ku_json
+        end
       elsif nengetsu.match(/ft|syorai/)
         shiku == "age" ? :syorai_json : :syorai_ku_json
       else
@@ -235,7 +239,7 @@ class PyramidApp
 
   def generate_response(obj, level)
     case level
-    when :shiku_json, :cho_json, :kujuki_json, :ayumi_json, :syorai_json, :syorai_ku_json, :all_options
+    when :shiku_json, :cho_json, :kujuki_json, :ayumi_json, :ayumi_ku_json, :syorai_json, :syorai_ku_json, :all_options
       if obj.json_error
         ["text/plain;charset=utf-8", obj.csv || "CSV data not available"]
       else

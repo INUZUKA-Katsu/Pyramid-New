@@ -62,6 +62,13 @@ class DataFetcher
     file_path = @file_manager.local_file_path(:ayumi_csv)
     @file_manager.read_file(file_path)
   end
+
+  # あゆみ区別CSVデータを取得
+  def fetch_ayumi_ku_json(ku, nengetsu)
+    puts "fetch_ayumi_ku_json開始: ku=#{ku}, nengetsu=#{nengetsu}"
+    file_path = @file_manager.local_file_path(:ayumi_ku_json,ku, nengetsu)
+    @file_manager.read_file(file_path)
+  end
   
   # 最新の町丁別リストを取得
   def fetch_newest_cho_list(ku)

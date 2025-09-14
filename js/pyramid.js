@@ -26,14 +26,14 @@ function on_page_load() {
   //フッターの位置を調整する.
   //adjustFooterPosition();
   //************初期設定1ここまで**********
-
+  console.warn("on_page_load get_selected_nengetsu()",get_selected_nengetsu());
   redisplay_pyramid();
   console.log("redisplay_pyramid");
   //************初期設定2****************
   //端末へのデータ保存のチェックボックス表示を各人の既定値にする.
-  if (lStorage == "use") {
-    localStorage_defautSetting();
-  }
+  //if (lStorage == "use") {
+  //  localStorage_defautSetting();
+  //}
   console.log("localStorage_defautSetting");
   //市区・町丁の年月日セレクトボックスをローカルに保存し、HTMLも更新する.
   all_option_renew();
@@ -113,6 +113,7 @@ function ku_pyramid_button() {
 function change_shiku_year() {
   set_comment("off");
   shiku_pyramid();
+  $nengetsu = get_selected_nengetsu();
 }
 
 //町丁別用の年月日セレクトボックスを変更したときの処理
@@ -207,6 +208,8 @@ function getOptionsWithCache(type) {
   ajax("all_options", null, 1);
   return null; // 非同期で取得される
 }
+
+
 //町丁用の年月日セレクトボックスを最新の内容に更新する.(初期設定)
 //function cho_option(){
 //  ajax("cho_option");
@@ -271,7 +274,7 @@ function cho_pyramid(nengetsu) {
     //ローカルデータが存在しないときはサーバから取得して描画する.
     ajax("cho_json", nengetsu, 1);
   }
-  adjust_title_size(checked.join(","));
+  //adjust_title_size(checked.join(","));
 }
 //ローカルデータを読み出して描画処理する.（ピラミッドのみ？町丁名一覧は？）
 //mode: shiku_json, cho_json, cho_csv, cho_list
@@ -450,6 +453,8 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
   console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
   
   myFunc();
+  console.warn("1 get_selected_nengetsu()",get_selected_nengetsu());
+  console.warn("1 $nengetsu",$nengetsu);
 
   //ピラミッドを描画する。
   if (window.pyramidRenderer == null) {
@@ -461,24 +466,27 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
   //その他の情報
 
   console.log("change_pyramid step2");
-
+  console.warn("2 get_selected_nengetsu()",get_selected_nengetsu());
+  console.warn("2 $nengetsu",$nengetsu);  
   var shiku = objectData["shiku"];
   var not_exist = objectData["not_exist"];
   var kijunbi = objectData["kijunbi"];
   var source = objectData["source_url"];
   
+  data_key = objectData.hasOwnProperty("kakusai_betsu") ? "kakusai_betsu" : "five_year_age_group";
+
   // デバッグ: kakusai_betsuの構造を確認
-  console.log("change_pyramid: kakusai_betsu配列の長さ:", objectData["kakusai_betsu"].length);
-  console.log("change_pyramid: kakusai_betsu[0]の内容:", objectData["kakusai_betsu"][0]);
-  console.log("change_pyramid: kakusai_betsu[0][1] (総数):", objectData["kakusai_betsu"][0][1]);
-  console.log("change_pyramid: kakusai_betsu[0][2] (男性):", objectData["kakusai_betsu"][0][2]);
-  console.log("change_pyramid: kakusai_betsu[0][3] (女性):", objectData["kakusai_betsu"][0][3]);
+  console.log("change_pyramid: kakusai_betsu配列の長さ:", objectData[data_key].length);
+  console.log("change_pyramid: kakusai_betsu[0]の内容:", objectData[data_key][0]);
+  console.log("change_pyramid: kakusai_betsu[0][1] (総数):", objectData[data_key][0][1]);
+  console.log("change_pyramid: kakusai_betsu[0][2] (男性):", objectData[data_key][0][2]);
+  console.log("change_pyramid: kakusai_betsu[0][3] (女性):", objectData[data_key][0][3]);
   
   // 重要な情報をalertで表示
-  if (objectData["kakusai_betsu"] && objectData["kakusai_betsu"].length > 0) {
-    const firstElement = objectData["kakusai_betsu"][0];
+  if (objectData[data_key] && objectData[data_key].length > 0) {
+    const firstElement = objectData[data_key][0];
     console.warn(`📊 人口データ表示:\n` +
-          `kakusai_betsu配列長: ${objectData["kakusai_betsu"].length}\n` +
+          `kakusai_betsu配列長: ${objectData[data_key].length}\n` +
           `kakusai_betsu[0]: ${JSON.stringify(firstElement)}\n` +
           `総数: ${firstElement[1]}\n` +
           `男性: ${firstElement[2]}\n` +
@@ -488,18 +496,23 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
     console.warn(`❌ エラー: kakusai_betsuが空または未定義です！`);
   }
   
-  var sosu = objectData["kakusai_betsu"][0][1];
-  var male = objectData["kakusai_betsu"][0][2];
-  var female = objectData["kakusai_betsu"][0][3];
-  var kakusaiData = objectData["kakusai_betsu"].filter((item) =>
+  var sosu = objectData[data_key][0][1];
+  var male = objectData[data_key][0][2];
+  var female = objectData[data_key][0][3];
+  var kakusaiData = objectData[data_key].filter((item) =>
     /\d+(以上)?/.test(item[0])
   );
 
   console.log("change_pyramid step2.1");
-
+  console.warn("3 get_selected_nengetsu()",get_selected_nengetsu());
+  console.warn("3 $nengetsu",$nengetsu);
+  
   if (!isAnm) displey_hitoku_comment(objectData["hitoku"]);
 
   console.log("change_pyramid step3");
+
+  // グローバル変数を初期化
+  $kakusaiObject = {};
 
   kakusaiData.forEach(function (val) {
     var nenrei = val[0];
@@ -511,21 +524,27 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
     };
   });
 
+
+  console.warn("平成７年の港北・緑・青葉・都筑４区のとりあつかい。");
+  console.warn("get_selected_nengetsu()",get_selected_nengetsu());
+  console.warn("4 $nengetsu",$nengetsu);
   if (!isAnm){
-    var nengetsu = get_selected_nengetsu();
-    if (nengetsu == undefined) {
-      nengetsu = $nengetsu;
-    }
+    //var nengetsu = get_selected_nengetsu();
+    //if (nengetsu == undefined) {
+    //  nengetsu = $nengetsu;
+    //}
+    //console.warn("nengetsu",nengetsu);
     if (
-      nengetsu == "9501" &&
+      $nengetsu == "199501" &&
       (shiku == "港北区" ||
         shiku == "緑区" ||
         shiku == "都筑区" ||
         shiku == "青葉区")
     ) {
-      shiku = "港北・緑・青葉・都筑４区";
+      shiku = "港北・緑・青葉・都筑４区<span class='small'> (分区直後で区別データなし)</span><br>";
     }
   }
+  console.warn("shiku",shiku);
   console.log("change_pyramid step4");
 
   var h2 = shiku + '<span class="inline-block">' + kijunbi + "</span>";
@@ -534,8 +553,9 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
     /10月(1|１)日(現在)?/,
     '10月1日現在<span class="small">(国勢調査結果)</span>'
   );
+
   if (not_exist != undefined && not_exist != "") {
-    if (not_exist == "青葉区" || not_exist == "都筑区") {
+    if (not_exist.match(/区$/)) {
       comment = "はこのころまだありませんでした.";
     } else {
       comment =
@@ -548,12 +568,15 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
   //h2(タイトル)を西暦主体に書き直す.
   h2 = change_seireki_main(h2);
   document.getElementById("h2").innerHTML = h2;
+  adjust_title_size(h2);
+
   if (!isInterpolation) {
     document.getElementById("sosu").innerHTML = plus_comma(sosu);
     document.getElementById("male").innerHTML = plus_comma(male);
     document.getElementById("female").innerHTML = plus_comma(female);
   }
   document.getElementById("source").innerHTML = source_str(shiku, source);
+
   if (!isAnm) basic_data_position();
   
   console.log("change_pyramid step6");
@@ -663,7 +686,11 @@ function makePyramidData(csv) {
   objectData["not_exist"] = not_exist_cho(cho, exist_cho);
   objectData["kijunbi"] = get_kijunbi();
   objectData["source_url"] = get_source_url();
-  objectData["kakusai_betsu"] = make_kakusaiData(sumArray);
+  if (objectData.hasOwnProperty("kakusai_betsu")){
+    objectData["kakusai_betsu"] = make_kakusaiData(sumArray);
+  } else {
+    objectData["five_year_age_group"] = make_kakusaiData(sumArray);
+  }
 
   console.log("makePyramidDataの戻り値", objectData);
   return objectData;
@@ -771,8 +798,16 @@ function makePyramidData(csv) {
 
 //選択した町丁が多いとき、タイトルのフォントを小さくする.
 function adjust_title_size(title) {
-  if (title.length > 50) {
-    document.getElementById("h2").style.fontSize = "90%";
+  const h2Eelement=document.getElementById("h2");
+  const preSize = h2Eelement.style.fontSize;
+  if (title.replace(/<[^>]*>?/g, '').length > 50) {
+    h2Eelement.style.fontSize = "90%";
+    // 前回のフォントサイズが90%でない場合は画面を再配置する.(年齢３区分の高さを調整するため)
+    if (preSize != "90%") centerContents();
+  }else{
+    h2Eelement.style.fontSize = "";
+    // 前回のフォントサイズが90%の場合は画面を再配置する.
+    if (preSize == "90%") centerContents();
   }
 }
 //人口データの表示位置を調整する.
@@ -869,12 +904,24 @@ function change_shiku_option(str) {
       return;
     }
   }
-  var nengetsu = get_selected_nengetsu("shiku");
-  if (nengetsu == undefined) {
+  // $nengetsuが設定されている場合はそれを優先使用（前回データの復元）
+  var nengetsu;
+  if ($nengetsu && $nengetsu !== 0) {
     nengetsu = $nengetsu;
+    console.log(`change_shiku_option: $nengetsuを使用 (${nengetsu})`);
+  } else {
+    nengetsu = get_selected_nengetsu("shiku");
+    if (nengetsu == undefined) {
+      nengetsu = $nengetsu;
+    }
   }
   document.getElementById("shiku_year").innerHTML = str;
   select_nengetsu(nengetsu, "shiku");
+  
+  // セレクトボックスとスライドバーを連動
+  setTimeout(() => {
+    syncSelectBoxWithSlider('shiku');
+  }, 100); // 少し遅延させてDOM更新を待つ
 }
 //町丁ピラミッド用の年月日セレクトボックスの選択肢を更新する.
 function change_cho_option(str) {
@@ -885,6 +932,11 @@ function change_cho_option(str) {
   }
   document.getElementById("cho_year").innerHTML = str;
   select_nengetsu(nengetsu, "cho");
+  
+  // セレクトボックスとスライドバーを連動
+  setTimeout(() => {
+    syncSelectBoxWithSlider('cho');
+  }, 100); // 少し遅延させてDOM更新を待つ
 }
 //町丁名一覧の選択をすべて解除する.
 function checkbox_clear() {
@@ -1903,7 +1955,9 @@ function kubunChange(ratio) {
 //各歳別のデータから年齢３区分別人口を計算して返す。
 //戻り値：{hei:{male:nn,female:nn,sosu:nn},mid:{male:nn,female:nn,sosu:nn},low:{male:nn,female:nn,sosu:nn}}
 function getNin(kakusaiData, ssai, esai) {
+  var ageGroupData = Object.assign({}, kakusaiData); //kakusaiDataを参照ではなくコピー
   console.log("getNin開始");
+  console.log(ageGroupData);
   var hei = {};
   hei.male = 0;
   hei.female = 0;
@@ -1913,18 +1967,57 @@ function getNin(kakusaiData, ssai, esai) {
   var low = {};
   low.male = 0;
   low.female = 0;
-  for (i = 0; i <= 100; i++) {
-    if (i in kakusaiData) {
-      if (i > esai) {
-        hei.male += Number(kakusaiData[i].male);
-        hei.female += Number(kakusaiData[i].female);
-      } else if (i >= ssai) {
-        mid.male += Number(kakusaiData[i].male);
-        mid.female += Number(kakusaiData[i].female);
-      } else {
-        low.male += Number(kakusaiData[i].male);
-        low.female += Number(kakusaiData[i].female);
+
+  console.log(Object.keys(ageGroupData).length);
+
+  var keys = Object.keys(ageGroupData);
+  
+  for (i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    male = Number(ageGroupData[key].male) || 0;
+    female = Number(ageGroupData[key].female) || 0;
+    
+    // 総数等はスキップする
+    if (key.match(/総数|合計|年齢不詳/)) {
+      continue;
+    }
+      
+    // 年齢範囲を解析
+    var ageRange = parseAgeRange(key);
+    if (!ageRange) {
+      console.log("年齢範囲を解析できませんでした:", key);
+      continue;
+    }
+
+    if (ageRange.endAge > esai) {
+      hei.male += male;
+      hei.female += female;
+    } else if (ageRange.startAge >= ssai) {
+      mid.male += male;
+      mid.female += female;
+    } else if (ageRange.endAge < ssai) {
+      low.male += male;
+      low.female += female;
+    } else {
+      // 境界をまたぐ場合の処理
+      var overlapWithMid = Math.max(0, Math.min(ageRange.endAge, esai) - Math.max(ageRange.startAge, ssai) + 1);
+      var overlapWithLow = Math.max(0, Math.min(ageRange.endAge, ssai - 1) - ageRange.startAge + 1);
+      var overlapWithHei = Math.max(0, ageRange.endAge - Math.max(ageRange.startAge, esai + 1) + 1);
+      
+      var totalYears = ageRange.endAge - ageRange.startAge + 1;
+      
+      if (overlapWithMid > 0) {
+        mid.male += Math.round(male * overlapWithMid / totalYears);
+        mid.female += Math.round(female * overlapWithMid / totalYears);
       }
+      if (overlapWithLow > 0) {
+        low.male += Math.round(male * overlapWithLow / totalYears);
+        low.female += Math.round(female * overlapWithLow / totalYears);
+      }
+      if (overlapWithHei > 0) {
+        hei.male += Math.round(male * overlapWithHei / totalYears);
+        hei.female += Math.round(female * overlapWithHei / totalYears);
+      }       
     }
   }
   hei.sosu = hei.male + hei.female;
@@ -1934,6 +2027,56 @@ function getNin(kakusaiData, ssai, esai) {
   //console.log(JSON.stringify(kubunNinData));
   return kubunNinData;
 }
+
+// 年齢範囲を解析するヘルパー関数
+function parseAgeRange(ageGroupStr) {
+  // 総数や年齢不詳は除外
+  if (ageGroupStr.match(/総数|合計|年齢不詳/)) {
+    return null;
+  }
+  
+  // 範囲形式（例：「0～4歳」「5～9歳」）
+  var rangeMatch = ageGroupStr.match(/(\d+)[～〜](\d+)歳/);
+  if (rangeMatch) {
+    return {
+      startAge: parseInt(rangeMatch[1]),
+      endAge: parseInt(rangeMatch[2])
+    };
+  }
+  
+  // 以上形式（例：「80歳以上」「100歳以上」）
+  var aboveMatch = ageGroupStr.match(/(\d+)歳以上/);
+  if (aboveMatch) {
+    var age = parseInt(aboveMatch[1]);
+    return {
+      startAge: age,
+      endAge: 100 // 最大年齢を100歳とする
+    };
+  }
+  
+  // 単一年齢形式（例：「0歳」「1歳」）
+  var singleMatch = ageGroupStr.match(/^(\d+)歳$/);
+  if (singleMatch) {
+    var age = parseInt(singleMatch[1]);
+    return {
+      startAge: age,
+      endAge: age
+    };
+  }
+  
+   // 各歳データ形式（例：「0」「1」「2」...「100」）
+   var numberMatch = ageGroupStr.match(/^(\d+)$/);
+   if (numberMatch) {
+     var age = parseInt(numberMatch[1]);
+     return {
+       startAge: age,
+       endAge: age
+     };
+   }
+   
+  return null;
+}
+
 //年齢3区分別人口から年齢3区分別人口構成比を計算して返す。
 //戻り値：{hei:{male:%%,female:%%,sosu:%%},mid:{male:%%,female:%%,sosu:%%},low:{male:%%,female:%%,sosu:%%}}
 function getRatio(kubunNinData) {

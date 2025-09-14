@@ -17,7 +17,8 @@ module PyramidConstants
   CSV_FILE_S3 = "Pyramid/nenreibetsu/<ku><nengetsu>.csv"
   SHIKU_CSV_FILE = "/e3yokohama<nengetsu>/e3<ku><nengetsu>.csv"
   AYUMI_CSV_FILE = "/ayumi/ayumi.csv"
-  
+  AYUMI_KU_FILE = "/ayumi/ku/<ku><nengetsu>-5g.txt"
+    
   # オプションファイル
   SHI_OPTION_FILE_S3 = "Pyramid/option/shi-option.txt"
   KU_OPTION_FILE_S3 = "Pyramid/option/ku-option.txt"
@@ -25,7 +26,9 @@ module PyramidConstants
   AYUMI_OPTION_FILE_S3 = "Pyramid/option/ayumi-option.txt"
   SYORAI_OPTION_FILE_S3 = "Pyramid/option/syorai-option.txt"
   KU_JUKI_OPTION_FILE_S3 = "Pyramid/option/kujuki-option.txt"
-  
+  # 開発中代替ファイル
+  KU_OPTION_FILE = "/option/ku-option.txt"
+
   # ディレクトリ
   DIR_SHIKU_JSON_S3 = "Pyramid/nenreibetsu/"
   

@@ -28,7 +28,7 @@ class ParallelDataFetcher
           nengetsu = process_year_for_request(year)
           puts "Thread: #{year} -> nengetsu: #{nengetsu} のデータ取得開始"
           
-          data = PopulationData.new(shiku, nengetsu, level, cho_selection, @s3_client)
+          data = PopulationData.new(shiku, nengetsu, level, cho_selection, @s3_client, :is_batch)
           
           mutex.synchronize do
             results << {

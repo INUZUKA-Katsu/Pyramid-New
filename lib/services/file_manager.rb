@@ -34,10 +34,13 @@ class FileManager
       @root_dir + SHIKU_CSV_FILE.sub("<ku>", shiku).gsub("<nengetsu>", nengetsu[2,4])
     when :ayumi_csv
       @root_dir + AYUMI_CSV_FILE
+    when :ayumi_ku_json
+      @root_dir + AYUMI_KU_FILE.sub("<ku>", ku).sub("<nengetsu>", nengetsu)
     when :shi_option
       SHI_OPTION_FILE_S3
     when :ku_option
-      KU_OPTION_FILE_S3
+      #KU_OPTION_FILE_S3  開発中は暫定ファイルを使用
+      @root_dir + KU_OPTION_FILE
     when :cho_option
       CHO_OPTION_FILE_S3
     when :ayumi_option
@@ -62,6 +65,7 @@ class FileManager
       
       @s3_client.read(file_path)
     elsif File.exist?(file_path)
+      puts "read_file: "+file_path
       File.read(file_path)
     else
       nil
@@ -99,6 +103,9 @@ class FileManager
       res =list1 + (list - list1).sort #nengetuの古い順
     when :ayumi_json
       res= [ @root_dir + AYUMI_CSV_FILE ]
+    when :ayumi_ku_json
+      res=Dir.glob(File.dirname(@root_dir + AYUMI_KU_FILE) + "/#{shiku}*-5g.txt")
+      puts res
     when :syorai_json
       res=Dir.glob(File.dirname(@root_dir + JSON_FILE_SYORAI) + "/*suikei.txt")
     when :syorai_ku_json
@@ -142,3 +149,5 @@ class FileManager
     files.flatten
   end
 end
+
+

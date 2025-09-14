@@ -27,6 +27,7 @@
       <script type="text/javascript" src="./js/pyramid.js"></script>
       <script type="text/javascript" src="./js/PyramidSVGRenderer.js"></script>
       <script type="text/javascript" src="./js/streaming-animation.js"></script>
+      <script type="text/javascript" src="./js/ui-synchronizer.js"></script>
       <script
         type="text/javascript"
         src="./js/interpolation-animation.js"
@@ -623,7 +624,7 @@
             display: inline-block;
             position: relative;
             margin-left: 260px;
-            width: 25em;
+            /*width: 25em;*/
             box-sizing: border-box;
             min-width: 300px;
           }
@@ -2157,7 +2158,9 @@
         console.log("loadDemoData:", typeof loadDemoData);
         console.log("renderPyramid:", typeof renderPyramid);
 
-        // 画面デザイン（各要素の配置位置）
+        // ****************************************************************
+        // 画面デザイン（各要素の配置位置） ************************************
+        // ****************************************************************
         function centerContents() {
           const menu = document.querySelector(".left-controls");
           const pyramid = document.querySelector("#pyramid-block");
@@ -2194,7 +2197,7 @@
             // #basic_dataをSVG描画領域内の右下に配置
             const basicLeftPos = pyramidContainer_rect.right - basicWidth - 20;
             const basicTopPos =
-              pyramidContainer_rect.bottom - basic.offsetHeight - 15;
+              pyramidContainer_rect.bottom - basic.offsetHeight - 25;
             basic.style.left = basicLeftPos + "px";
             basic.style.top = basicTopPos + "px";
             basic.style.display = "block";
@@ -2227,156 +2230,11 @@
         // ウィンドウリサイズ時に再度計算して反映
         window.addEventListener("resize", centerContents);
 
-        // 年月選択スライドバーの初期化とイベントリスナー
-        function setupYearSliders() {
-          // 市区ピラミッド用スライドバー
-          const shikuSlider = document.getElementById("shiku-year-slider");
-          const shikuSliderDisplay = document.getElementById(
-            "shiku-year-slider-display"
-          );
-          const shikuSliderContainer = document.getElementById(
-            "shiku-year-slider-container"
-          );
-
-          if (shikuSlider && shikuSliderDisplay && shikuSliderContainer) {
-            let isDragging = false;
-
-            shikuSlider.addEventListener("input", function () {
-              const progress = parseInt(this.value);
-              const pyramode = get_pyramid_mode();
-
-              if (pyramode === "shiku" || pyramode === "age") {
-                const selectElement = document.getElementById("shiku_year");
-                if (selectElement && selectElement.options.length > 0) {
-                  // 方向を逆転：0%が過去、100%が最新
-                  const targetIndex = Math.floor(
-                    ((100 - progress) / 100) *
-                      (selectElement.options.length - 1)
-                  );
-                  const clampedIndex = Math.max(
-                    0,
-                    Math.min(targetIndex, selectElement.options.length - 1)
-                  );
-                  const targetOption = selectElement.options[clampedIndex];
-
-                  // 機能的に必要：削除しないでください
-                  shikuSliderDisplay.textContent = targetOption.text;
-                  if (isDragging) {
-                    // ドラッグ中は表示のみ更新
-                    selectElement.value = targetOption.value;
-                  }
-                }
-              }
-            });
-
-            shikuSlider.addEventListener("mousedown", function () {
-              isDragging = true;
-            });
-
-            shikuSlider.addEventListener("mouseup", function () {
-              isDragging = false;
-              // ドラッグ終了時に描画
-              const selectElement = document.getElementById("shiku_year");
-              if (selectElement) {
-                selectElement.dispatchEvent(
-                  new Event("change", { bubbles: true })
-                );
-              }
-            });
-
-            shikuSlider.addEventListener("touchstart", function () {
-              isDragging = true;
-            });
-
-            shikuSlider.addEventListener("touchend", function () {
-              isDragging = false;
-              // ドラッグ終了時に描画
-              const selectElement = document.getElementById("shiku_year");
-              if (selectElement) {
-                selectElement.dispatchEvent(
-                  new Event("change", { bubbles: true })
-                );
-              }
-            });
-          }
-
-          // 町丁別ピラミッド用スライドバー
-          const choSlider = document.getElementById("cho-year-slider");
-          const choSliderDisplay = document.getElementById(
-            "cho-year-slider-display"
-          );
-          const choSliderContainer = document.getElementById(
-            "cho-year-slider-container"
-          );
-
-          if (choSlider && choSliderDisplay && choSliderContainer) {
-            let isDragging = false;
-
-            choSlider.addEventListener("input", function () {
-              const progress = parseInt(this.value);
-              const pyramode = get_pyramid_mode();
-
-              if (pyramode === "cho") {
-                const selectElement = document.getElementById("cho_year");
-                if (selectElement && selectElement.options.length > 0) {
-                  // 方向を逆転：0%が過去、100%が最新
-                  const targetIndex = Math.floor(
-                    ((100 - progress) / 100) *
-                      (selectElement.options.length - 1)
-                  );
-                  const clampedIndex = Math.max(
-                    0,
-                    Math.min(targetIndex, selectElement.options.length - 1)
-                  );
-                  const targetOption = selectElement.options[clampedIndex];
-
-                  // 機能的に必要：削除しないでください
-                  choSliderDisplay.textContent = targetOption.text;
-
-                  if (isDragging) {
-                    // ドラッグ中は表示のみ更新
-                    selectElement.value = targetOption.value;
-                  }
-                }
-              }
-            });
-
-            choSlider.addEventListener("mousedown", function () {
-              isDragging = true;
-            });
-
-            choSlider.addEventListener("mouseup", function () {
-              isDragging = false;
-              // ドラッグ終了時に描画
-              const selectElement = document.getElementById("cho_year");
-              if (selectElement) {
-                selectElement.dispatchEvent(
-                  new Event("change", { bubbles: true })
-                );
-              }
-            });
-
-            choSlider.addEventListener("touchstart", function () {
-              isDragging = true;
-            });
-
-            choSlider.addEventListener("touchend", function () {
-              isDragging = false;
-              // ドラッグ終了時に描画
-              const selectElement = document.getElementById("cho_year");
-              if (selectElement) {
-                selectElement.dispatchEvent(
-                  new Event("change", { bubbles: true })
-                );
-              }
-            });
-          }
-        }
 
         // アニメーション制御のイベントリスナー
         document.addEventListener("DOMContentLoaded", function () {
-          // 年月選択スライドバーを初期化
-          setupYearSliders();
+          // UI同期機能を初期化
+          initializeUISynchronizer();
 
           const speedSlider = document.getElementById("animation-speed");
           const barDurationSlider = document.getElementById(
@@ -2578,90 +2436,6 @@
           // アニメーション開始後にスライダーを有効化
           updateSliderState();
         }
-
-        // 総人口変化反映の選択ダイアログを表示
-        //function showPopulationSizeDialog() {
-        //  return new Promise((resolve) => {
-        //    const dialog = document.createElement("div");
-        //    dialog.style.cssText = `
-        //      position: fixed;
-        //      top: 0;
-        //      left: 0;
-        //      width: 100%;
-        //      height: 100%;
-        //      background-color: rgba(0, 0, 0, 0.5);
-        //      display: flex;
-        //      justify-content: center;
-        //      align-items: center;
-        //      z-index: 10000;
-        //    `;
-
-        //    const content = document.createElement("div");
-        //    content.style.cssText = `
-        //      background: white;
-        //      padding: 30px;
-        //      border-radius: 10px;
-        //      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        //      max-width: 500px;
-        //      text-align: center;
-        //    `;
-
-        //    content.innerHTML = `
-        //      <h3 style="margin-top: 0; color: #333;">アニメーション設定</h3>
-        //      <p style="margin: 20px 0; color: #666;">
-        //        総人口の増減によってグラフの大きさを変えますか？
-        //      </p>
-        //      <div style="margin: 30px 0;">
-        //        <label style="display: block; margin: 15px 0; cursor: pointer;">
-        //          <input type="radio" name="population-size" value="true" checked style="margin-right: 10px;">
-        //          <strong>グラフの大きさを変化させる</strong><br>
-        //          <small style="color: #888;">人口の増減に比例してピラミッドの大きさ(面積)が変化します。<br>年齢構成の変化と人口の増減の両方を見ることができます。</small>
-        //        </label>
-        //        <label style="display: block; margin: 15px 0; cursor: pointer;">
-        //          <input type="radio" name="population-size" value="false" style="margin-right: 10px;">
-        //          <strong>グラフの大きさを一定にする</strong><br>
-        //          <small style="color: #888;">ピラミッドの大きさ(面積)を固定します。<br>年齢構成の変化だけを集中して見ることができます。</small>
-        //        </label>
-        //      </div>
-        //      <div>
-        //        <button id="dialog-ok" style="
-        //          background: #4a90e2;
-        //          color: white;
-        //          border: none;
-        //          padding: 10px 20px;
-        //          border-radius: 5px;
-        //          cursor: pointer;
-        //          margin-right: 10px;
-        //        ">OK</button>
-        //        <button id="dialog-cancel" style="
-        //          background: #ccc;
-        //          color: #333;
-        //          border: none;
-        //          padding: 10px 20px;
-        //          border-radius: 5px;
-        //          cursor: pointer;
-        //        ">キャンセル</button>
-        //      </div>
-        //    `;
-
-        //    dialog.appendChild(content);
-        //    document.body.appendChild(dialog);
-
-        //    // イベントリスナー
-        //    document.getElementById("dialog-ok").onclick = () => {
-        //      const selected =
-        //        document.querySelector('input[name="population-size"]:checked')
-        //          .value === "true";
-        //      document.body.removeChild(dialog);
-        //      resolve(selected);
-        //    };
-
-        //    document.getElementById("dialog-cancel").onclick = () => {
-        //      document.body.removeChild(dialog);
-        //      resolve(null); // キャンセル時はnullを返す
-        //    };
-        //  });
-        //}
 
         // 可変面積モードアニメーション開始（新しいzoomScaleモード）
         async function startAnimationWithVariableAreaMode() {

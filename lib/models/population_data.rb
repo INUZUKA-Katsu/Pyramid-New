@@ -12,7 +12,7 @@ class PopulationData
   
   attr_reader :json, :html_str, :csv, :json_error
   
-  def initialize(ku, nengetsu, level, cho = nil, s3_client = nil)
+  def initialize(ku, nengetsu, level, cho = nil, s3_client = nil, is_batch = nil)
 
     puts "PopulationData開始"
     puts "PopulationData: ku=#{ku}, nengetsu=#{nengetsu}, level=#{level}, cho=#{cho}"
@@ -31,7 +31,7 @@ class PopulationData
     # file_managerが初期化された後にnengetsuを処理
     @nengetsu = process_nengetsu(nengetsu, level)
     p :step4
-    process_request
+    process_request(is_batch)
   end
   
   private
@@ -89,12 +89,12 @@ class PopulationData
   end
   
   # リクエストを処理
-  def process_request
+  def process_request(is_batch)
     p "process_request開始"
     p @level
     case @level
     when :shiku_json
-      @json = process_shiku_data
+      @json = process_shiku_data(is_batch)
     when :syorai_json
       @json = process_syorai_data
     when :syorai_ku_json
@@ -106,7 +106,9 @@ class PopulationData
     when :kujuki_json
       @json = process_kujuki_data
     when :ayumi_json
-      process_ayumi_json
+      @json = process_ayumi_json
+    when :ayumi_ku_json
+      @json = process_ayumi_ku_json
     when :cho_list
       @html_str = process_cho_list
     when :shi_option, :ku_option, :cho_option, :kujuki_option
@@ -116,12 +118,22 @@ class PopulationData
     end
   end
   
-  # 市区データを処理
-  def process_shiku_data
+  # 市区データを処理(:shiku_jsonの場合)
+  def process_shiku_data(is_batch)
     puts "Processing shiku data for ku: #{@ku}, nengetsu: #{@nengetsu}" # デバッグ用
     
     # 青葉区・都筑区の非存在期間チェック
-    if ["aoba", "tsuzuki"].include?(@ku) && ["199301", "199401"].include?(@nengetsu)
+    # バッチリクエスト(=アニメーション)の場合は非存在期間に199501を加える。
+    # 199501は分区直後のため２区を合わせたデータとなっているため.
+    if is_batch
+      non_existent_range = ["199301", "199401", "199501"]
+    else
+      non_existent_range = ["199301", "199401"]
+    end
+    p "☆☆☆process_shiku_data☆☆☆"
+    p is_batch
+    p non_existent_range
+    if ["aoba", "tsuzuki"].include?(@ku) && non_existent_range.include?(@nengetsu)
       return generate_non_existent_data
     end
     
@@ -176,7 +188,32 @@ class PopulationData
   def process_ayumi_json
     @csv = @data_fetcher.fetch_ayumi_csv
     kijunbi = @data_converter.generate_ayumi_kijunbi(@nengetsu)
-    @json = @data_converter.ayumi_csv_to_json(@csv, kijunbi, @nengetsu)
+    @data_converter.ayumi_csv_to_json(@csv, kijunbi, @nengetsu)
+  end
+
+  # あゆみ区別JSONデータを処理
+  def process_ayumi_ku_json
+    
+    # 非存在期間チェック
+    oldest_stat_nengetsu = {
+      "aoba" => "199501",
+      "izumi" => "199010",
+      "kohoku" => "194010",
+      "konan" => "197010",
+      "midori" => "197010",
+      "minami" => "195010",
+      "naka" => "197010",
+      "nishi" => "195010",
+      "sakae" => "199010",
+      "seya" => "197010",
+      "totsuka" => "194010",
+      "tsuzuki" => "199501"
+    }
+    if oldest_stat_nengetsu.keys.include?(@ku) && @nengetsu < oldest_stat_nengetsu[@ku]
+      return generate_non_existent_data
+    end
+    puts "fetch_ayumi_ku_json呼出し: @ku=#{@ku}, @nengetsu=#{@nengetsu}"
+    @data_fetcher.fetch_ayumi_ku_json(@ku, @nengetsu)
   end
   
   # 町丁リストを処理
@@ -228,6 +265,11 @@ class PopulationData
   def process_all_options
     p "process_all_options開始"
     ku_str = @file_manager.read_file(@file_manager.local_file_path(:ku_option))
+
+    p "process_all_options ku_option"
+    p @file_manager.local_file_path(:ku_option)
+    p File.exist?(@file_manager.local_file_path(:ku_option))
+
     shi_str = @file_manager.read_file(@file_manager.local_file_path(:shi_option))
     cho_str = @file_manager.read_file(@file_manager.local_file_path(:cho_option))
     kujuki_str = @file_manager.read_file(@file_manager.local_file_path(:kujuki_option))

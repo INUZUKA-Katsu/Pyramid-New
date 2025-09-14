@@ -56,7 +56,11 @@ class StreamingAnimationManager {
             return;
           }
           
-          if (!convertedData.kakusai_betsu || !Array.isArray(convertedData.kakusai_betsu)) {
+          // データ形式を検証（各歳別データまたは5歳階級別データのいずれかが存在することを確認）
+          const hasKakusaiBetsu = convertedData.kakusai_betsu && Array.isArray(convertedData.kakusai_betsu);
+          const hasFiveYearAgeGroup = convertedData.five_year_age_group && Array.isArray(convertedData.five_year_age_group);
+          
+          if (!hasKakusaiBetsu && !hasFiveYearAgeGroup) {
             console.error(`❌ 事前取得 年次 ${year} 変換後のデータ形式が不正:`, convertedData);
             failedYears.push(year);
             return;
@@ -108,16 +112,21 @@ class StreamingAnimationManager {
       console.log(`  - yearData存在: ${!!yearData}`);
       console.log(`  - yearData型: ${typeof yearData}`);
       console.log(`  - yearData.kakusai_betsu存在: ${!!yearData?.kakusai_betsu}`);
-      console.log(`  - yearData.kakusai_betsu型: ${typeof yearData?.kakusai_betsu}`);
-      console.log(`  - yearData.kakusai_betsu配列: ${Array.isArray(yearData?.kakusai_betsu)}`);
-      console.log(`  - yearData.kakusai_betsu長さ: ${yearData?.kakusai_betsu?.length}`);
+      console.log(`  - yearData.five_year_age_group存在: ${!!yearData?.five_year_age_group}`);
       
-      if (yearData && yearData.kakusai_betsu && Array.isArray(yearData.kakusai_betsu)) {
-        console.log(`🔍 年次 ${year} kakusai_betsu[0]:`, yearData.kakusai_betsu[0]);
-        console.log(`🔍 年次 ${year} kakusai_betsu[0][1] (総人口文字列):`, yearData.kakusai_betsu[0][1]);
+      // データタイプを判定
+      const isFiveYearAgeGroup = yearData?.five_year_age_group && Array.isArray(yearData.five_year_age_group);
+      const isKakusaiBetsu = yearData?.kakusai_betsu && Array.isArray(yearData.kakusai_betsu);
+      
+      if (isFiveYearAgeGroup || isKakusaiBetsu) {
+        const dataArray = isFiveYearAgeGroup ? yearData.five_year_age_group : yearData.kakusai_betsu;
+        const dataType = isFiveYearAgeGroup ? 'five_year_age_group' : 'kakusai_betsu';
+        
+        console.log(`🔍 年次 ${year} ${dataType}[0]:`, dataArray[0]);
+        console.log(`🔍 年次 ${year} ${dataType}[0][1] (総人口文字列):`, dataArray[0][1]);
         
         // 総人口を取得（最初の要素の2番目が総人口）
-        const totalPopulationString = yearData.kakusai_betsu[0][1];
+        const totalPopulationString = dataArray[0][1];
         const totalPopulation = parseInt(totalPopulationString.replace(/,/g, ''));
         
         console.log(`🔍 年次 ${year} 総人口変換: "${totalPopulationString}" → ${totalPopulation} (isNaN: ${isNaN(totalPopulation)})`);
@@ -129,12 +138,27 @@ class StreamingAnimationManager {
         
         console.log(`年次 ${year}: 総人口 ${totalPopulation.toLocaleString()}`);
       } else {
-        console.log(`❌ 年次 ${year} データ形式が不正: yearData存在=${!!yearData}, kakusai_betsu存在=${!!yearData?.kakusai_betsu}`);
+        console.log(`❌ 年次 ${year} データ形式が不正: yearData存在=${!!yearData}, kakusai_betsu存在=${!!yearData?.kakusai_betsu}, five_year_age_group存在=${!!yearData?.five_year_age_group}`);
       }
     });
     
     console.warn(`最大総人口計算終了: ${maxTotalPopulation.toLocaleString()} (年次: ${maxYear})`);
     return maxTotalPopulation;
+  }
+
+  // 全年次データから最大人口（年齢別最大値）を算出し、PyramidSVGRendererに設定
+  calculateAndSetMaxPopulationForAnimation(allData) {
+    console.log('全年次データから最大人口（年齢別最大値）を算出開始');
+    
+    if (window.pyramidRenderer && typeof window.pyramidRenderer.calculateMaxPopulationFromAllYears === 'function') {
+      const maxPopulation = window.pyramidRenderer.calculateMaxPopulationFromAllYears(allData);
+      window.pyramidRenderer.setMaxPopulationForAnimation(maxPopulation);
+      console.log(`アニメーション用最大人口を設定完了: ${maxPopulation}`);
+      return maxPopulation;
+    } else {
+      console.error('PyramidSVGRendererまたはcalculateMaxPopulationFromAllYearsメソッドが利用できません');
+      return null;
+    }
   }
 
   // 当年の総人口に基づいてスケールを計算
@@ -217,6 +241,9 @@ class StreamingAnimationManager {
       this.maxTotalPopulation = this.calculateMaxTotalPopulation(allData);
       console.log('算出された最大総人口:', this.maxTotalPopulation);
       
+      // 全年次データから最大人口（年齢別最大値）を算出し、PyramidSVGRendererに設定
+      this.calculateAndSetMaxPopulationForAnimation(allData);
+      
       console.log('zoomScaleモード: 全年次データ取得完了、アニメーション開始');
       
       // データ取得完了の表示を非表示
@@ -228,10 +255,35 @@ class StreamingAnimationManager {
       this.startAnimation();
 
     } else {
-      console.log('通常モード: バッチ処理でデータ取得');
+      console.log('固定面積モード: 全年次データを一括取得');
       
-      // 最初のバッチを読み込み
-      await this.loadNextBatch(shiku);
+      // データ取得中の表示
+      if (typeof showDataLoadingMessage === 'function') {
+        showDataLoadingMessage();
+      }
+      
+      // アニメーション開始時に基準スケールを取得・保持
+      if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
+        this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
+        console.log(`基準スケールを取得・保持: ${this.baseZoomScale}`);
+      } else {
+        console.error('PyramidSVGRendererのzoomScaleが取得できません');
+        this.baseZoomScale = 1; // デフォルト値
+      }
+      
+      // 全年次データを事前取得
+      const allData = await this.preloadAllData(shiku);
+      console.log('取得した全年次データ:', allData);
+      console.log('全年次データのキー:', Object.keys(allData));
+      console.warn('全年次データ取得完了!');
+
+      // 全年次データから最大人口（年齢別最大値）を算出し、PyramidSVGRendererに設定
+      this.calculateAndSetMaxPopulationForAnimation(allData);
+      
+      // データ取得完了の表示を非表示
+      if (typeof hideDataLoadingMessage === 'function') {
+        hideDataLoadingMessage();
+      }
       
       // アニメーション開始
       this.startAnimation();
@@ -345,7 +397,11 @@ class StreamingAnimationManager {
             return;
           }
           
-          if (!processedData.kakusai_betsu || !Array.isArray(processedData.kakusai_betsu)) {
+          // データ形式を検証（各歳別データまたは5歳階級別データのいずれかが存在することを確認）
+          const hasKakusaiBetsu = processedData.kakusai_betsu && Array.isArray(processedData.kakusai_betsu);
+          const hasFiveYearAgeGroup = processedData.five_year_age_group && Array.isArray(processedData.five_year_age_group);
+          
+          if (!hasKakusaiBetsu && !hasFiveYearAgeGroup) {
             console.error(`❌ 年次 ${year} 変換後のデータ形式が不正:`, processedData);
             failedYears.push(year);
             return;
@@ -777,16 +833,25 @@ class StreamingAnimationManager {
       this.updateYearDisplay(year);
       
       // 可変面積モードを使用する場合の処理（分岐前に実行）
-      if (this.useVariableAreaMode && window.pyramidRenderer && data && data.kakusai_betsu) {
-        // 当年の総人口を取得
-        const currentYearTotalPopulation = parseInt(data.kakusai_betsu[0][1].replace(/,/g, ''));
+      if (this.useVariableAreaMode && window.pyramidRenderer && data) {
+        // データタイプを判定して総人口を取得
+        const isFiveYearAgeGroup = data.five_year_age_group && Array.isArray(data.five_year_age_group);
+        const isKakusaiBetsu = data.kakusai_betsu && Array.isArray(data.kakusai_betsu);
         
-        // 当年スケールを計算
-        const currentYearScale = this.calculateCurrentYearScale(currentYearTotalPopulation);
-        
-        // options.zoomScaleに当年スケールをセット
-        window.pyramidRenderer.options.zoomScale = currentYearScale;
-        console.warn(`🎨 当年スケールセット完了: ${currentYearScale.toFixed(3)} (総人口: ${currentYearTotalPopulation.toLocaleString()})`);
+        if (isFiveYearAgeGroup || isKakusaiBetsu) {
+          const dataArray = isFiveYearAgeGroup ? data.five_year_age_group : data.kakusai_betsu;
+          const dataType = isFiveYearAgeGroup ? 'five_year_age_group' : 'kakusai_betsu';
+          
+          // 当年の総人口を取得
+          const currentYearTotalPopulation = parseInt(dataArray[0][1].replace(/,/g, ''));
+          
+          // 当年スケールを計算
+          const currentYearScale = this.calculateCurrentYearScale(currentYearTotalPopulation);
+          
+          // options.zoomScaleに当年スケールをセット
+          window.pyramidRenderer.options.zoomScale = currentYearScale;
+          console.warn(`🎨 当年スケールセット完了: ${currentYearScale.toFixed(3)} (総人口: ${currentYearTotalPopulation.toLocaleString()}, データタイプ: ${dataType})`);
+        }
       }
       
       //補間アニメーションか通常描画かによって分岐する
@@ -836,10 +901,13 @@ class StreamingAnimationManager {
       console.log(`🔍 年次 ${year} renderDirectly データ構造チェック:`);
       console.log(`  - data存在: ${!!data}`);
       console.log(`  - data.kakusai_betsu存在: ${!!data?.kakusai_betsu}`);
-      console.log(`  - data.kakusai_betsu配列: ${Array.isArray(data?.kakusai_betsu)}`);
-      console.log(`  - data.kakusai_betsu長さ: ${data?.kakusai_betsu?.length}`);
+      console.log(`  - data.five_year_age_group存在: ${!!data?.five_year_age_group}`);
       
-      if (!data || !data.kakusai_betsu || !Array.isArray(data.kakusai_betsu)) {
+      // データタイプを判定
+      const hasKakusaiBetsu = data?.kakusai_betsu && Array.isArray(data.kakusai_betsu);
+      const hasFiveYearAgeGroup = data?.five_year_age_group && Array.isArray(data.five_year_age_group);
+      
+      if (!data || (!hasKakusaiBetsu && !hasFiveYearAgeGroup)) {
         console.error(`❌ 年次 ${year} データ形式が不正:`, data);
         
         // 応急措置: 配列形式の場合はオブジェクト形式に変換してリカバリー
@@ -1161,16 +1229,27 @@ class StreamingAnimationManager {
       this.updateYearDisplay(targetYear);
       
       // 可変面積モードを使用する場合の処理（描画前に実行）
-      if (this.useVariableAreaMode && window.pyramidRenderer && this.dataCache && this.dataCache[targetYear] && this.dataCache[targetYear].kakusai_betsu) {
-        // 当年の総人口を取得
-        const currentYearTotalPopulation = parseInt(this.dataCache[targetYear].kakusai_betsu[0][1].replace(/,/g, ''));
+      if (this.useVariableAreaMode && window.pyramidRenderer && this.dataCache && this.dataCache[targetYear]) {
+        const targetData = this.dataCache[targetYear];
         
-        // 当年スケールを計算
-        const currentYearScale = this.calculateCurrentYearScale(currentYearTotalPopulation);
+        // データタイプを判定して総人口を取得
+        const isFiveYearAgeGroup = targetData.five_year_age_group && Array.isArray(targetData.five_year_age_group);
+        const isKakusaiBetsu = targetData.kakusai_betsu && Array.isArray(targetData.kakusai_betsu);
         
-        // options.zoomScaleに当年スケールをセット
-        window.pyramidRenderer.options.zoomScale = currentYearScale;
-        console.warn(`🎨 seekToProgress 当年スケールセット完了: ${currentYearScale.toFixed(3)} (総人口: ${currentYearTotalPopulation.toLocaleString()})`);
+        if (isFiveYearAgeGroup || isKakusaiBetsu) {
+          const dataArray = isFiveYearAgeGroup ? targetData.five_year_age_group : targetData.kakusai_betsu;
+          const dataType = isFiveYearAgeGroup ? 'five_year_age_group' : 'kakusai_betsu';
+          
+          // 当年の総人口を取得
+          const currentYearTotalPopulation = parseInt(dataArray[0][1].replace(/,/g, ''));
+          
+          // 当年スケールを計算
+          const currentYearScale = this.calculateCurrentYearScale(currentYearTotalPopulation);
+          
+          // options.zoomScaleに当年スケールをセット
+          window.pyramidRenderer.options.zoomScale = currentYearScale;
+          console.warn(`🎨 seekToProgress 当年スケールセット完了: ${currentYearScale.toFixed(3)} (総人口: ${currentYearTotalPopulation.toLocaleString()}, データタイプ: ${dataType})`);
+        }
       }
       
       // ピラミッドを更新
