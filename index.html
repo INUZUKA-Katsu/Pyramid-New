@@ -28,20 +28,13 @@
       <script type="text/javascript" src="./js/PyramidSVGRenderer.js"></script>
       <script type="text/javascript" src="./js/streaming-animation.js"></script>
       <script type="text/javascript" src="./js/ui-synchronizer.js"></script>
-      <script
-        type="text/javascript"
-        src="./js/interpolation-animation.js"
-      ></script>
+      <script type="text/javascript" src="./js/interpolation-animation.js"></script>
       <script type="text/javascript" src="./js/jquery-3.1.1.js"></script>
-      <script
-        type="text/javascript"
-        src="./js/jquery-ui-1.12.1/jquery-ui.min.js"
-      ></script>
+      <script type="text/javascript" src="./js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
       <!-- Tippy.js JavaScript -->
       <script src="https://unpkg.com/@popperjs/core@2"></script>
       <script src="https://unpkg.com/tippy.js@6"></script>
       <script type="text/javascript" src="/js/html2canvas.js"></script>
-      <!--script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> -->
       <script type="text/javascript">
         // Tippy.js ツールチップ設定
         var w;
@@ -63,6 +56,17 @@
           //   right, right-start, right-end
           //   自動調整: auto, auto-start, auto-end
           const tooltipContents = {
+            new_info_tooltip: {
+              content: `
+                <p>1. SVG (Scalable Vector Graphics)というグラフィックフォーマットできれいな人口ピラミッドを描画できるようになりました。縮小・拡大も自由自在です。</p>
+                <p>2. 長期時系列統計の区５歳階級別人口のピラミッドを表示できるようになりました。区についても昭和時代の人口ピラミッドを見ることができます。</p>
+                <p>3. アニメーション（動画）の機能を大幅に拡充しました。棒が伸び縮みするアニメーションや人口増減をピラミッドの大きさの変化でみることのできるアニメーションを選ぶことができます。スピード調整や、アニメーションの途中で気になるところがあったとき、スライドバーで任意の時点に戻ったり進めたりすることもできます。ぜひ動画ボタンをクリックしてお試しください。</p>
+                <p>4. スライドバーで簡単に年次を切り替えることができるようになりました。</p>
+              `,
+              placement: "bottom-start",
+              maxWidth: 450,
+              interactive: false
+            },
             info_3kubun_tooltip: {
               content: `
                 <p>1. セレクトボックスで年齢3区分別の人口と構成比を切替えることができます。非表示にもできます。</p>
@@ -76,34 +80,83 @@
             },
             info_animation_tooltip: { 
               content: `
-                <p>1. アニメーションの種類について<br>
-                    　通常タイプは紙芝居のように人口ピラミッドを年を追って切り替えて表示します。<br>
-                    　伸び縮みタイプは各歳の棒の長さが伸び縮みして年々の変化をおもしろく表示します。</p>
+                <p>1. アニメーションの種類について</p>
+                <p>(1) <通常タイプ> と <伸び縮みタイプ><br>
+                    　<通常タイプ>は、紙芝居のように人口ピラミッドを年を追って切り替えて表示します。<br>
+                    　<伸び縮みタイプ>は、各歳の棒の長さが伸び縮みして年々の変化をおもしろく表示します。</p>
+                <p>(2) <年齢構成> と <年齢構成 + 人口増減><br>
+                    　<年齢構成>を選択すると、一定の大きさの人口ピラミッドが年齢構成の変化によって形を変えていく様子を見ることができます。<br>
+                      人口ピラミッドは形の違いで年齢構成の違いを見るためのグラフなので、人口ピラミッドの本来の見方に沿った表現ということができます。<br>
+                    　<年齢構成 + 人口増減>を選択すると、人口の増減を反映して人口ピラミッドの大きさが変化します。<br>
+                      　人口ピラミッドの面積が厳密に人口に比例するように描画しています。<br>
+                      　市域拡大に加えて市外からの流入で人口が急激に増加した大正、昭和時代の横浜市の様子などを興味深く見ることができます。</p>
                 <p>2. [開始]ボタンをクリックすると、アニメーションが開始されます。</p>
                 <p>3. 進行状況スライダーバーについて<br>
                     　[一時停止]してからスライダーバーを動かすことで、見返したい年次に戻ることができます。<br>
                     　[再開]ボタンでその年次からのアニメーションを再開します。</p>
-            `,
+              `,
               placement: "bottom-start",
               maxWidth: 450,
               interactive: false
-          },
+            },
+            cho_link_tooltip: {
+              content: `
+                <p>1. 町丁選択パネルの表示<br>
+                    　左のリンクをクリックすると人口ピラミッドの下にある町丁選択パネルをスクロール表示します。</p>
+                <p>2. 地域の人口ピラミッドの表示方法<br>
+                   (1) 町丁選択パネルで、人口ピラミッドを見たいと思う地域に含まれる町丁のチェックボックスをチェックしてください。<br>
+                   (2) 町丁のチェックを終えたら、[町丁別人口ピラミッド]ボタンをクリックしてください。<br>
+                   (3) 指定した町丁を合わせた地域の人口ピラミッドが表示されます。<br>
+                   (4) 人口ピラミッドの上の年月セレクトボックスで別の年次を選択すると、同じ地域の別に年の人口ピラミッドを見ることができます。</p>
+                <p>3. 区や市のピラミッドへの戻り方<br>
+                  　町丁選択パネル上部にある[市区全体の人口ピラミッド]ボタンをクリックすると表示中の地域を含む区全体の人口ピラミッドを表示します。<br>
+                  　人口ピラミッド上部の市区選択セレクトボックスで横浜市や他の区を選択しても、市または区の人口ピラミッドに戻ることができます。</p>
+               `,
+               placement: "bottom-start",
+               maxWidth: 450,
+               interactive: false
+            },
+            doga_button_tooltip: {
+              content: `
+                <p>1. [動画]ボタンについて<br>
+                  　表示中の市区・地域の人口ピラミッドの変化(=年齢構成の移り変わり)をアニメーションのように見ることができます。<br>
+                  　クリックするとアニメーションのための操作ボタンなどが表示されます。</p>
+                <p>2. スライダーバーについて<br>　スライドバーを左右に動かすことによって素早くセレクトボックスの年次を変えることができます。</p>
+              `,
+              placement: "top-end",
+              maxWidth: 450,
+              interactive: false
+            },
+            screen_shot_tooltip: {
+              content: `
+                <p>1. スクリーンショットの使い道<br>
+                (1) 人口ピラミッドの画像ファイルをダウンロードして、人口ピラミッドをWordやPowerPointなどに貼り付けて利用することができます。<br>
+                (2) 比較したい人口ピラミッドを並べて表示し、見比べることができます。</p>
+                <p>2. スクリーンショットの作成とダウンロードの方法<br>
+                (1) 作成<br>
+                    スクリーンショットボタンをクリックすると、このページの下部にイメージが埋め込まれます。<br>
+                (2) ダウンロード<br>
+                    画像データをダウンロードしたいときは、イメージの右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。<br>
+                (3) 複数の人口ピラミッドの比較<br>
+                    市区や地域を変えたり時点を変えて様々の人口ピラミッドを表示させ、それらのスクリーンショットを撮ってください。<br>
+                    ページの下の方に撮影したイメージが並んで表示されます。並べることのできる数に制限はありません。</p>
+              `,
+              placement: "top-start",
+              maxWidth: 450,
+              interactive: false
+            },
+            info_cho_pyramid_tooltip: {
+              content: `
+                <p>1. 地域の人口ピラミッドを描く方法<br>
+                  　町丁名をチェックしてから[町丁別人口ピラミッド]ボタンをクリックしてください。<br>
+                  　隣接する複数の町丁を選択してその地域の人口ピラミッドを描くことができます。</p>
+                <p>2. 区全体の人口ピラミッドに戻るときは[区全体の人口ピラミッド]ボタンをクリックしてください。</p>
+              `,
+              placement: "top-end",
+              maxWidth: 450,
+              interactive: false
+            }
           };
-
-          // スクリーンショットツールチップ（クリック表示）
-          tippy("#screen_shot_tooltip", {
-            content:
-              "表示している人口ピラミッドグラフの画像をこのページ最下部に表示します。画像データを保存したいときは、画像の右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。",
-            placement: "top",
-            theme: "light",
-            trigger: "click",
-            interactive: false,
-            maxWidth: 300,
-            allowHTML: true,
-            arrow: true,
-            offset: [0, 10],
-          });
-
           // ヘッダーツールチップ（クリック表示）
           $(".header").each(function () {
             const tooltipText = $(this).attr("data-tooltip");
@@ -128,7 +181,7 @@
 
           // その他のツールチップ（クリック表示）
           $(
-            ".info-icon-left, .info-icon-right, .info-icon-bottom, .info-icon-3kubun"
+            ".info-icon-left, .info-icon-right, .info-icon-bottom, .info-icon-3kubun, [data-tooltip-id]"
           ).each(function () {
             // data-tooltip-id属性がある場合は、定義されたコンテンツを使用
             const tooltipId = $(this).attr("data-tooltip-id");
@@ -159,8 +212,10 @@
                 if (dataPlacement) {
                   placement = dataPlacement;
                 } else {
-                  // クラス名で判定
-                  if ($(this).hasClass("tooltip-top")) {
+                  // クラス名で判定（data-tooltip-id属性がある場合はクラス名による方向指定をスキップ）
+                  if ($(this).attr("data-tooltip-id")) {
+                    placement = "top"; // デフォルト（tooltipContentsのplacementが優先される）
+                  } else if ($(this).hasClass("tooltip-top")) {
                     placement = "top";
                   } else if ($(this).hasClass("tooltip-bottom")) {
                     placement = "bottom";
@@ -1154,8 +1209,7 @@
         <div id="header" data-html2canvas-ignore="true">
           <a
             href="#"
-            class="header"
-            data-tooltip="●横浜市全体の将来推計人口を2024年1月に公表された新たな将来推計人口に差し替えました。区別の将来推計人口は3月に公表される予定です。<br>●スクリーンショットの解像度を上げて文字が読めるようにしました。<br>●人口ピラミッドのスクリーンショットを撮り画像ファイルとして保存することができるようになりました。<br>●年齢3区分区別の人口と構成比を見ることができるようになりました。年齢区分はデフォルトでは通常の年少人口、生産年齢人口、高齢人口の区分で表示しますが、区切りの年齢を自由に変更して見ることができます。例えば、中位の年齢区分を「65〜75歳」とすれば、前期高齢者、後期高齢者の人数や構成比を確認することができます。<br>●将来推計人口を人口ピラミッドで見ることができるようになりました。また、市区の動画では横軸を固定し、人口の増減を合わせて見ることができるようになりました。"
+            data-tooltip-id="new_info_tooltip"
           >
             ><span style="color: red; font-size: 100%">New!</span>
           </a>
@@ -1446,16 +1500,7 @@
                 <a href="#cho"> 地域別人口ピラミッドのための町丁名の指定 </a>
                 <span
                   class="info-icon-right"
-                  data-tooltip="\1. 町丁選択パネルの表示<br>\
-                                 　左のリンクをクリックすると人口ピラミッドの下にある町丁選択パネルをスクロール表示します。<br><br>\
-                                2. 地域の人口ピラミッドの表示方法<br>\
-                                (1) 町丁選択パネルで、人口ピラミッドを見たいと思う地域に含まれる町丁のチェックボックスをチェックしてください。<br>\
-                                (2) 町丁のチェックを終えたら、[町丁別人口ピラミッド]ボタンをクリックしてください。<br>\
-                                (3) 指定した町丁を合わせた地域の人口ピラミッドが表示されます。<br>\
-                                (4) 人口ピラミッドの上の年月セレクトボックスで別の年次を選択すると、同じ地域の別に年の人口ピラミッドを見ることができます。<br><br>\
-                                3. 区や市のピラミッドへの戻り方<br>\
-                                　町丁選択パネル上部にある[市区全体の人口ピラミッド]ボタンをクリックすると表示中の地域を含む区全体の人口ピラミッドを表示します。<br>\
-                                　人口ピラミッド上部の市区選択セレクトボックスで横浜市や他の区を選択しても、市または区の人口ピラミッドに戻ることができます。"
+                  data-tooltip-id="cho_link_tooltip"
                   style="cursor: pointer"
                 >
                   <img src="./image/tooltip-icon.png" class="small-icon"
@@ -1568,8 +1613,7 @@
                       <a
                         href="#"
                         class="info-icon-right"
-                        data-tooltip="\1. [動画]ボタンについて<br>　表示中の市区・地域の人口ピラミッドの変化(=年齢構成の移り変わり)をアニメーションのように見ることができます。<br>　クリックするとアニメーションのための操作ボタンなどが表示されます。<br><br>\
-                                      2. スライダーバーについて<br>　スライドバーを左右に動かすことによって素早くセレクトボックスの年次を変えることができます。"
+                        data-tooltip-id="doga_button_tooltip"
                         ><img src="./image/tooltip-icon.png" class="small-icon"
                       /></a>
                     </div>
@@ -1708,8 +1752,7 @@
                   <a
                     href="#here"
                     class="info-icon-bottom"
-                    data-tooltip="\1. 地域の人口ピラミッドを描く方法<br>　町丁名をチェックしてから[町丁別人口ピラミッド]ボタンをクリックしてください。<br>　隣接する複数の町丁を選択してその地域の人口ピラミッドを描くことができます。<br>\
-                                  2. 区全体の人口ピラミッドに戻るときは[区全体の人口ピラミッド]ボタンをクリックしてください。"
+                    data-tooltip-id="info_cho_pyramid_tooltip"
                     ><img src="./image/tooltip-icon.png" class="small-icon"
                   /></a>
                 </div>
@@ -1733,8 +1776,7 @@
                 スクリーンショット
                 <a
                   href="#"
-                  class="header"
-                  id="screen_shot_tooltip"
+                  data-tooltip-id="screen_shot_tooltip"
                   style="margin-left: 8px; display: inline-block"
                   ><img src="./image/tooltip-icon.png" class="small-icon"
                 /></a>
@@ -1969,7 +2011,7 @@
         document.addEventListener("DOMContentLoaded", function () {
           // アニメーション進行スライダーの初期化
           setupAnimationProgressSlider();
-
+          
           // セレクトボックスのイベントリスナーを設定
           //const demoDataSelect = document.getElementById("demoData");
           //demoDataSelect.addEventListener("change", changeDemoData);
@@ -2038,6 +2080,7 @@
               showNumbers: currentOptions.showNumbers,
             });
           }
+          localStorage_set("showNumbers", currentOptions.showNumbers);
         }
 
         // グリッド表示の切り替え
@@ -2082,7 +2125,13 @@
         //}
 
         // ピラミッドの描画
-        function renderPyramid(data, isAnimation = false) {
+        function renderPyramid(data, animeMode) {
+          
+          let isAnimation = false;
+          if (animeMode != undefined) {
+            isAnimation = true;
+          }
+
           console.log(
             "renderPyramid 関数定義完了",
             "isAnimation:",
@@ -2107,7 +2156,7 @@
                 "更新前のzoomScale:",
                 window.pyramidRenderer.options.zoomScale
               );
-              window.pyramidRenderer.updateData(data, isAnimation);
+              window.pyramidRenderer.updateData(data, animeMode);
               console.log(
                 "更新後のzoomScale:",
                 window.pyramidRenderer.options.zoomScale
@@ -2158,9 +2207,7 @@
         console.log("loadDemoData:", typeof loadDemoData);
         console.log("renderPyramid:", typeof renderPyramid);
 
-        // ****************************************************************
-        // 画面デザイン（各要素の配置位置） ************************************
-        // ****************************************************************
+        // 画面デザイン（各要素の配置位置）
         function centerContents() {
           const menu = document.querySelector(".left-controls");
           const pyramid = document.querySelector("#pyramid-block");
@@ -2197,7 +2244,7 @@
             // #basic_dataをSVG描画領域内の右下に配置
             const basicLeftPos = pyramidContainer_rect.right - basicWidth - 20;
             const basicTopPos =
-              pyramidContainer_rect.bottom - basic.offsetHeight - 25;
+              pyramidContainer_rect.bottom - basic.offsetHeight - 15;
             basic.style.left = basicLeftPos + "px";
             basic.style.top = basicTopPos + "px";
             basic.style.display = "block";
@@ -2551,14 +2598,14 @@
           }
         }
 
-        // アニメーション停止
+        // アニメーション終了
         function stopAnimationFromControls() {
           // 元の選択状態を保存
-          const originalNengetsu = get_selected_nengetsu();
-          const originalPyramode = get_pyramid_mode();
-          console.log(
-            `終了ボタン: 元の選択状態を保存 - 年次: ${originalNengetsu}, モード: ${originalPyramode}`
-          );
+          //const originalNengetsu = get_selected_nengetsu();
+          //const originalPyramode = get_pyramid_mode();
+          //console.log(
+          //  `終了ボタン: 元の選択状態を保存 - 年次: ${originalNengetsu}, モード: ${originalPyramode}`
+          //);
 
           // ストリーミングアニメーションの停止
           if (window.streamingAnimation) {
@@ -2578,13 +2625,13 @@
             progressDisplay.textContent = "0%";
           }
 
-          // 元の選択状態を復元
-          if (originalNengetsu && originalNengetsu !== undefined) {
-            console.log(
-              `終了ボタン: 元の選択状態を復元 - 年次: ${originalNengetsu}`
-            );
-            select_nengetsu(originalNengetsu, originalPyramode);
-          }
+          //// 元の選択状態を復元
+          //if (originalNengetsu && originalNengetsu !== undefined) {
+          //  console.log(
+          //    `終了ボタン: 元の選択状態を復元 - 年次: ${originalNengetsu}`
+          //  );
+          //  select_nengetsu(originalNengetsu, originalPyramode);
+          //}
         }
 
         // スライダーの操作可否を制御する関数

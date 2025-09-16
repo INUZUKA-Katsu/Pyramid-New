@@ -9,7 +9,7 @@ class InterpolationAnimationManager {
     this.startData = null;
     this.endData = null;
     this.currentData = null;
-    this.minChangeThreshold = 5; // 最小変化閾値（5人未満の変化は表示しない）
+    this.minChangeThreshold = 5; // 最小変化閾値（5人未満の変化は表示しない
   }
 
   // 2つの年次データ間の補間アニメーションを開始
@@ -192,7 +192,11 @@ class InterpolationAnimationManager {
       
       // 補間されたデータをchange_pyramidに渡す（アニメーション中フラグをtrue、補間フラグをtrueに設定）
       if (typeof change_pyramid === 'function') {
-        change_pyramid(data, true, true);
+        let animeMode = {
+          isInterpolation: true,
+          isVariableAreaMode: window.streamingAnimation.useVariableAreaMode
+        };
+        change_pyramid(data, animeMode);
       } else {
         console.error('change_pyramid関数が見つかりません');
       }
@@ -228,10 +232,10 @@ class InterpolationAnimationManager {
   showPopulationLabels() {
     // 現在のデータをchange_pyramidで描画（アニメーション中フラグをtrueのままにして人数ラベルを非表示）
     if (this.currentData && typeof change_pyramid === 'function') {
-      change_pyramid(this.currentData, true);
+      change_pyramid(this.currentData, {});
     } else if (this.endData && typeof change_pyramid === 'function') {
       // フォールバック: 現在のデータがない場合は終了データを使用
-      change_pyramid(this.endData, true);
+      change_pyramid(this.endData, {});
     }
   }
 

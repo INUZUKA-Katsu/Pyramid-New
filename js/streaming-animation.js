@@ -147,16 +147,38 @@ class StreamingAnimationManager {
   }
 
   // 全年次データから最大人口（年齢別最大値）を算出し、PyramidSVGRendererに設定
+  // ５歳階級別人口の場合も計算中getMaxPopulationで適切に処理されている.
   calculateAndSetMaxPopulationForAnimation(allData) {
     console.log('全年次データから最大人口（年齢別最大値）を算出開始');
     
     if (window.pyramidRenderer && typeof window.pyramidRenderer.calculateMaxPopulationFromAllYears === 'function') {
+
       const maxPopulation = window.pyramidRenderer.calculateMaxPopulationFromAllYears(allData);
+
       window.pyramidRenderer.setMaxPopulationForAnimation(maxPopulation);
-      console.log(`アニメーション用最大人口を設定完了: ${maxPopulation}`);
+      
+      console.warn(`アニメーション用最大人口を設定完了: ${maxPopulation}`);
       return maxPopulation;
     } else {
       console.error('PyramidSVGRendererまたはcalculateMaxPopulationFromAllYearsメソッドが利用できません');
+      return null;
+    }
+  }
+
+  // 全年次データから最大BarLength（年齢別最大値）を算出し、PyramidSVGRendererに設定
+  calculateAndSetMaxPopulationForAnimation(allData) {
+    console.log('全年次データから最大BarLength（年齢別最大値）を算出開始');
+    
+    if ( window.pyramidRenderer && 
+         typeof window.pyramidRenderer.calculateMaxBarLengthFromAllYears === 'function') {
+
+      const maxBarLength = window.pyramidRenderer.calculateMaxBarLengthFromAllYears(allData);
+      window.pyramidRenderer.setMaxBarLengthForAnimation(maxBarLength);
+      console.log(`アニメーション用最大BarLengthを設定完了: ${maxBarLength}`);
+      return maxBarLength;
+      
+    } else {
+      console.error('PyramidSVGRendererまたはcalculateMaxBarLengthFromAllYearsメソッドが利用できません');
       return null;
     }
   }
@@ -213,8 +235,10 @@ class StreamingAnimationManager {
       alert('年次データが見つかりません。ページを再読み込みしてください。');
       return;
     }
-    // 可変面積モードの場合は、全年次データを事前取得して最大総人口を算出
     if (this.useVariableAreaMode) {
+      // ********************************************************
+      // 以下は可変面積モード （全年次データを事前取得して最大総人口を算出）
+      // ********************************************************
       console.log('可変面積モード: 全年次データを事前取得');
       
       // データ取得中の表示
@@ -222,10 +246,10 @@ class StreamingAnimationManager {
         showDataLoadingMessage();
       }
       
-      // アニメーション開始時に基準スケールを取得・保持
+      // アニメーション開始時に基準スケールを取得・保持 
       if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
         this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
-        console.log(`基準スケールを取得・保持: ${this.baseZoomScale}`);
+        console.warn(`基準スケールを取得・保持: ${this.baseZoomScale}`);
       } else {
         console.error('PyramidSVGRendererのzoomScaleが取得できません');
         this.baseZoomScale = 1; // デフォルト値
@@ -239,12 +263,7 @@ class StreamingAnimationManager {
 
       // 最大総人口を算出
       this.maxTotalPopulation = this.calculateMaxTotalPopulation(allData);
-      console.log('算出された最大総人口:', this.maxTotalPopulation);
-      
-      // 全年次データから最大人口（年齢別最大値）を算出し、PyramidSVGRendererに設定
-      this.calculateAndSetMaxPopulationForAnimation(allData);
-      
-      console.log('zoomScaleモード: 全年次データ取得完了、アニメーション開始');
+      console.warn('算出された最大総人口:', this.maxTotalPopulation);
       
       // データ取得完了の表示を非表示
       if (typeof hideDataLoadingMessage === 'function') {
@@ -255,6 +274,9 @@ class StreamingAnimationManager {
       this.startAnimation();
 
     } else {
+      // ********************************************************
+      // 以下は固定面積モード
+      // ********************************************************
       console.log('固定面積モード: 全年次データを一括取得');
       
       // データ取得中の表示
@@ -263,13 +285,13 @@ class StreamingAnimationManager {
       }
       
       // アニメーション開始時に基準スケールを取得・保持
-      if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
-        this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
-        console.log(`基準スケールを取得・保持: ${this.baseZoomScale}`);
-      } else {
-        console.error('PyramidSVGRendererのzoomScaleが取得できません');
-        this.baseZoomScale = 1; // デフォルト値
-      }
+      //if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
+      //  this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
+      //  console.log(`基準スケールを取得・保持: ${this.baseZoomScale}`);
+      //} else {
+      //  console.error('PyramidSVGRendererのzoomScaleが取得できません');
+      //  this.baseZoomScale = 1; // デフォルト値
+      //}
       
       // 全年次データを事前取得
       const allData = await this.preloadAllData(shiku);
@@ -277,8 +299,9 @@ class StreamingAnimationManager {
       console.log('全年次データのキー:', Object.keys(allData));
       console.warn('全年次データ取得完了!');
 
-      // 全年次データから最大人口（年齢別最大値）を算出し、PyramidSVGRendererに設定
+      // 全年次データから最大BarLenrth（年齢別最大値）を算出し、PyramidSVGRendererに設定
       this.calculateAndSetMaxPopulationForAnimation(allData);
+      console.warn('年齢別最大BarLengthのセット完了');
       
       // データ取得完了の表示を非表示
       if (typeof hideDataLoadingMessage === 'function') {
@@ -850,7 +873,7 @@ class StreamingAnimationManager {
           
           // options.zoomScaleに当年スケールをセット
           window.pyramidRenderer.options.zoomScale = currentYearScale;
-          console.warn(`🎨 当年スケールセット完了: ${currentYearScale.toFixed(3)} (総人口: ${currentYearTotalPopulation.toLocaleString()}, データタイプ: ${dataType})`);
+          console.warn(`🎨 当年スケールセット完了: ${currentYearScale.toFixed(3)} (当年スケール: ${currentYearScale}、総人口: ${currentYearTotalPopulation.toLocaleString()}, データタイプ: ${dataType})`);
         }
       }
       
@@ -883,7 +906,7 @@ class StreamingAnimationManager {
 
   // 直接描画
   renderDirectly(year, data) {
-    console.log(`🎬 年次 ${year} 直接描画開始`);
+    console.warn(`🎬 年次 ${year} 直接描画開始(renderDirectly)`);
     console.warn(`🎬 renderDirectly呼び出し: 年次=${year}, データ存在=${data ? 'あり' : 'なし'}, データ型=${typeof data}`);
     try {
       // データ構造を確認
@@ -916,7 +939,11 @@ class StreamingAnimationManager {
           const convertedData = this.getObjectPiramidData(data);
           if (convertedData && convertedData.kakusai_betsu && Array.isArray(convertedData.kakusai_betsu)) {
             console.log(`✅ 年次 ${year} リカバリー成功、変換済みデータで描画`);
-            change_pyramid(convertedData, true, false);
+            let animeMode = {
+              isInterpolation: false,
+              isVariableAreaMode: this.useVariableAreaMode
+            };
+            change_pyramid(convertedData, animeMode);
             return;
           }
         }
@@ -934,7 +961,13 @@ class StreamingAnimationManager {
       
       // アニメーション中フラグをtrue、補間フラグをfalseに設定してchange_pyramidを呼び出し
       console.warn(`🎬 直接描画(change_pyramid呼び出し): 年次=${year}`);
-      change_pyramid(data, true, false);
+
+      let animeMode = {
+        isInterpolation: false,
+        isVariableAreaMode: this.useVariableAreaMode
+      };
+      change_pyramid(data, animeMode);
+      
       console.log(`✅ 年次 ${year} 直接描画完了`);
       
       // デバッグ: 直接描画の総数を確認
@@ -950,7 +983,13 @@ class StreamingAnimationManager {
           const convertedData = this.getObjectPiramidData(data);
           if (convertedData && convertedData.kakusai_betsu && Array.isArray(convertedData.kakusai_betsu)) {
             console.log(`✅ 年次 ${year} エラー時リカバリー成功、変換済みデータで描画`);
-            change_pyramid(convertedData, true, false);
+
+            let animeMode = {
+              isInterpolation: false,
+              isVariableAreaMode: this.useVariableAreaMode
+            };
+            change_pyramid(convertedData, animeMode);
+
             return;
           }
         } catch (recoveryError) {
@@ -962,7 +1001,7 @@ class StreamingAnimationManager {
 
   // 補間アニメーション付き描画
   async renderWithInterpolation(startYear, endYear, startData, endData) {
-    console.log(`🎬 年次 ${startYear} → ${endYear} 補間アニメーション開始`);
+    console.warn(`🎬 年次 ${startYear} → ${endYear} 補間アニメーション開始(renderWithInterpolation)`);
     return new Promise((resolve) => {
       if (window.interpolationAnimation) {
         try {
@@ -1096,96 +1135,80 @@ class StreamingAnimationManager {
     }
   }
 
-  // セレクトボックスの表示を現在の年次に同期
-  syncSelectBoxToCurrentYear(year) {
-    try {
-      const pyramode = get_pyramid_mode();
-      console.log(`🔄 セレクトボックス同期: 年次=${year}, モード=${pyramode}`);
-      
-      // 年次が有効でない場合は同期をスキップ
-      if (!year || year === undefined || year === null) {
-        console.log(`⚠️ セレクトボックス同期をスキップ: 無効な年次 (${year})`);
-        return;
-      }
-      
-      // グローバル変数$nengetsuを更新
-      if (typeof window.$nengetsu !== 'undefined') {
-        window.$nengetsu = year;
-      }
-      
-      // セレクトボックスの値を更新
-      if (pyramode === "shiku" || pyramode === "age") {
-        const shikuYearSelect = document.getElementById("shiku_year");
-        if (shikuYearSelect) {
-          // オプションが存在するかチェック
-          if (this.optionExists(shikuYearSelect, year)) {
-            shikuYearSelect.value = year;
-            console.log(`✅ shiku_yearセレクトボックスを${year}に更新`);
-            
-            // セレクトボックスのchangeイベントを発火して再描画
-            const changeEvent = new Event('change', { bubbles: true });
-            shikuYearSelect.dispatchEvent(changeEvent);
-            console.log(`🔄 shiku_yearセレクトボックスのchangeイベントを発火`);
-          } else {
-            console.log(`⚠️ shiku_yearセレクトボックス同期をスキップ: 年次${year}がオプションに存在しません`);
-          }
-        }
-      } else if (pyramode === "cho") {
-        const choYearSelect = document.getElementById("cho_year");
-        if (choYearSelect) {
-          // オプションが存在するかチェック
-          if (this.optionExists(choYearSelect, year)) {
-            choYearSelect.value = year;
-            console.log(`✅ cho_yearセレクトボックスを${year}に更新`);
-            
-            // セレクトボックスのchangeイベントを発火して再描画
-            const changeEvent = new Event('change', { bubbles: true });
-            choYearSelect.dispatchEvent(changeEvent);
-            console.log(`🔄 cho_yearセレクトボックスのchangeイベントを発火`);
-          } else {
-            console.log(`⚠️ cho_yearセレクトボックス同期をスキップ: 年次${year}がオプションに存在しません`);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('セレクトボックス同期エラー:', error);
-    }
-  }
-
-  // オプションが存在するかチェックするヘルパー関数
-  optionExists(selectElement, value) {
-    if (!selectElement || !selectElement.options || selectElement.options.length === 0) {
-      return false;
+  // セレクトボックスを現在の年次に同期
+  syncSelectBoxToCurrentYear(year = null) {
+    // 引数が指定されていない場合は、getCurrentDisplayYear()で取得
+    const targetYear = year || this.getCurrentDisplayYear();
+    console.log(`🔄 セレクトボックスを年次(${targetYear})に同期`);
+    
+    const shikuYearSelect = document.getElementById("shiku_year");
+    if (!shikuYearSelect) {
+      console.warn("⚠️ shiku_yearセレクトボックスが見つかりません");
+      return;
     }
     
-    for (let i = 0; i < selectElement.options.length; i++) {
-      if (selectElement.options[i].value === value) {
-        return true;
-      }
+    // オプションの存在確認
+    const optionExists = Array.from(shikuYearSelect.options).some(option => option.value === targetYear);
+    if (!optionExists) {
+      console.warn(`⚠️ 年次${targetYear}のオプションが存在しません`);
+      return;
     }
-    return false;
+    
+    // セレクトボックスの値を更新
+    shikuYearSelect.value = targetYear;
+    console.log(`✅ shiku_yearセレクトボックスを${targetYear}に更新`);
+    
+    // UISynchronizerを使ってスライドバーも同期
+    if (window.uiSynchronizer) {
+      window.uiSynchronizer.syncSelectBoxWithSlider('shiku');
+    }
+    
+    // セレクトボックスのchangeイベントを発火して再描画
+    //const changeEvent = new Event('change', { bubbles: true });
+    //shikuYearSelect.dispatchEvent(changeEvent);
+    //alert(`ピラミッド再描画終了`);
   }
 
-  // アニメーション停止
+  // アニメーション終了
   stopAnimation() {
     this.isAnimating = false;
     if (this.animationInterval) {
       clearTimeout(this.animationInterval);
       this.animationInterval = null;
     }
-    // 停止時にもセレクトボックスを現在の年次に同期
+    
+    // 補間アニメーションのstopAnimationメソッドを元に戻す
+    if (window.interpolationAnimation && 
+        window.interpolationAnimation.originalStopAnimation
+       ) 
+    {
+      window.interpolationAnimation.stopAnimation = window.interpolationAnimation.originalStopAnimation;
+    }
+    
+    // 補間アニメーションも停止
+    if (window.interpolationAnimation) {
+      window.interpolationAnimation.stopAnimation();
+    }
+    
+    // 終了時にもセレクトボックスを現在の年次に同期
     const currentYear = this.getCurrentDisplayYear();
+    console.log(`アニメーション終了: セレクトボックスを現在の年次に同期: ${currentYear}`);
+    //set_shiku_nengetsu(currentYear);
     this.syncSelectBoxToCurrentYear(currentYear);
     
     // 可変面積モードの場合は、基準スケールを復元
-    if (this.useVariableAreaMode && this.baseZoomScale && window.pyramidRenderer) {
+    if (this.useVariableAreaMode && 
+        this.baseZoomScale && 
+        window.pyramidRenderer
+       ) 
+    {
       window.pyramidRenderer.options.zoomScale = this.baseZoomScale;
       window.pyramidRenderer.resizeByScale(this.baseZoomScale);
-      console.log('アニメーション停止: 基準スケールを復元:', this.baseZoomScale);
+      console.log('アニメーション終了: 基準スケールを復元:', this.baseZoomScale);
     }
     
-    // アニメーション停止時に人数ラベルを表示
-    this.showPopulationLabels();
+    //// アニメーション終了時に人数ラベルを表示
+    //this.showPopulationLabels();
     
     // アニメーションコントロールを非表示
     if (typeof hideAnimationControls === 'function') {
@@ -1204,7 +1227,10 @@ class StreamingAnimationManager {
 
   // アニメーション再開
   resumeAnimation() {
-    if (!this.isAnimating && this.currentYearIndex < this.allYears.length) {
+    if (!this.isAnimating && 
+        this.currentYearIndex < this.allYears.length
+       )
+    {
       this.isAnimating = true;
       this.startAnimation();
     }
@@ -1254,7 +1280,11 @@ class StreamingAnimationManager {
       
       // ピラミッドを更新
       if (this.dataCache && this.dataCache[targetYear]) {
-        change_pyramid(this.dataCache[targetYear], true, false);
+        let animeMode = {
+          isInterpolation: false,
+          isVariableAreaMode: this.useVariableAreaMode
+        };
+        change_pyramid(this.dataCache[targetYear], animeMode);
       } else {
         console.warn(`年次 ${targetYear} のデータが見つかりません`);
       }

@@ -247,3 +247,4 @@ function syncSelectBoxWithSlider(pyramode) {
     uiSynchronizer.syncSelectBoxWithSlider(pyramode);
   }
 }
+

@@ -122,6 +122,31 @@ function change_cho_year() {
   cho_pyramid();
 }
 
+//市区用の年月日を設定してピラミッドを更新する.
+//動作するが未使用(select_nengetsu()との異同未解明)
+function set_shiku_nengetsu(nengetsu) {
+  let elm = document.getElementById('shiku_year');
+  elm.addEventListener('change', function() {
+    console.log('shiku_year changed');
+  });
+  elm.value = nengetsu;
+  elm.dispatchEvent(new Event('change'));
+  $nengetsu = nengetsu;
+}
+//set_shiku_nengetsu('201501');
+
+//町丁別用の年月日を設定してピラミッドを更新する.
+function set_cho_nengetsu(nengetsu) {
+  let elm = document.getElementById('cho_year');
+  elm.addEventListener('change', function() {
+    console.log('cho_year changed');
+  });
+  elm.value = nengetsu;
+  elm.dispatchEvent(new Event('change'));
+  $nengetsu = nengetsu;
+}
+//set_cho_nengetsu('201509');
+
 //端末データ保存のラジオボタンを変更したときの処理
 function localStorage_Setting() {
   //localStorage_list();
@@ -251,8 +276,7 @@ function shiku_pyramid(nengetsu) {
   //console.log("step1");
   //console.log(nengetsu); //市区を変更したときは、undefined
 
-  //テストのため一時的にコメント化
-  var ans ; //= escape_ajax("shiku_json", nengetsu);
+   var ans = escape_ajax("shiku_json", nengetsu);
   //console.log("step2");
   if (ans === false || ans == undefined) {
     //ローカルデータが存在しないときはサーバから取得して描画する.
@@ -283,7 +307,7 @@ function escape_ajax(mode, nengetsu) {
   if (key != false) {
     //console.log("step1.5-1");
     var response = localStorage_get(key);
-    if (mode == "cho_csv" && response.substr(0, 2) != "町名") {
+    if (mode == "cho_csv" && response.slice(0, 2) != "町名") {
       response = JSON.parse(response).csv;
     }
     //console.log("step1.5-1-2");
@@ -395,7 +419,7 @@ function modify_html(response, mode, nengetsu) {
       } catch (e) {
         //サーバ側のrubyのJSON作成処理で文字コードに起因するエラーが発生した場合、
         //CSVファイルを返すようにした。CSVはJSON.parseでエラーになるのでリカバリーする.
-        if (response.substr(0, 2) == "町名") {
+        if (response.slice(0, 2) == "町名") {
           console.log("makePyramidData呼出し");
           var pyramidData = makePyramidData(response);
           change_pyramid(pyramidData);
@@ -447,20 +471,31 @@ function modify_html(response, mode, nengetsu) {
 //#######  ピラミッドを描画するコアプログラム  ##########
 
 //ピラミッド描画エンジン(引数isAnm: アニメーション中かどうかのフラグ, isInterpolation: 補間アニメーション中かどうかのフラグ)
-function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
+function change_pyramid(objectData, animeMode) {
   console.log("change_pyramid開始");
   console.log(objectData["kijunbi"]);
-  console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
   
   myFunc();
+  
+  let isAnm ;
+  let isInterpolation ;
+  if ( animeMode != undefined) {
+    isAnm = true;
+    isInterpolation = animeMode.isInterpolation;
+  } else {
+    isAnm = false;
+    isInterpolation =false ;
+  }
+  console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
   console.warn("1 get_selected_nengetsu()",get_selected_nengetsu());
   console.warn("1 $nengetsu",$nengetsu);
 
+
   //ピラミッドを描画する。
   if (window.pyramidRenderer == null) {
-    renderPyramid(objectData, isAnm);
+    renderPyramid(objectData, animeMode);
   } else {
-    window.pyramidRenderer.updateData(objectData, isAnm);
+    window.pyramidRenderer.updateData(objectData, animeMode);
   }
 
   //その他の情報
@@ -525,15 +560,7 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
   });
 
 
-  console.warn("平成７年の港北・緑・青葉・都筑４区のとりあつかい。");
-  console.warn("get_selected_nengetsu()",get_selected_nengetsu());
-  console.warn("4 $nengetsu",$nengetsu);
   if (!isAnm){
-    //var nengetsu = get_selected_nengetsu();
-    //if (nengetsu == undefined) {
-    //  nengetsu = $nengetsu;
-    //}
-    //console.warn("nengetsu",nengetsu);
     if (
       $nengetsu == "199501" &&
       (shiku == "港北区" ||
@@ -541,11 +568,9 @@ function change_pyramid(objectData, isAnm = false, isInterpolation = false) {
         shiku == "都筑区" ||
         shiku == "青葉区")
     ) {
-      shiku = "港北・緑・青葉・都筑４区<span class='small'> (分区直後で区別データなし)</span><br>";
+      shiku = "港北・緑・青葉・都筑４区<span class='small'> (分区直後で区別データなし)</span>";
     }
   }
-  console.warn("shiku",shiku);
-  console.log("change_pyramid step4");
 
   var h2 = shiku + '<span class="inline-block">' + kijunbi + "</span>";
   h2 = h2.replace("将来推計人口", '<span class="small">将来推計人口</span>');
@@ -1340,7 +1365,7 @@ function localStorage_get(key) {
   if (get_browser_usage_of_localStorage() == "not_use") {
     return;
   }
-  if (key.substr(-6) == "option") {
+  if (key.slice(-6) == "option") {
     var json = localStorage.getItem("all_option.txt");
     var obj = JSON.parse(json);
     return obj[key];
@@ -1429,9 +1454,9 @@ function localStorage_lotation() {
   var ary = [];
   for (i = 0; i < localStorage.length; i++) {
     var key = localStorage.key(i);
-    if (key.substr(-4) == ".csv") {
+    if (key.slice(-4) == ".csv") {
       var val = localStorage[key];
-      if (val.substr(0, 2) == "町名") {
+      if (val.slice(0, 2) == "町名") {
         localStorage.removeItem(key); //素のcsvファイルは削除する.
       } else {
         ary.push([key, JSON.parse(val).timeStamp]);
@@ -1465,9 +1490,9 @@ function localStorage_list() {
   }
   //キーの拡張子でソートする.
   ary.sort(function (a, b) {
-    if (a.substr(-3) < b.substr(-3)) {
+    if (a.slice(-3) < b.slice(-3)) {
       return -1;
-    } else if (a.substr(-3) > b.substr(-3)) {
+    } else if (a.slice(-3) > b.slice(-3)) {
       return 1;
     } else {
       return 0;
@@ -1508,8 +1533,8 @@ function set_another_nengetsu(newPyramode) {
   var cho = document.getElementById("cho_year");
   var another_nengetsu;
   if (newPyramode == "shiku") {
-    var nen = Number(nengetsu.substr(0, 4));
-    var tsuki = Number(nengetsu.substr(4, 2));
+    var nen = Number(nengetsu.slice(0, 4));
+    var tsuki = Number(nengetsu.slice(4, 6));
     temp = String(nen + 1) + "01";
     var i = get_option_id(ku, temp);
     if (i == false) {
@@ -1524,18 +1549,15 @@ function set_another_nengetsu(newPyramode) {
     } else if (nengetsu.match(/ft/)) {
       var i = 0;
     } else if (nengetsu.match(/new/)) {
-      var pre_ku_nen = ku.options[get_option_id(ku, "new") + 1].value.substr(
-        0,
-        4
-      );
-      if (cho.options[0].value.substr(0, 4) == pre_ku_nen) {
+      var pre_ku_nen = ku.options[get_option_id(ku, "new") + 1].value.slice(0,4);
+      if (cho.options[0].value.slice(0, 4) == pre_ku_nen) {
         var i = 0;
       } else {
         var i = 1;
       }
     } else {
-      var nen = Number(nengetsu.substr(0, 4));
-      var tsuki = Number(nengetsu.substr(4, 2));
+      var nen = Number(nengetsu.slice(0, 4));
+      var tsuki = Number(nengetsu.slice(4, 6));
       if (nen < 1998) {
         var i = cho.options.length - 1;
       } else {
@@ -1745,6 +1767,15 @@ function redisplay_pyramid() {
         }
       }, 10);
     }
+    // 人数表示
+    const showNumbers = localStorage_get("showNumbers");
+    if (showNumbers == "false") {
+      if (window.pyramidRenderer) {
+        window.pyramidRenderer.updateOptions({
+          showNumbers: false
+        });
+      }
+    }
     return true;
   } else {
     change_display("shiku");
@@ -1755,8 +1786,8 @@ function redisplay_pyramid() {
 function dateTime(arg = "-sec") {
   var day = new Date();
   var y = String(day.getFullYear());
-  var M = ("0" + String(day.getMonth() + 1)).substr(-2);
-  var d = ("0" + String(day.getDate())).substr(-2);
+  var M = ("0" + String(day.getMonth() + 1)).slice(-2);
+  var d = ("0" + String(day.getDate())).slice(-2);
   var h = day.getHours();
   var m = day.getMinutes();
   var s = day.getSeconds();
@@ -1792,9 +1823,21 @@ function plus_comma(su, unit) {
 }
 
 function change_seireki_main(hi) {
+  function zen2han(str) {
+    return str.replace(/[０-９]/g, function(match) {
+      return String.fromCharCode(match.charCodeAt(0) - 0xFEE0);
+    });
+  }
   //「元号年月日」形式を「西暦年(元号年)月日」形式に変換する。
+  console.warn("change_seireki_main hi", hi);
+  console.warn("change_seireki_main zen2han(hi)", zen2han(hi));
+  hi = zen2han(hi);
   var a = hi.match(/(大正|昭和|平成|令和)(\d+|元).*年\)?/);
+  if (!a) {
+    console.warn("change_seireki_main 元号が見つかりませんでした");
+  }
   var org = a[0];
+  console.warn("元号change_seireki_main org", org);
   var gen = a[1];
   var nen = a[2];
   if (nen == "元") {
