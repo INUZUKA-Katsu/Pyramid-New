@@ -942,6 +942,25 @@ class StreamingAnimationManager {
         const previousData = this.dataCache[previousYear];
         
         if (previousData) {
+          // 補間アニメーション実行前のデータタイプチェック
+          if (this.useInterpolation) {
+            const startData = this.dataCache[previousYear];
+            const endData = this.dataCache[year];
+            
+            // 5歳階級別データの場合は補間アニメーションをスキップ
+            const startHasFiveYear = startData?.five_year_age_group && Array.isArray(startData.five_year_age_group);
+            const endHasFiveYear = endData?.five_year_age_group && Array.isArray(endData.five_year_age_group);
+            
+            if (startHasFiveYear || endHasFiveYear) {
+              console.log('5歳階級別データのため補間アニメーションをスキップ');
+              
+              // 5歳階級別データを完全にスキップして次の年次へ
+              this.currentYearIndex++;
+              this.continueAnimation(); // 通常のアニメーション継続処理
+              return;
+            }
+          }
+          
           // 補間アニメーションを実行
           console.warn(`各歳別データの年齢:${data["kakusai_betsu"][0][0]}`);
           await this.renderWithInterpolation(previousYear, year, previousData, data);
@@ -951,6 +970,15 @@ class StreamingAnimationManager {
         }
       } else {
         // 最初の年次または補間無効の場合は通常描画
+        // ただし補間アニメーションで5歳階級別データの場合はスキップ
+        if (this.useInterpolation) {
+          const hasFiveYear = data?.five_year_age_group && Array.isArray(data.five_year_age_group);
+          if (hasFiveYear) {
+            console.log(`年次${year}は5歳階級別データのためスキップ`);
+            this.currentYearIndex++;
+            return; // 次の年次に移動
+          }
+        }
         this.renderDirectly(year, data);
       }
       
