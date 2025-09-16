@@ -235,82 +235,139 @@ class StreamingAnimationManager {
       alert('年次データが見つかりません。ページを再読み込みしてください。');
       return;
     }
-    if (this.useVariableAreaMode) {
+
+    // キャッシュデータの確認
+    const cacheStatus = this.checkCacheStatus();
+    console.log('キャッシュステータス:', cacheStatus);
+    
+    if (cacheStatus.hasAllData) {
+      console.log('✅ キャッシュデータが完全に存在します。POSTリクエストをスキップします。');
+      this.dataCache = cacheStatus.cachedData;
+      if (this.useVariableAreaMode) {
+        // 可変面積モード: キャッシュデータから最大総人口を算出
+        this.maxTotalPopulation = this.calculateMaxTotalPopulation(this.dataCache);
+        console.warn('キャッシュから算出された最大総人口:', this.maxTotalPopulation);
+        
+        // 基準スケールを取得・保持
+        if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
+          this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
+          console.warn(`基準スケールを取得・保持: ${this.baseZoomScale}`);
+        } else {
+          this.baseZoomScale = 1;
+        }
+      } else {
+        // 固定面積モード: キャッシュデータから最大BarLengthを算出
+        this.calculateAndSetMaxPopulationForAnimation(this.dataCache);
+        console.warn('キャッシュから年齢別最大BarLengthのセット完了');
+      }
+      
+      // アニメーション開始
+      this.startAnimation();
+      
+    } else {
+      console.log('⚠️ キャッシュデータが不完全です。POSTリクエストを実行します。');
+      
+      if (this.useVariableAreaMode) {
       // ********************************************************
       // 以下は可変面積モード （全年次データを事前取得して最大総人口を算出）
       // ********************************************************
-      console.log('可変面積モード: 全年次データを事前取得');
-      
-      // データ取得中の表示
-      if (typeof showDataLoadingMessage === 'function') {
-        showDataLoadingMessage();
-      }
-      
-      // アニメーション開始時に基準スケールを取得・保持 
-      if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
-        this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
-        console.warn(`基準スケールを取得・保持: ${this.baseZoomScale}`);
+        // 可変面積モード: 全年次データを事前取得
+        console.log('可変面積モード: 全年次データを事前取得');
+        
+        // データ取得中の表示
+        if (typeof showDataLoadingMessage === 'function') {
+          showDataLoadingMessage();
+        }
+        
+        // 基準スケールを取得・保持
+        if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
+          this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
+          console.warn(`基準スケールを取得・保持: ${this.baseZoomScale}`);
+        } else {
+          this.baseZoomScale = 1;
+        }
+        
+        // 全年次データを事前取得
+        const allData = await this.preloadAllData(shiku);
+        console.log('取得した全年次データ:', allData);
+        console.log('全年次データのキー:', Object.keys(allData));
+        console.warn('全年次データ取得完了!');
+
+        // 最大総人口を算出
+        this.maxTotalPopulation = this.calculateMaxTotalPopulation(allData);
+        console.warn('算出された最大総人口:', this.maxTotalPopulation);
+        
+        // データ取得完了の表示を非表示
+        if (typeof hideDataLoadingMessage === 'function') {
+          hideDataLoadingMessage();
+        }
+        
+        // アニメーション開始
+        this.startAnimation();
+
       } else {
-        console.error('PyramidSVGRendererのzoomScaleが取得できません');
-        this.baseZoomScale = 1; // デフォルト値
-      }
-      
-      // 全年次データを事前取得
-      const allData = await this.preloadAllData(shiku);
-      console.log('取得した全年次データ:', allData);
-      console.log('全年次データのキー:', Object.keys(allData));
-      console.warn('全年次データ取得完了!');
-
-      // 最大総人口を算出
-      this.maxTotalPopulation = this.calculateMaxTotalPopulation(allData);
-      console.warn('算出された最大総人口:', this.maxTotalPopulation);
-      
-      // データ取得完了の表示を非表示
-      if (typeof hideDataLoadingMessage === 'function') {
-        hideDataLoadingMessage();
-      }
-      
-      // アニメーション開始
-      this.startAnimation();
-
-    } else {
       // ********************************************************
       // 以下は固定面積モード
       // ********************************************************
-      console.log('固定面積モード: 全年次データを一括取得');
-      
-      // データ取得中の表示
-      if (typeof showDataLoadingMessage === 'function') {
-        showDataLoadingMessage();
-      }
-      
-      // アニメーション開始時に基準スケールを取得・保持
-      //if (window.pyramidRenderer && window.pyramidRenderer.options.zoomScale) {
-      //  this.baseZoomScale = window.pyramidRenderer.options.zoomScale;
-      //  console.log(`基準スケールを取得・保持: ${this.baseZoomScale}`);
-      //} else {
-      //  console.error('PyramidSVGRendererのzoomScaleが取得できません');
-      //  this.baseZoomScale = 1; // デフォルト値
-      //}
-      
-      // 全年次データを事前取得
-      const allData = await this.preloadAllData(shiku);
-      console.log('取得した全年次データ:', allData);
-      console.log('全年次データのキー:', Object.keys(allData));
-      console.warn('全年次データ取得完了!');
+        // 固定面積モード: 全年次データを一括取得
+        console.log('固定面積モード: 全年次データを一括取得');
+        
+        // データ取得中の表示
+        if (typeof showDataLoadingMessage === 'function') {
+          showDataLoadingMessage();
+        }
+        
+        // 全年次データを事前取得
+        const allData = await this.preloadAllData(shiku);
+        console.log('取得した全年次データ:', allData);
+        console.log('全年次データのキー:', Object.keys(allData));
+        console.warn('全年次データ取得完了!');
 
-      // 全年次データから最大BarLenrth（年齢別最大値）を算出し、PyramidSVGRendererに設定
-      this.calculateAndSetMaxPopulationForAnimation(allData);
-      console.warn('年齢別最大BarLengthのセット完了');
-      
-      // データ取得完了の表示を非表示
-      if (typeof hideDataLoadingMessage === 'function') {
-        hideDataLoadingMessage();
+        // 全年次データから最大BarLengthを算出
+        this.calculateAndSetMaxPopulationForAnimation(allData);
+        console.warn('年齢別最大BarLengthのセット完了');
+        
+        // データ取得完了の表示を非表示
+        if (typeof hideDataLoadingMessage === 'function') {
+          hideDataLoadingMessage();
+        }
+        
+        // アニメーション開始
+        this.startAnimation();
       }
-      
-      // アニメーション開始
-      this.startAnimation();
     }
+  }
+
+  // キャッシュデータの状態を確認
+  checkCacheStatus() {
+    const requiredYears = this.allYears;
+    const cachedData = {};
+    let cachedCount = 0;
+    
+    console.log('キャッシュ確認: 必要な年次数 =', requiredYears.length);
+    
+    for (const year of requiredYears) {
+      if (this.dataCache && this.dataCache[year]) {
+        cachedData[year] = this.dataCache[year];
+        cachedCount++;
+        console.log(`✅ 年次 ${year} のキャッシュデータが存在`);
+      } else {
+        console.log(`❌ 年次 ${year} のキャッシュデータが存在しません`);
+      }
+    }
+    
+    const hasAllData = cachedCount === requiredYears.length;
+    const cacheRatio = (cachedCount / requiredYears.length * 100).toFixed(1);
+    
+    console.log(`キャッシュ状況: ${cachedCount}/${requiredYears.length} (${cacheRatio}%)`);
+    
+    return {
+      hasAllData,
+      cachedData,
+      cachedCount,
+      totalCount: requiredYears.length,
+      cacheRatio: parseFloat(cacheRatio)
+    };
   }
 
   // 年次リストを抽出
@@ -1156,17 +1213,35 @@ class StreamingAnimationManager {
     
     // セレクトボックスの値を更新
     shikuYearSelect.value = targetYear;
+    $nengetsu = targetYear;
     console.log(`✅ shiku_yearセレクトボックスを${targetYear}に更新`);
     
+    // デバッグ: スライドバー要素の存在確認
+    const shikuSlider = document.getElementById("shiku-year-slider");
+    const shikuSliderContainer = document.getElementById("shiku-year-slider-container");
+    console.log(` スライドバー要素確認:`, {
+      slider: !!shikuSlider,
+      container: !!shikuSliderContainer,
+      containerDisplay: shikuSliderContainer ? shikuSliderContainer.style.display : 'N/A',
+      sliderValue: shikuSlider ? shikuSlider.value : 'N/A'
+    });
+    
     // UISynchronizerを使ってスライドバーも同期
-    if (window.uiSynchronizer) {
-      window.uiSynchronizer.syncSelectBoxWithSlider('shiku');
+    if (typeof uiSynchronizer !== 'undefined' && uiSynchronizer) {
+      console.log(`🔍 UISynchronizer同期開始`);
+      uiSynchronizer.syncSelectBoxWithSlider('shiku');
+      console.log(`🔍 UISynchronizer同期完了`);
+    } else {
+      console.warn("⚠️ uiSynchronizerが見つかりません");
     }
     
-    // セレクトボックスのchangeイベントを発火して再描画
-    //const changeEvent = new Event('change', { bubbles: true });
-    //shikuYearSelect.dispatchEvent(changeEvent);
-    //alert(`ピラミッド再描画終了`);
+    // キャッシュデータを使用してピラミッドを再描画（第2引数なしで通常表示）
+    if (this.dataCache && this.dataCache[targetYear]) {
+      console.log(`🎨 キャッシュデータを使用してピラミッドを再描画: ${targetYear}`);
+      change_pyramid(this.dataCache[targetYear]); // ← 第2引数なし
+    } else {
+      console.warn(`⚠️ 年次${targetYear}のキャッシュデータが見つかりません`);
+    }
   }
 
   // アニメーション終了
@@ -1195,6 +1270,7 @@ class StreamingAnimationManager {
     console.log(`アニメーション終了: セレクトボックスを現在の年次に同期: ${currentYear}`);
     //set_shiku_nengetsu(currentYear);
     this.syncSelectBoxToCurrentYear(currentYear);
+    
     
     // 可変面積モードの場合は、基準スケールを復元
     if (this.useVariableAreaMode && 
