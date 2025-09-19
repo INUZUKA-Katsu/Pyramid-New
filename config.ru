@@ -2,11 +2,14 @@ require 'cgi'
 require 'uri'
 require 'json'
 require_relative 'lib/pyramid_app'
+require_relative 'lib/reverse_proxy_middleware'
 
 Encoding.default_external = "utf-8"
 
+use ReverseProxy, "https://mcc-choir-938712885657.asia-northeast1.run.app"
+
 # 静的ファイルの配信設定
-use Rack::Static, :urls => ['/index.html','/nagareyama.html','/js','/css','/image','/mcc/img','/tmp'], :root => '.'
+use Rack::Static, :urls => ['/index.html','/js','/css','/image','/tmp'], :root => '.'
 use Rack::Static, :urls => {'/'=>'index.html'}, :root => '.'
 
 # メインアプリケーションを実行
