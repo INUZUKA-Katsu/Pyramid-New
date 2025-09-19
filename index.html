@@ -59,9 +59,36 @@
             new_info_tooltip: {
               content: `
                 <p>1. SVG (Scalable Vector Graphics)というグラフィックフォーマットできれいな人口ピラミッドを描画できるようになりました。縮小・拡大も自由自在です。</p>
+                <p>2. 区の将来推計人口の新しいデータが公表されていたので、2017年の将来推計人口から差し替えました。区についても2070年までの人口ピラミッドを見ることができます。</p>
                 <p>2. 長期時系列統計の区５歳階級別人口のピラミッドを表示できるようになりました。区についても昭和時代の人口ピラミッドを見ることができます。</p>
                 <p>3. アニメーション（動画）の機能を大幅に拡充しました。棒が伸び縮みするアニメーションや人口増減をピラミッドの大きさの変化でみることのできるアニメーションを選ぶことができます。スピード調整や、アニメーションの途中で気になるところがあったとき、スライドバーで任意の時点に戻ったり進めたりすることもできます。ぜひ動画ボタンをクリックしてお試しください。</p>
                 <p>4. スライドバーで簡単に年次を切り替えることができるようになりました。</p>
+              `,
+              placement: "bottom-start",
+              maxWidth: 450,
+              interactive: false
+            },
+            about_site_tooltip: {
+              content: `
+                <p>横浜市がWebサイトで公表している年齢別人口統計を利用して人口ピラミッドを表示するサイトです。</p>
+                <p>統計がある全ての年の横浜市、行政区、任意の町丁目を含む地域の人口ピラミッドを表示することができます。(年２回公表される住民基本台帳による統計は９月30日現在の統計を採用)</p>
+                <p>2024年に公表された2070年までの将来推計人口による将来予測も人口ピラミッドで表示。</p>
+                <p>横浜市がHPで公表しているオープンデータをリアルタイムで取得するので、新しい統計が公表されたときタイムラグなしにすぐに人口ピラミッドで見ることができます。</p>
+              `,
+              placement: "bottom-start",
+              maxWidth: 450,
+              interactive: false
+            },
+            info_pyramid_size_tooltip: {
+              content: `
+                <p>1. 人口ピラミッドの大きさについて<br>
+                  　人口ピラミッドは、年齢構成を視覚的に把握するためのグラフです。<br>
+                  　総人口が違っても年齢構成が同じであれば全く同じグラフにならなければなりません。<br>
+                  　そのため、このサイトでは、総人口の多寡によらずグラフの面積が常に一定となるように計算して描画しています。</p>
+                <p>2. しかし、例外として、人口ピラミッドの変化をアニメーション（動画）で見るときには、
+                    人口の増減を人口ピラミッドの大きさ(面積)の変化で見ることのできるオプションを用意しました。<br>
+                  　大正、昭和の時代を通じて横浜市の人口が劇的に増大した様子をピラミッドの形の変化と合わせて見ることができます。<br>
+                  　将来推計による人口減少の様子もある程度見て取ることができます。是非一度お試しください。</p>
               `,
               placement: "bottom-start",
               maxWidth: 450,
@@ -1216,14 +1243,14 @@
           <a
             href="#"
             class="header"
-            data-tooltip="横浜市がWebサイトで公表している人口統計を利用して作成可能な全ての人口ピラミッドを自由自在に表示できるサイトです。統計がある全ての年、区、町丁目、複数の町丁目を含む小地域の人口ピラミッドを表示させることができます。2017年12月に公表された2065年までの将来推計人口による将来予測も人口ピラミッドで表示。横浜市がHPで公表しているオープンデータをリアルタイムで取得するので、新しい統計が公表されたときタイムラグなしにすぐに人口ピラミッドで見ることができます。"
+            data-tooltip-id="about_site_tooltip"
           >
             >このサイトについて
           </a>
           <a
             href="#"
             class="header"
-            data-tooltip="このサイトでは、グラフの形から人口の年齢別構成を把握しやすくするため、人口の多い少ないにかかわらずグラフの面積が一定となるように描画することを基本としています。このため、人口の多寡をグラフの大きさから読み取ることはできません。ただし、例外として、市と区の人口ピラミッドの変化を動画で見るときに限っては、横軸の目盛を固定して描画しており、人口の増減を合わせてみることができるようにしています。"
+            data-tooltip-id="info_pyramid_size_tooltip"
           >
             >人口ピラミッドと人口の増減について
           </a>
@@ -1979,7 +2006,7 @@
           <span style="display: block">
             <span class="block"> INUZUKA Katsu </span
             ><span> - 2016年12月21日 作成 </span
-            ><span> - 2024年2月29日 更新 </span>
+            ><span> - 2025年9月18日 更新 </span>
           </span>
           <span style="display: block">
             <span class="block">
@@ -2215,8 +2242,7 @@
           const basic = document.querySelector("#basic_data");
           const pyramidContainer = document.querySelector("#pyramid-container");
 
-          const pyramidContainer_rect =
-            pyramidContainer.getBoundingClientRect();
+          // スクロール位置に依存しない固定位置計算を使用
           const menuWidth = menu.offsetWidth;
           const pyramidWidth = pyramid.offsetWidth;
           const windowWidth = window.innerWidth;
@@ -2234,17 +2260,16 @@
             pyramid.style.left = pyramidLeftPos + "px";
             footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
 
-            // 左コントロールをSVG領域と縦の中央揃えにする
-            const pyramidTop = pyramidContainer_rect.top;
-            const pyramidHeight = pyramidContainer_rect.height;
+            // 左コントロールをSVG領域と縦の中央揃えにする（スクロール位置に依存しない固定位置）
+            const pyramidContainerTop = pyramidContainer.offsetTop; // getBoundingClientRect()の代わりにoffsetTopを使用
+            const pyramidHeight = pyramidContainer.offsetHeight;
             const menuHeight = menu.offsetHeight;
-            const menuTopPos = pyramidTop + (pyramidHeight - menuHeight) / 2;
+            const menuTopPos = pyramidContainerTop + (pyramidHeight - menuHeight) / 2;
             menu.style.top = menuTopPos + "px";
 
-            // #basic_dataをSVG描画領域内の右下に配置
-            const basicLeftPos = pyramidContainer_rect.right - basicWidth - 20;
-            const basicTopPos =
-              pyramidContainer_rect.bottom - basic.offsetHeight - 15;
+            // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
+            const basicLeftPos = pyramidLeftPos + pyramidWidth - basicWidth - 20;
+            const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 15;
             basic.style.left = basicLeftPos + "px";
             basic.style.top = basicTopPos + "px";
             basic.style.display = "block";
@@ -2256,11 +2281,11 @@
             // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
             const svgFixedWidth = 1108;
             if (windowWidth > svgFixedWidth) {
-              // #basic_dataをSVG描画領域内の右下に配置
-              const basicLeftPos =
-                pyramidContainer_rect.right - basicWidth - 20;
-              const basicTopPos =
-                pyramidContainer_rect.bottom - basic.offsetHeight - 15;
+              // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
+              const pyramidContainerTop = pyramidContainer.offsetTop;
+              const pyramidHeight = pyramidContainer.offsetHeight;
+              const basicLeftPos = pyramidLeftPos + pyramidWidth - basicWidth - 20;
+              const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 15;
               basic.style.left = basicLeftPos + "px";
               basic.style.top = basicTopPos + "px";
               basic.style.display = "block";
