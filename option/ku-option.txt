@@ -1,3 +1,8 @@
+                  <option value="2070ft">2070年(将来推計)</option>
+                  <option value="2069ft">2069年(将来推計)</option>
+                  <option value="2068ft">2068年(将来推計)</option>
+                  <option value="2067ft">2067年(将来推計)</option>
+                  <option value="2066ft">2066年(将来推計)</option>
                   <option value="2065ft">2065年(将来推計)</option>
                   <option value="2064ft">2064年(将来推計)</option>
                   <option value="2063ft">2063年(将来推計)</option>

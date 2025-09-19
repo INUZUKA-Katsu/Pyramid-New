@@ -95,6 +95,7 @@ class PyramidApp
         param = req.params
         puts req.params.to_s
         response_data = process_main_request(param)
+
         header["content-type"] = response_data[0]
         response = response_data[1]
       end
@@ -114,14 +115,15 @@ class PyramidApp
         path=File.join(File.dirname(__FILE__),'..', path)
         response = File.read(path)
       end
-    
+    elsif path.match(/\/mcc/)
+      return [301, {'Location' => 'https://mcc-choir-938712885657.asia-northeast1.run.app' + path}, []]
     else
       return [404, {}, ["Not Found"]]
     end
     
     # レスポンスがnilの場合はデフォルト値を設定
     response = "No response generated" if response.nil?
-    
+
     puts "最終レスポンス: #{response.class} - #{response.to_s[0..100]}"
     puts "ヘッダー: #{header.inspect}"
     #puts "レスポンス配列: #{[response].inspect}"
@@ -243,6 +245,8 @@ class PyramidApp
       if obj.json_error
         ["text/plain;charset=utf-8", obj.csv || "CSV data not available"]
       else
+        p "generate_response"
+        p obj.json
         ["text/json;charset=utf-8", obj.json || "{}"]
       end
     when :cho_csv, :cho_csv_for_save

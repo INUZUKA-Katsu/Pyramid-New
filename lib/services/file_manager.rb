@@ -56,6 +56,7 @@ class FileManager
   
   # ファイルを読み込み
   def read_file(file_path)
+    p "read_file開始: #{file_path}"
     @s3_client = S3Client.new if @s3_client.nil?
     if file_path.start_with?('Pyramid') && @s3_client&.exist?(file_path)
       
@@ -66,7 +67,9 @@ class FileManager
       @s3_client.read(file_path)
     elsif File.exist?(file_path)
       puts "read_file: "+file_path
-      File.read(file_path)
+      json = File.read(file_path)
+      puts "read_file json: #{json}"
+      json
     else
       nil
     end

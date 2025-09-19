@@ -234,8 +234,11 @@ class PopulationData
   
   # 区別将来推計データを処理
   def process_syorai_ku_data
+    p "process_syorai_ku_data開始"
     json_file = @file_manager.local_file_path(:json_ku_syorai, @ku, @nengetsu)
+    p "process_syorai_ku_data json_file: #{json_file}"
     json = @file_manager.read_file(json_file)
+    p "process_syorai_ku_data json: #{json}"
     modify_source_url(json) if json
   end
   
@@ -252,6 +255,7 @@ class PopulationData
       file_path = @file_manager.local_file_path(:shi_option)
     when :ku_option
       file_path = @file_manager.local_file_path(:ku_option)
+      p "process_option ku_option: #{file_path}"
     when :cho_option
       file_path = @file_manager.local_file_path(:cho_option)
     when :kujuki_option

@@ -549,7 +549,8 @@ class PyramidSVGRenderer {
       }
       
       // 各歳別データの場合（従来の処理）
-      if (ageGroup.match(/^[0-9]+(以上)?$/)) {
+      const ageNum = this.parseIndividualAge(ageGroup);
+      if (ageNum !== null) {
         const maleNum = parseInt(male.replace(/,/g, '')) || 0;
         const femaleNum = parseInt(female.replace(/,/g, '')) || 0;
         const currentMax = Math.max(maleNum, femaleNum);
@@ -624,6 +625,33 @@ class PyramidSVGRenderer {
     
     // デフォルト（解析できない場合）
     return { startAge: 0, endAge: 0, yearSpan: 1 };
+  }
+
+  parseIndividualAge(ageStr) {
+    if (!ageStr || typeof ageStr !== 'string') {
+      return null;
+    }
+    
+    if (ageStr.match(/総数|合計|年齢不詳/)) {
+      return null;
+    }
+    
+    if (ageStr.match(/(\d+)歳以上/)) {
+      return parseInt(ageStr.match(/(\d+)歳以上/)[1]);
+    }
+    
+    const singleMatch = ageStr.match(/^(\d+)歳$/);
+    if (singleMatch) {
+      return parseInt(singleMatch[1]);
+    }
+
+    const ageOnlyMatch = ageStr.match(/^(\d+)$/);
+    if (ageOnlyMatch) {
+      return parseInt(ageOnlyMatch[1]);
+    }
+    
+    //解析できない場合
+    return null;
   }
 
   // 全年次データから最大BarLengthを算出するメソッド
@@ -877,11 +905,26 @@ class PyramidSVGRenderer {
         if (age.match(/総数|合計|年齢不詳/) || male == null || female == null) {
           return;
         }
-        
+
+        // 年齢を解析（"0歳"形式にも対応）
+        let ageNum = this.parseIndividualAge(age);
+        if (ageNum === null) {
+          return; // 解析できない場合はスキップ
+        }
+        if (ageNum > 100) {
+          ageNum = 100; // 101歳以上は100歳に集約するため便宜上100とする.
+        }        
+
         const maleNum = parseInt(male.replace(/,/g, '')) || 0;
         const femaleNum = parseInt(female.replace(/,/g, '')) || 0;
-        
-        populationMap.set(parseInt(age), { male: maleNum, female: femaleNum, yearSpan: 1 });
+
+        // 既存のデータ(同じageNumのデータ)がある場合は加算
+        const existingData = populationMap.get(ageNum) || { male: 0, female: 0, yearSpan: 1 };
+        populationMap.set(ageNum, { 
+          male: existingData.male + maleNum, 
+          female: existingData.female + femaleNum, 
+          yearSpan: 1 
+        });        
       });
     }
 

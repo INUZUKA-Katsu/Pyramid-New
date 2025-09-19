@@ -922,6 +922,7 @@ function change_shiku_option(str) {
       optionType = "ku";
     }
     str = getOptionsWithCache(optionType);
+    console.log(`getOptionsWithCache(${optionType}): ${str}`);
 
     if (!str) {
       // キャッシュがない場合はサーバーから取得
@@ -940,6 +941,7 @@ function change_shiku_option(str) {
       nengetsu = $nengetsu;
     }
   }
+  console.log(`change_shiku_option: ${str}`);
   document.getElementById("shiku_year").innerHTML = str;
   select_nengetsu(nengetsu, "shiku");
   
@@ -2091,10 +2093,17 @@ function parseAgeRange(ageGroupStr) {
   var aboveMatch = ageGroupStr.match(/(\d+)歳以上/);
   if (aboveMatch) {
     var age = parseInt(aboveMatch[1]);
-    return {
-      startAge: age,
-      endAge: 100 // 最大年齢を100歳とする
-    };
+    if (age <= 100) {
+      return {
+        startAge: age,
+        endAge: 100 // 最大年齢を100歳とする
+      };
+    } else {
+      return {
+        startAge: age,
+        endAge: age
+      };
+    }
   }
   
   // 単一年齢形式（例：「0歳」「1歳」）

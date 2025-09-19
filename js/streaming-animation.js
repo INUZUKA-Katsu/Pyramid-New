@@ -96,7 +96,7 @@ class StreamingAnimationManager {
     }
   }
 
-  // 全年次データから最大総人口を算出
+  // 全年次データから最大総人口を算出(可変面積モード時の当年スケールの計算基礎となる値)
   calculateMaxTotalPopulation(allData) {
     console.log('最大総人口の算出開始');
     console.log('🔍 calculateMaxTotalPopulation: allData keys:', Object.keys(allData));
@@ -146,27 +146,8 @@ class StreamingAnimationManager {
     return maxTotalPopulation;
   }
 
-  // 全年次データから最大人口（年齢別最大値）を算出し、PyramidSVGRendererに設定
-  // ５歳階級別人口の場合も計算中getMaxPopulationで適切に処理されている.
-  calculateAndSetMaxPopulationForAnimation(allData) {
-    console.log('全年次データから最大人口（年齢別最大値）を算出開始');
-    
-    if (window.pyramidRenderer && typeof window.pyramidRenderer.calculateMaxPopulationFromAllYears === 'function') {
-
-      const maxPopulation = window.pyramidRenderer.calculateMaxPopulationFromAllYears(allData);
-
-      window.pyramidRenderer.setMaxPopulationForAnimation(maxPopulation);
-      
-      console.warn(`アニメーション用最大人口を設定完了: ${maxPopulation}`);
-      return maxPopulation;
-    } else {
-      console.error('PyramidSVGRendererまたはcalculateMaxPopulationFromAllYearsメソッドが利用できません');
-      return null;
-    }
-  }
-
   // 全年次データから最大BarLength（年齢別最大値）を算出し、PyramidSVGRendererに設定
-  calculateAndSetMaxPopulationForAnimation(allData) {
+  calculateAndSetMaxBarLengthForAnimation(allData) {
     console.log('全年次データから最大BarLength（年齢別最大値）を算出開始');
     
     if ( window.pyramidRenderer && 
@@ -257,7 +238,7 @@ class StreamingAnimationManager {
         }
       } else {
         // 固定面積モード: キャッシュデータから最大BarLengthを算出
-        this.calculateAndSetMaxPopulationForAnimation(this.dataCache);
+        this.calculateAndSetMaxBarLengthForAnimation(this.dataCache);
         console.warn('キャッシュから年齢別最大BarLengthのセット完了');
       }
       
@@ -324,7 +305,7 @@ class StreamingAnimationManager {
         console.warn('全年次データ取得完了!');
 
         // 全年次データから最大BarLengthを算出
-        this.calculateAndSetMaxPopulationForAnimation(allData);
+        this.calculateAndSetMaxBarLengthForAnimation(allData);
         console.warn('年齢別最大BarLengthのセット完了');
         
         // データ取得完了の表示を非表示
