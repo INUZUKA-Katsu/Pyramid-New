@@ -10,14 +10,14 @@ module PyramidConstants
   KU_JUKI_TOP = "/jinko/nenrei/juki"
   
   # ファイルパステンプレート
-  JSON_FILE_S3 = "Pyramid/nenreibetsu/<ku><nengetsu>-j.txt"
-  JSON_FILE_SYORAI = "/syoraisuikei/<nen>-suikei.txt"
-  JSON_FILE_KUJUKI_S3 = "Pyramid/jukijinko/<ku><nen>-t.txt"
-  JSON_FILE_KU_SYORAI = "/syoraisuikei/kubetsu/<ku>-<nen>-suikei.txt"
-  CSV_FILE_S3 = "Pyramid/nenreibetsu/<ku><nengetsu>.csv"
+  JSON_FILE_S3 = "Pyramid/nenreibetsu/<ku><nengetsu>-j.txt"  # 市区別推計人口データ
+  JSON_FILE_SYORAI = "/syoraisuikei/<nen>-suikei.txt"        # 市将来推計人口データ
+  JSON_FILE_KUJUKI_S3 = "Pyramid/jukijinko/<ku><nen>-t.txt"  # 区別住基人口データ（現在は未使用）
+  JSON_FILE_KU_SYORAI = "/syoraisuikei/kubetsu/<ku>-<nen>-suikei.txt" # 区別将来推計人口データ
+  CSV_FILE_S3 = "Pyramid/nenreibetsu/<ku><nengetsu>.csv"     # 町丁別データファイル
   SHIKU_CSV_FILE = "/e3yokohama<nengetsu>/e3<ku><nengetsu>.csv"
-  AYUMI_CSV_FILE = "/ayumi/ayumi.csv"
-  AYUMI_KU_FILE = "/ayumi/ku/<ku><nengetsu>-5g.txt"
+  AYUMI_CSV_FILE = "/ayumi/ayumi.csv"                        # 市長期時系列データ
+  AYUMI_KU_FILE = "/ayumi/ku/<ku><nengetsu>-5g.txt"          # 区別長期時系列データ
     
   # オプションファイル
   SHI_OPTION_FILE_S3 = "Pyramid/option/shi-option.txt"
