@@ -10,23 +10,22 @@ class PyramidSVGRenderer {
       height: 600,
       unitSize: null,
       barHeight: null, // 各年齢の棒の高さ
-      maleColor: '#0066cc',
-      femaleColor: '#cc0066',
-      maleStrokeColor: '#004499',
-      femaleStrokeColor: '#990044',
-      maleSpecialStrokeColor: '#002E66',
-      femaleSpecialStrokeColor: '#66002E',
-      backgroundColor: '#f5f5f5',
-      gridColor: '#e0e0e0',
-      textColor: '#333333',
+      maleColor: '#4a90e2',
+      femaleColor: '#e24a90',
+      maleStrokeColor: '#3a7bc8',
+      femaleStrokeColor: '#c23a7a',
+      maleSpecialStrokeColor: '#2a6bb4',
+      femaleSpecialStrokeColor: '#a22a6a',
+      backgroundColor: '#f8f9fa',
+      gridColor: '#e9ecef',
+      textColor: '#495057',
       fontSize: 12,
       showGrid: true,
       showLabels: true,
       showNumbers: true,
-      zoomScale1: 1.0,
-      zoomScale2: 1.0,
-      unitSizeScale: 1.0,
-      barHeightScale: 1.0,
+      zoomScale: 1,
+      unitSizeScale: 1,
+      barHeightScale: 1,
       scaleMode: 'auto', // 'auto', 'fixed'
       maxWidth: 400, // 最大バー幅（ピクセル）
       ...options //引数で渡された値でデフォルト値を上書き
@@ -47,8 +46,7 @@ class PyramidSVGRenderer {
     console.log('this.options.height', this.options.height);
     console.log('this.options.unitSize', this.options.unitSize);
     console.log('this.options.barHeight', this.options.barHeight);
-    console.log('this.options.zoomScale1', this.options.zoomScale1);
-    console.log('this.options.zoomScale2', this.options.zoomScale2);
+    console.log('this.options.zoomScale', this.options.zoomScale);
 
     // 既存のコンテナをクリア
     this.container.innerHTML = '';
@@ -93,11 +91,8 @@ class PyramidSVGRenderer {
     this.container.appendChild(this.svg);
 
     // ズームを適用
-    if (this.options.zoomScale1 != 1) {
-      this.resizeByScale1(this.options.zoomScale1);
-    }
-    if (this.options.zoomScale2 != 1) {
-      this.resizeByScale2(this.options.zoomScale2);
+    if (this.options.zoomScale != 1) {
+      this.resizeByScale(this.options.zoomScale);
     }
   }
 
@@ -126,7 +121,7 @@ class PyramidSVGRenderer {
     leftStartLine.setAttribute('y1', viewBoxHeight);
     leftStartLine.setAttribute('x2', viewBoxWidth / 2 - 10);
     leftStartLine.setAttribute('y2', viewBoxHeight - (101 * this.options.barHeight));
-    leftStartLine.setAttribute('stroke', '#ccc');
+    leftStartLine.setAttribute('stroke', '#dee2e6');
     leftStartLine.setAttribute('stroke-width', '1');
     gridGroup.appendChild(leftStartLine);
     
@@ -135,7 +130,7 @@ class PyramidSVGRenderer {
     rightStartLine.setAttribute('y1', viewBoxHeight);
     rightStartLine.setAttribute('x2', viewBoxWidth / 2 + 10);
     rightStartLine.setAttribute('y2', viewBoxHeight - (101 * this.options.barHeight));
-    rightStartLine.setAttribute('stroke', '#ccc');
+    rightStartLine.setAttribute('stroke', '#dee2e6');
     rightStartLine.setAttribute('stroke-width', '1');
     gridGroup.appendChild(rightStartLine);
 
@@ -156,10 +151,10 @@ class PyramidSVGRenderer {
       line.setAttribute('y2', viewBoxHeight - (age * this.options.barHeight));
       // 5歳ごとに線の色を少しく濃くする
       if (age % 5 === 0) {
-        line.setAttribute('stroke', '#cccccc');
+        line.setAttribute('stroke', '#e9ecef');
         line.setAttribute('stroke-width', '1');
       } else {
-        line.setAttribute('stroke', '#eee');
+        line.setAttribute('stroke', '#f8f9fa');
         line.setAttribute('stroke-width', '1');
       }
       
@@ -186,7 +181,7 @@ class PyramidSVGRenderer {
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('dominant-baseline', 'middle');
       label.setAttribute('font-size', '12');
-      label.setAttribute('fill', '#666');
+      label.setAttribute('fill', '#6c757d');
       label.setAttribute('font-weight', 'bold');
       
       ageLabelGroup.appendChild(label);
@@ -218,7 +213,7 @@ class PyramidSVGRenderer {
       line.setAttribute('y1', y);
       line.setAttribute('x2', x2);
       line.setAttribute('y2', y);
-      line.setAttribute('stroke', '#919191');
+      line.setAttribute('stroke', '#adb5bd');
       line.setAttribute('stroke-width', '1');
       
       // 年齢ラベル
@@ -229,7 +224,7 @@ class PyramidSVGRenderer {
       label.setAttribute('text-anchor', 'end');
       label.setAttribute('dominant-baseline', 'bottom');
       label.setAttribute('font-size', '14');
-      label.setAttribute('fill', '#666');
+      label.setAttribute('fill', '#6c757d');
       label.setAttribute('font-weight', 'bold');
       
       specialLineGroup.appendChild(line);
@@ -433,8 +428,7 @@ class PyramidSVGRenderer {
     console.log('this.options.height', this.options.height);
     console.log('this.options.unitSize', this.options.unitSize);
     console.log('this.options.barHeight', this.options.barHeight);
-    console.log('this.options.zoomScale1', this.options.zoomScale1);
-    console.log('this.options.zoomScale2', this.options.zoomScale2);
+    console.log('this.options.zoomScale', this.options.zoomScale);
 
     let unitSize = this.options.unitSize;
     let barHeight = this.options.barHeight;
@@ -473,23 +467,19 @@ class PyramidSVGRenderer {
   updateData(newData) {
     this.data = newData.kakusai_betsu;
   
-    let z1 = this.options.zoomScale1;
-    let z2 = this.options.zoomScale2;
+    let z = this.options.zoomScale;
   
     // 新しいデータに基づいて再描画
     let originalUnitSize = this.calculateUnitSize(this.data);
     let scale = this.options.unitSizeScale;
     this.options.unitSize = originalUnitSize * scale;
     console.log('updateData this.options.unitSize', this.options.unitSize);
-    if (z1 != 1) {
-      this.resizeByScale1(z1);
-    }else if (z2 != 1) {
-      this.resizeByScale2(z2);
+    if (z != 1) {
+      this.resizeByScale(z);
     }
     this.render();
   }
-  
-  
+    
   // オプションの動的変更
   updateOptions(newOptions) {
     this.options = { ...this.options, ...newOptions };
@@ -503,47 +493,18 @@ class PyramidSVGRenderer {
   resize(options = {}) {
     if (options.scale) {
       // 方式1: スケール指定
-      this.resizeByScale2(options.scale);
+      this.resizeByScale(options.scale);
 
     } else if (options.unitSize || options.barHeight) {
       // 方式2: 個別パラメータ指定
       console.log('options.unitSize', options.unitSize);
       console.log('options.barHeight', options.barHeight);
       this.resizeByParameters(options);
-    
-    } else if (typeof options === 'number' && typeof arguments[1] === 'number') {
-      // 後方互換性: resize(width, height) の呼び出し
-      this.resizeByDimensions(options, arguments[1]);
     }
   }
 
-  // 方式1-1: viewBoxを使いズーム
-  resizeByScale1(scale) {
-    
-    const baseBox = this.sceneGroup.getBBox();
-    
-    let w = baseBox.width / scale ;
-    let h = baseBox.height / scale ;
-    
-    let cx = baseBox.x + baseBox.width / 2;
-    let cy = baseBox.y + baseBox.height / 2;
-
-    // svgのviewBox属性を更新
-    this.svg.setAttribute('viewBox', `${cx - w/2} ${cy - h/2} ${w} ${h}`);    
-
-    // 後続の処理のためにオプションの値を更新
-    this.options = {
-      ...this.options,
-      zoomScale1 :scale
-    };
-    console.log('this.options.zoomScale1', this.options.zoomScale1);
-
-    // sceneGroupのtransform属性を更新
-    //this.sceneGroup.setAttribute('transform', `translate(${translateX},${translateY}) scale(${scale})`);    
-  }
-
-  // 方式1-2: transform属性を使いズーム
-  resizeByScale2(scale) {
+  // 方式1: transform属性を使いズーム
+  resizeByScale(scale) {
     
     const baseBox = this.sceneGroup.getBBox();
 
@@ -574,9 +535,9 @@ class PyramidSVGRenderer {
     // 後続の処理のためにオプションの値を更新
     this.options = {
       ...this.options,
-      zoomScale2 :scale
+      zoomScale :scale
     };
-    console.log('this.options.zoomScale2', this.options.zoomScale2);
+    console.log('this.options.zoomScale', this.options.zoomScale);
   }
 
   // 方式2: 個別パラメータ指定によるリサイズ

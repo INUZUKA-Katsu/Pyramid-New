@@ -1,10 +1,14 @@
 # データファイル（除外）
-tmp/                    # 一時ファイル
-excel/                  # Excelファイル
-jukijinko/              # 年齢別住基人口データ
-nenreibetsu/            # 年齢別推計人口データ
-syoraisuikei/           # 将来推計人口データ
-option/                 # オプションファイル
+tmp/                        # 一時ファイル
+excel/                      # Excelファイル
+nenreibetsu/
+jukijinko/                  # 年齢別住基人口データ
+option/ayumi*               # オプションファイル
+option/syorai*
+option/kujuki*
+option/cho*
+option/shi*
+#option/ku_option.txt
 
 # ruby関連
 vendor/
@@ -12,11 +16,18 @@ vendor/
 .bundle/
 
 #それ以外
+syoraisuikei/suikei_2017/
+syoraisuikei/suikei_2024/
+syoraisuikei/kubetsu_2017/
+syoraisuikei/kubetsu_2024/
+syoraisuikei/suikei-r6/
+ayumi/ku/*.xls*
+ayumi/ku/*.csv
 rackup.app/
 .vscode/
 unnamedfolder/
 back/
-backup/
+*backup*
 unused/
 js/zip
 js/pyramid2.js
@@ -37,4 +48,7 @@ nagareyama/
 *コピー*
 *テスト*
 *test*
-*old.*
+*demo*
+*old*
+*original*
+svg-pyramid-demo.html

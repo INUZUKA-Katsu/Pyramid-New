@@ -2284,7 +2284,13 @@
               // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
               const pyramidContainerTop = pyramidContainer.offsetTop;
               const pyramidHeight = pyramidContainer.offsetHeight;
-              const basicLeftPos = pyramidLeftPos + pyramidWidth - basicWidth - 20;
+                            
+              // SVG領域を画面中央に配置（左右の余白を均等にする）
+              const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2;
+              pyramidContainer.style.marginLeft = pyramidContainerLeft + "px";
+
+              // #basic_dataをSVG描画領域内の右下に配置
+              const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth - 20;
               const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 15;
               basic.style.left = basicLeftPos + "px";
               basic.style.top = basicTopPos + "px";
