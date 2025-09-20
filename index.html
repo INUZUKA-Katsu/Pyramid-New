@@ -2234,10 +2234,12 @@
         console.log("loadDemoData:", typeof loadDemoData);
         console.log("renderPyramid:", typeof renderPyramid);
 
-        // 画面デザイン（各要素の配置位置）
+        // ********** 画面デザイン（各要素の配置位置） **********
         function centerContents() {
           const menu = document.querySelector(".left-controls");
           const pyramid = document.querySelector("#pyramid-block");
+          const h1Title = document.querySelector("#h1");
+          const h2Title = document.querySelector("#h2");
           const footer = document.querySelector("#footer");
           const basic = document.querySelector("#basic_data");
           const pyramidContainer = document.querySelector("#pyramid-container");
@@ -2248,16 +2250,28 @@
           const windowWidth = window.innerWidth;
           const basicWidth = basic.offsetWidth;
 
+          // 実際のピラミッドコンテナの位置を使用（#basic_dataの位置決めに使用）
+          const actualPyramidLeft = pyramidContainer.offsetLeft;
+          const actualPyramidWidth = pyramidContainer.offsetWidth;
+
+          // パディングを考慮（#main: 20px + #container-flex: 10px = 30px）
+          const totalPadding = 30;
+          const availableWidth = windowWidth - (totalPadding * 2); // 左右のパディングを引く
+
           // 画面中央に配置（ウィンドウ中央 - (メニュー幅 + ピラミッド幅 + すき間)の半分）
           const gap = 20; // コントロールとSVGの間のすき間
           const framePadding = 40; // 額縁の太さ（左右各20px）
           const totalWidth = menuWidth + pyramidWidth + gap + framePadding;
-          const menuLeftPos = Math.max(0, (windowWidth - totalWidth) / 2);
+          //const menuLeftPos = Math.max(0, (windowWidth - totalWidth) / 2);
+          const menuLeftPos = Math.max(0, (availableWidth - totalWidth) / 2);
           const pyramidLeftPos = Math.max(0, menuLeftPos + menuWidth + gap);
 
           if (windowWidth >= 1200) {
             menu.style.left = menuLeftPos + "px";
             pyramid.style.left = pyramidLeftPos + "px";
+
+            h1Title.style["margin-left"] = actualPyramidLeft + "px";
+            h2Title.style["margin-left"] = actualPyramidLeft + "px";
             footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
 
             // 左コントロールをSVG領域と縦の中央揃えにする（スクロール位置に依存しない固定位置）
@@ -2267,12 +2281,13 @@
             const menuTopPos = pyramidContainerTop + (pyramidHeight - menuHeight) / 2;
             menu.style.top = menuTopPos + "px";
 
-            // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
-            const basicLeftPos = pyramidLeftPos + pyramidWidth - basicWidth - 20;
-            const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 15;
+            // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+            const basicLeftPos = actualPyramidLeft + actualPyramidWidth - basicWidth - 20 ;
+            const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
             basic.style.left = basicLeftPos + "px";
             basic.style.top = basicTopPos + "px";
             basic.style.display = "block";
+
           } else if (windowWidth < 1200) {
             menu.style.left = "0px";
             pyramid.style.left = "0px";
@@ -2280,18 +2295,19 @@
 
             // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
             const svgFixedWidth = 1108;
-            if (windowWidth > svgFixedWidth) {
+            //if (windowWidth > svgFixedWidth) {
+            if (windowWidth > 900) {
               // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
               const pyramidContainerTop = pyramidContainer.offsetTop;
               const pyramidHeight = pyramidContainer.offsetHeight;
                             
               // SVG領域を画面中央に配置（左右の余白を均等にする）
-              const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2;
+              const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2 -50 ;
               pyramidContainer.style.marginLeft = pyramidContainerLeft + "px";
 
               // #basic_dataをSVG描画領域内の右下に配置
-              const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth - 20;
-              const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 15;
+              const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth + 40;
+              const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
               basic.style.left = basicLeftPos + "px";
               basic.style.top = basicTopPos + "px";
               basic.style.display = "block";
