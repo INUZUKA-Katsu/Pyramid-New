@@ -9,8 +9,6 @@ class UISynchronizer {
   init() {
     if (this.isInitialized) return;
     
-    console.log('UISynchronizer: 初期化開始');
-    
     // DOMContentLoadedイベントを待つ
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
@@ -25,7 +23,6 @@ class UISynchronizer {
   }
 
   setupAllSynchronizations() {
-    console.log('UISynchronizer: 同期設定開始');
     
     // スライドバー → セレクトボックスの連動（既存機能の移行）
     this.setupSliderToSelectBox();
@@ -33,12 +30,10 @@ class UISynchronizer {
     // セレクトボックス → スライドバーの連動（新規追加）
     this.setupSelectBoxToSlider();
     
-    console.log('UISynchronizer: 同期設定完了');
   }
 
   // スライドバーからセレクトボックスへの連動（既存のindex.htmlのsetupYearSliders()を移行）
   setupSliderToSelectBox() {
-    console.log('UISynchronizer: スライドバー→セレクトボックス連動設定');
     
     // 市区ピラミッド用スライドバー
     const shikuSlider = document.getElementById("shiku-year-slider");
@@ -178,7 +173,6 @@ class UISynchronizer {
 
   // セレクトボックスからスライドバーへの連動（新規追加）
   setupSelectBoxToSlider() {
-    console.log('UISynchronizer: セレクトボックス→スライドバー連動設定');
     
     // 市区ピラミッド用セレクトボックス
     const shikuSelect = document.getElementById("shiku_year");
@@ -219,8 +213,6 @@ class UISynchronizer {
     const sliderPosition = Math.round(((totalOptions - 1 - selectedIndex) / (totalOptions - 1)) * 100);
     
     sliderElement.value = sliderPosition;
-    
-    console.log(`UISynchronizer: ${pyramode} セレクトボックス(${selectedIndex}/${totalOptions-1}) → スライドバー(${sliderPosition}%)`);
   }
 
   // 外部から呼び出し可能な同期メソッド
@@ -236,7 +228,6 @@ let uiSynchronizer = null;
 function initializeUISynchronizer() {
   if (!uiSynchronizer) {
     uiSynchronizer = new UISynchronizer();
-    console.log('UISynchronizer: グローバルインスタンス作成完了');
   }
   return uiSynchronizer;
 }

@@ -3,7 +3,6 @@
 
 class PyramidSVGRenderer {
   constructor(containerId, hashData, options = {}) {
-    console.log('PyramidSVGRenderer constructor');
     this.containerId = containerId;
     this.container = document.getElementById(containerId);
     this.options = {
@@ -46,19 +45,19 @@ class PyramidSVGRenderer {
     this.options.unitSize = this.calculateUnitSize(this.data);
     this.options.barHeight = this.options.height * 0.95 / 105; // 目盛ラベル用のスペースを確保
 
-    console.log('init this.options.unitSize', this.options.unitSize);
+    //console.log('init this.options.unitSize', this.options.unitSize);
 
     this.init();
     this.render();
   }
 
   init() {
-    console.warn('init開始');
-    console.warn('this.options.width', this.options.width);
-    console.warn('this.options.height', this.options.height);
-    console.warn('this.options.unitSize', this.options.unitSize);
-    console.warn('this.options.barHeight', this.options.barHeight);
-    console.warn('this.options.zoomScale', this.options.zoomScale);
+    //console.warn('init開始');
+    //console.warn('this.options.width', this.options.width);
+    //console.warn('this.options.height', this.options.height);
+    //console.warn('this.options.unitSize', this.options.unitSize);
+    //console.warn('this.options.barHeight', this.options.barHeight);
+    //console.warn('this.options.zoomScale', this.options.zoomScale);
 
     // 既存のコンテナをクリア
     this.container.innerHTML = '';
@@ -113,23 +112,18 @@ class PyramidSVGRenderer {
     // 1.非アニメーション
     // 2.面積固定モードのアニメーションの最初のフレーム
     // 3.可変面積モードのアニメーション
-    if ( !this.isAnimation ) {
-      console.warn('非アニメーション: 固定要素を再描画');
-    } else if ( !this.isVariableAreaMode && this.isFirstAnimationFrame) {
-      console.warn('面積固定モードのアニメーションの最初のフレーム: 固定要素を再描画（最大人口に基づく）');
-    } else if (this.isVariableAreaMode) {
-      console.warn('可変面積モード: 固定要素を再描画（zoomScale=' + this.options.zoomScale + '）');
-    }
+    //if ( !this.isAnimation ) {
+    //  console.warn('非アニメーション: 固定要素を再描画');
+    //} else if ( !this.isVariableAreaMode && this.isFirstAnimationFrame) {
+    //  console.warn('面積固定モードのアニメーションの最初のフレーム: 固定要素を再描画（最大人口に基づく）');
+    //} else if (this.isVariableAreaMode) {
+    //  console.warn('可変面積モード: 固定要素を再描画（zoomScale=' + this.options.zoomScale + '）');
+    //}
     
     // 既存の静的要素をクリア（背景以外）
     this.clearStaticElements();
 
-    console.warn('これから静的要素を再描画スタート');
-    console.warn('this.options.width', this.options.width);
-    console.warn('this.options.height', this.options.height);
-    console.warn('this.options.unitSize', this.options.unitSize);
-    console.warn('this.options.barHeight', this.options.barHeight);
-    console.warn('this.options.zoomScale', this.options.zoomScale);
+    //console.warn('これから静的要素を再描画スタート');
 
     // グリッドを描画
     if (this.options.showGrid) {
@@ -202,16 +196,16 @@ class PyramidSVGRenderer {
     }
     
     // デバッグ用ログ
-    console.warn('drawGrid デバッグ:', {
-      isAnimation: this.isAnimation,
-      maxPopulationForAnimation: this.maxPopulationForAnimation,
-      currentMaxPopulation: this.getMaxPopulation(this.data),
-      unitSize: this.options.unitSize,
-      viewBoxWidth: viewBoxWidth,
-      x1: x1,
-      x2: x2,
-      centerX: viewBoxWidth / 2
-    });
+    //console.warn('drawGrid デバッグ:', {
+    //  isAnimation: this.isAnimation,
+    //  maxPopulationForAnimation: this.maxPopulationForAnimation,
+    //  currentMaxPopulation: this.getMaxPopulation(this.data),
+    //  unitSize: this.options.unitSize,
+    //  viewBoxWidth: viewBoxWidth,
+    //  x1: x1,
+    //  x2: x2,
+    //  centerX: viewBoxWidth / 2
+    //});
 
     for (let age = 0; age <= 101; age++) {
       
@@ -465,18 +459,18 @@ class PyramidSVGRenderer {
     const fx = x2 - 40;
     
     // デバッグ用ログ
-    console.warn('drawGenderLabels デバッグ:', {
-      isAnimation: this.isAnimation,
-      maxPopulationForAnimation: this.maxPopulationForAnimation,
-      currentMaxPopulation: this.getMaxPopulation(this.data),
-      unitSize: this.options.unitSize,
-      viewBoxWidth: viewBoxWidth,
-      x1: x1,
-      x2: x2,
-      mx: mx,
-      fx: fx,
-      centerX: viewBoxWidth / 2
-    });
+    //console.warn('drawGenderLabels デバッグ:', {
+    //  isAnimation: this.isAnimation,
+    //  maxPopulationForAnimation: this.maxPopulationForAnimation,
+    //  currentMaxPopulation: this.getMaxPopulation(this.data),
+    //  unitSize: this.options.unitSize,
+    //  viewBoxWidth: viewBoxWidth,
+    //  x1: x1,
+    //  x2: x2,
+    //  mx: mx,
+    //  fx: fx,
+    //  centerX: viewBoxWidth / 2
+    //});
     
     // 96歳の位置（最上部）
     const y = viewBoxHeight - (96 * this.options.barHeight);
@@ -524,18 +518,13 @@ class PyramidSVGRenderer {
       return 0;
     }
 
-    let unitSize = pyramidWidth / (totalPopulation / 101);
-    
-    console.warn('デバッグ ピラミッド幅:', pyramidWidth);
-    console.warn('デバッグ 総人口:', totalPopulation);
-    console.warn('デバッグ ユニットサイズ計算結果:', unitSize);
-
+    let unitSize = pyramidWidth / (totalPopulation / 101);    
     return unitSize;    
   }
 
   getMaxPopulation(data) {
     let max = 0;
-    console.log('getMaxPopulation開始: データ件数 =', data.length);
+    //console.log('getMaxPopulation開始: データ件数 =', data.length);
     
     data.forEach((item, index) => {
       const ageGroup = item[0];
@@ -544,7 +533,6 @@ class PyramidSVGRenderer {
       
       // 総数、年齢不詳などの特殊ケースをスキップ
       if (ageGroup.match(/総数|合計|年齢不詳/) || male == null || female == null) {
-        console.log(`スキップ: ${ageGroup} (総数/年齢不詳/null)`);
         return;
       }
       
@@ -556,7 +544,6 @@ class PyramidSVGRenderer {
         const currentMax = Math.max(maleNum, femaleNum);
         if (currentMax > max) {
           max = currentMax;
-          console.log(`各歳別更新: ${ageGroup}歳, 男性=${maleNum}, 女性=${femaleNum}, 最大=${max}`);
         }
       }
       // 5歳階級別データの場合
@@ -575,12 +562,10 @@ class PyramidSVGRenderer {
         
         if (currentMax > max) {
           max = currentMax;
-          console.log(`5歳階級別更新: ${ageGroup}, 男性=${maleNum}, 女性=${femaleNum}, 年数=${yearSpan}, 男性/年=${malePerYear}, 女性/年=${femalePerYear}, 最大=${max}`);
         }
       }
     });
-    
-    console.log('getMaxPopulation完了: 最終最大値 =', max);
+  
     return max;
   }
 
@@ -656,42 +641,37 @@ class PyramidSVGRenderer {
 
   // 全年次データから最大BarLengthを算出するメソッド
   calculateMaxBarLengthFromAllYears(allYearsData) {
-    console.log('全年次データから最大BarLengthを算出開始');
-    console.log('全年次データのキー:', Object.keys(allYearsData));
+    //console.log('全年次データから最大BarLengthを算出開始');
+    //console.log('全年次データのキー:', Object.keys(allYearsData));
     let maxBarLength = 0;
     
     Object.keys(allYearsData).forEach(year => {
       const yearData = allYearsData[year];
-      console.log(`年次 ${year} 処理開始:`, yearData ? 'データ存在' : 'データなし');
       
       if (yearData) {
         // データタイプを判定
         const isFiveYearAgeGroup = yearData.five_year_age_group !== undefined;
         const data = isFiveYearAgeGroup ? yearData.five_year_age_group : yearData.kakusai_betsu;
-        
-        console.log(`年次 ${year} データタイプ:`, isFiveYearAgeGroup ? '5歳階級別' : '各歳別');
-        console.log(`年次 ${year} データ件数:`, data ? data.length : 0);
-        
+                
         if (data && Array.isArray(data)) {
           const yearMaxPopulation = this.getMaxPopulation(data);
           const yearUnitSize = this.calculateUnitSize(data);
           const yearMaxBarLength = yearUnitSize * yearMaxPopulation;
           maxBarLength = Math.max(maxBarLength, yearMaxBarLength);
-          console.log(`年次 ${year}: 最大BarLength ${yearMaxBarLength} (累積最大: ${maxBarLength})`);
         } else {
-          console.warn(`年次 ${year}: データが配列ではありません`, data);
+          //console.warn(`年次 ${year}: データが配列ではありません`, data);
         }
       } else {
-        console.warn(`年次 ${year}: データが存在しません`);
+        //console.warn(`年次 ${year}: データが存在しません`);
       }
     });
     
-    console.log(`全年次での最大BarLength: ${maxBarLength}`);
+    //console.log(`全年次での最大BarLength: ${maxBarLength}`);
     return maxBarLength;
   }
   setMaxBarLengthForAnimation(maxBarLength){
     this.maxBarLengthForAnimation = maxBarLength;
-    console.warn(`固定面積モードアニメーション用年齢別最大BarLengthを設定: ${maxBarLength}`);
+    //console.warn(`固定面積モードアニメーション用年齢別最大BarLengthを設定: ${maxBarLength}`);
   }
 
   getTotalPopulation(data) {
@@ -703,7 +683,7 @@ class PyramidSVGRenderer {
                      data && data.five_year_age_group ? data.five_year_age_group : data;
     
     if (!dataArray || !Array.isArray(dataArray)) {
-      console.warn('getTotalPopulation: データが配列ではありません', dataArray);
+      //console.warn('getTotalPopulation: データが配列ではありません', dataArray);
       return 0;
     }
     
@@ -841,13 +821,8 @@ class PyramidSVGRenderer {
   }
 
   render(animeMode) {
-    console.warn(`render開始 with zoomScale ${this.options.zoomScale}`);
     console.log('render開始');
-    console.log('this.options.width', this.options.width);
-    console.log('this.options.height', this.options.height);
-    console.log('this.options.unitSize', this.options.unitSize);
-    console.log('this.options.barHeight', this.options.barHeight);
-    console.log('this.options.zoomScale', this.options.zoomScale);
+    //console.log('this.options.zoomScale', this.options.zoomScale);
 
     let isInterpolation = false;
     let isVariableAreaMode = false;
@@ -861,7 +836,10 @@ class PyramidSVGRenderer {
     
     // 非アニメーション時またはアニメーションの最初のフレーム時または可変面積モード時は固定要素を再描画
     if (!this.isAnimation || this.isFirstAnimationFrame || isVariableAreaMode) {
-      this.drawStaticElements();
+      // 補間アニメーションの補間データでは静的要素を再描画しない.
+      if (!isInterpolation) {
+        this.drawStaticElements();
+      }
     }
 
     // 既存のバー要素をクリア
@@ -871,7 +849,7 @@ class PyramidSVGRenderer {
 
     if (this.isFiveYearAgeGroup) {
       // 5歳階級別データの処理
-      console.log('Processing five year age group data');
+      //console.log('Processing five year age group data');
       populationMap = new Map();
       this.data.forEach((item, index) => {
 
@@ -894,7 +872,7 @@ class PyramidSVGRenderer {
       });
     } else {
       // 各歳別データの処理（従来の処理）
-      console.log('Processing individual age data');
+      //console.log('Processing individual age data');
       // データから年齢別人口のマップを作成
       this.data.forEach((item, index) => {
         const age = item[0];
@@ -928,7 +906,6 @@ class PyramidSVGRenderer {
       });
     }
 
-    console.log('previous drawAgeBar');
     // 0歳から100歳までの全ての年齢のバーを描画
     let nextAge = 0;
     for (let age = 0; age <= 100; age++) {
@@ -939,7 +916,6 @@ class PyramidSVGRenderer {
         nextAge = age + yearSpan;
       }
     }
-    console.log('after drawAgeBar');
   }
 
   // データを差し替えたときに再描画するメソッド
@@ -998,15 +974,15 @@ class PyramidSVGRenderer {
   }
 
   // unitSizeを外部から指定して描画
-  renderWithFixedUnitSize(unitSize) {
-    console.log('renderWithFixedUnitSize: unitSize =', unitSize);
-    if (unitSize && unitSize > 0) {
-      this.options.unitSize = unitSize;
-      this.render();
-    } else {
-      console.warn('renderWithFixedUnitSize: 無効なunitSizeが指定されました:', unitSize);
-    }
-  }
+  //renderWithFixedUnitSize(unitSize) {
+  //  console.log('renderWithFixedUnitSize: unitSize =', unitSize);
+  //  if (unitSize && unitSize > 0) {
+  //    this.options.unitSize = unitSize;
+  //    this.render();
+  //  } else {
+  //    console.warn('renderWithFixedUnitSize: 無効なunitSizeが指定されました:', unitSize);
+  //  }
+  //}
 
   // ピラミッドのサイズ調整（ハイブリッド方式）
   resize(options = {}) {
@@ -1016,8 +992,8 @@ class PyramidSVGRenderer {
 
     } else if (options.unitSize || options.barHeight) {
       // 方式2: 個別パラメータ指定
-      console.log('options.unitSize', options.unitSize);
-      console.log('options.barHeight', options.barHeight);
+      //console.log('options.unitSize', options.unitSize);
+      //console.log('options.barHeight', options.barHeight);
       this.resizeByParameters(options);
     }
   }
@@ -1027,23 +1003,11 @@ class PyramidSVGRenderer {
     
     const baseBox = this.sceneGroup.getBBox();
 
-    console.log('resizeByScale2 baseBox');
-    console.log('baseBox.width', baseBox.width);
-    console.log('baseBox.height', baseBox.height);
-    console.log('baseBox.x', baseBox.x);
-    console.log('baseBox.y', baseBox.y);
-    
     let w = baseBox.width * scale ;
     let h = baseBox.height * scale ;
     
-    console.log('resizeByScale2 scale', scale);
-    console.log('resizeByScale2 w', w);
-    console.log('resizeByScale2 h', h);
-
     let cx = baseBox.x + baseBox.width / 2;
     let cy = baseBox.y + baseBox.height / 2;
-    //let cx = this.options.width / 2;
-    //let cy = this.options.height / 2;
 
     let tx = cx - w / 2 ;
     let ty = cy - h / 2 ;
@@ -1076,20 +1040,14 @@ class PyramidSVGRenderer {
       this.options.barHeight = options.barHeight;
       needsReinit = true;
     }
-    console.log('rout1');
-    console.log('this.options.barHeight2', this.options.barHeight);
 
     // パラメータが変更された場合は再初期化
     if (needsReinit) {
-      console.log('init実行');
       this.init();
       if (this.data) {
-        console.log('render実行');
         this.render();
       }
     }
-    console.log('rout2');
-    console.log('this.options.barHeight3', this.options.barHeight);
     //後続の処理のためにオプションの値を更新
     if (options.unitSize !== null && options.unitSize !== undefined) {
       // 可変面積モードではunitSizeScaleは使用しない（zoomScaleを使用）
@@ -1099,10 +1057,10 @@ class PyramidSVGRenderer {
         let originalUnitSize = this.calculateUnitSize(this.data) ;
         let unitSizeScale = options.unitSize / originalUnitSize;
         this.options.unitSizeScale = unitSizeScale;
-        console.log('面積固定モード/手動操作: unitSizeScaleを更新', unitSizeScale);
+        //console.log('面積固定モード/手動操作: unitSizeScaleを更新', unitSizeScale);
       } else {
         // 可変面積モード: unitSizeScaleは使用しない
-        console.log('可変面積モード: unitSizeScaleは使用しない（zoomScaleを使用）', this.options.unitSizeScale);
+        //console.log('可変面積モード: unitSizeScaleは使用しない（zoomScaleを使用）', this.options.unitSizeScale);
       }
     }
     if (options.barHeight !== null && options.barHeight !== undefined) {

@@ -398,18 +398,11 @@ function ajax(mode, nengetsu, i) {
 //ローカルまたはサーバから取得したデータを元にHTML変更処理を振り分ける.
 function modify_html(response, mode, nengetsu) {
   //s=mode+"の戻り値\n"+nengetsu+"\n"+response;
-  //alert(s);
-  //console.log("modify_html start");
-  //console.log(mode);
-  //console.log(nengetsu);
   switch (mode) {
     case "shiku_json":
     case "cho_json":
       try {
-        console.log("response", response);
-        console.log("JSON.parse(response)開始");
         var pyramidData = JSON.parse(response);
-        console.log("JSON.parse(response)終了");
 
         //戻り値が配列の場合はオブジェクトに変換する。
         let objectData = getObjectPiramidData(pyramidData);
@@ -420,12 +413,11 @@ function modify_html(response, mode, nengetsu) {
         //サーバ側のrubyのJSON作成処理で文字コードに起因するエラーが発生した場合、
         //CSVファイルを返すようにした。CSVはJSON.parseでエラーになるのでリカバリーする.
         if (response.slice(0, 2) == "町名") {
-          console.log("makePyramidData呼出し");
+          //console.log("makePyramidData呼出し");
           var pyramidData = makePyramidData(response);
           change_pyramid(pyramidData);
         } else {
           console.log(e.name + "\n" + e.message);
-          //alert(e.name+"\n"+e.message);
         }
       }
       break;
@@ -602,7 +594,7 @@ function change_pyramid(objectData, animeMode) {
   }
   document.getElementById("source").innerHTML = source_str(shiku, source);
 
-  if (!isAnm) basic_data_position();
+  //if (!isAnm) basic_data_position();
   
   console.log("change_pyramid step6");
 
@@ -835,54 +827,6 @@ function adjust_title_size(title) {
     if (preSize == "90%") centerContents();
   }
 }
-//人口データの表示位置を調整する.
-function basic_data_position() {
-  //var nengetsu = get_selected_nengetsu(get_pyramid_mode());
-  ////alert(nengetsu);
-  //if (nengetsu == undefined) {
-  //  nengetsu = $nengetsu;
-  //}
-  ////alert(nengetsu);
-  ////console.log(nengetsu);
-  //var obj = document.getElementById("basic_data");
-  //var btn = document.getElementById("kubun_button");
-  //if (nengetsu.match(/昭和|大正/)) {
-  //  if (btn.style.display == "none") {
-  //    obj.style.bottom = "400px";
-  //  } else {
-  //    obj.style.bottom = "300px";
-  //  }
-  //} else {
-  //  if (btn.style.display == "none") {
-  //    obj.style.bottom = "66pt";
-  //    obj.style.right = "5pt";
-  //  } else {
-  //    obj.style.bottom = "66pt";
-  //    obj.style.right = "10pt";
-  //  }
-  //}
-}
-//フッターの縦位置を調整する.
-//function adjustFooterPosition() {
-//  const cho = document.querySelector("#cho");
-//  const menu = document.querySelector(".left-controls");
-//  const pyramid = document.querySelector("#pyramid-block");
-//  const footer = document.querySelector("#footer");
-//  if (!footer || !cho) return;
-//  // 表示中のみ下に配置
-//  //if (cho.style.display !== 'none') {
-//  //  const rect = cho.getBoundingClientRect();
-//  //  footer.style.position = 'absolute';
-//  //  footer.style.top = (rect.bottom + window.scrollY + 20) + 'px'; // 20pxは余白
-//  //} else {
-//  // cho非表示時はウィンドウ下部
-//  const rect1 = pyramid.getBoundingClientRect();
-//  const rect2 = menu.getBoundingClientRect();
-//  footer.style.position = "absolute";
-//  //footer.style.top = (window.innerHeight - footer.offsetHeight) + 'px';
-//  footer.style.top = Math.max(rect1.bottom, rect2.bottom) + 20 + "px";
-//  //}
-//}
 //市区の選択が横浜市か区かを判別して、町丁一覧の表示・非表示を切り替える処理.
 function cho_list() {
   console.log("cho_list開始");
@@ -941,7 +885,7 @@ function change_shiku_option(str) {
       nengetsu = $nengetsu;
     }
   }
-  console.log(`change_shiku_option: ${str}`);
+  //console.log(`change_shiku_option: ${str}`);
   document.getElementById("shiku_year").innerHTML = str;
   select_nengetsu(nengetsu, "shiku");
   
@@ -1891,7 +1835,7 @@ function kubunDisplay() {
     btn.style.display = "block";
     info.style.display = "none";
   }
-  basic_data_position();
+  //basic_data_position();
   console.log("kubunChange呼出し");
   kubunChange(ratio);
 }
@@ -1906,7 +1850,7 @@ function kubunSelectDisp() {
   btn.style.display = "none";
   opt.style.display = "inline-block";
   info.style.display = "";
-  basic_data_position();
+  //basic_data_position();
 }
 
 // 年齢入力値の検証関数
@@ -2001,8 +1945,6 @@ function kubunChange(ratio) {
 //戻り値：{hei:{male:nn,female:nn,sosu:nn},mid:{male:nn,female:nn,sosu:nn},low:{male:nn,female:nn,sosu:nn}}
 function getNin(kakusaiData, ssai, esai) {
   var ageGroupData = Object.assign({}, kakusaiData); //kakusaiDataを参照ではなくコピー
-  console.log("getNin開始");
-  console.log(ageGroupData);
   var hei = {};
   hei.male = 0;
   hei.female = 0;
@@ -2012,8 +1954,6 @@ function getNin(kakusaiData, ssai, esai) {
   var low = {};
   low.male = 0;
   low.female = 0;
-
-  console.log(Object.keys(ageGroupData).length);
 
   var keys = Object.keys(ageGroupData);
   
