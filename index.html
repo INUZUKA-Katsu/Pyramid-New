@@ -343,7 +343,9 @@
           background: #f8f9fa;
           border-radius: 5px;
         }*/
-
+        #title-container {
+          text-align: left;
+        }
         h1,
         h2 {
           margin-left: 250px;
@@ -505,6 +507,9 @@
 
         /* 幅が狭い場合（例: 1200px以下）にfixed解除して縦並びに */
         @media (max-width: 1200px) {
+          #title-container {
+            text-align: center;
+          }
           h1,
           h2 {
             margin-left: 0;
@@ -688,7 +693,7 @@
             display: inline-block;
             margin: 20px auto;
             position: relative;
-            margin-left: 260px;
+            /*margin-left: 260px;*/
             width: 15em;
             box-sizing: border-box;
           }
@@ -705,7 +710,7 @@
             box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
             display: inline-block;
             position: relative;
-            margin-left: 260px;
+            /*margin-left: 260px;*/
             /*width: 25em;*/
             box-sizing: border-box;
             min-width: 300px;
@@ -1269,8 +1274,11 @@
           >
         </div>
 
-        <h1 id="h1" data-html2canvas-ignore="true">横浜市の人口ピラミッド</h1>
-        <br />
+        <div id="title-container">
+          <h1 id="h1" data-html2canvas-ignore="true">横浜市の人口ピラミッド</h1>
+          <br />
+          <h2 id="h2">横浜市(平成28年1月1日現在)</h2>
+        </div>
 
         <!-- データ読み込み中の表示 -->
         <div
@@ -1302,8 +1310,6 @@
             人口統計データを取得しています。しばらくお待ちください。
           </div>
         </div>
-
-        <h2 id="h2">横浜市(平成28年1月1日現在)</h2>
 
         <div id="container-flex" style="display: none">
           <div id="pyramid-block">
@@ -2237,22 +2243,26 @@
         // ********** 画面デザイン（各要素の配置位置） **********
         function centerContents() {
           const menu = document.querySelector(".left-controls");
+          const pyramidContainer = document.querySelector("#pyramid-container");
           const pyramid = document.querySelector("#pyramid-block");
+          const titleContainer = document.querySelector("#title-container");
           const h1Title = document.querySelector("#h1");
           const h2Title = document.querySelector("#h2");
+          const choLink = document.querySelector("#link");
+          const selectControls = document.querySelector("#select-controls");
           const footer = document.querySelector("#footer");
           const basic = document.querySelector("#basic_data");
-          const pyramidContainer = document.querySelector("#pyramid-container");
 
           // スクロール位置に依存しない固定位置計算を使用
           const menuWidth = menu.offsetWidth;
-          const pyramidWidth = pyramid.offsetWidth;
+          const pyramidWidth = pyramid.offsetWidth;  //画面に見えている範囲のピラミッドの幅
+          console.log("pyramidWidth:", pyramidWidth);
           const windowWidth = window.innerWidth;
           const basicWidth = basic.offsetWidth;
 
           // 実際のピラミッドコンテナの位置を使用（#basic_dataの位置決めに使用）
-          const actualPyramidLeft = pyramidContainer.offsetLeft;
-          const actualPyramidWidth = pyramidContainer.offsetWidth;
+          const actualPyramidLeft = pyramidContainer.offsetLeft;   //画面の左にあるときはマイナス値になる
+          const actualPyramidWidth = pyramidContainer.offsetWidth; //画面に収まっていなくても常に1148px
 
           // パディングを考慮（#main: 20px + #container-flex: 10px = 30px）
           const totalPadding = 30;
@@ -2270,16 +2280,20 @@
             menu.style.left = menuLeftPos + "px";
             pyramid.style.left = pyramidLeftPos + "px";
 
-            h1Title.style["margin-left"] = actualPyramidLeft + "px";
-            h2Title.style["margin-left"] = actualPyramidLeft + "px";
-            footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
-
             // 左コントロールをSVG領域と縦の中央揃えにする（スクロール位置に依存しない固定位置）
             const pyramidContainerTop = pyramidContainer.offsetTop; // getBoundingClientRect()の代わりにoffsetTopを使用
             const pyramidHeight = pyramidContainer.offsetHeight;
             const menuHeight = menu.offsetHeight;
             const menuTopPos = pyramidContainerTop + (pyramidHeight - menuHeight) / 2;
             menu.style.top = menuTopPos + "px";
+
+            // タイトル、トップコントロール、フッター
+            titleContainer.style["text-align"] = "left";
+            h1Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h1Title.offsetWidth)/2 + "px";
+            h2Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h2Title.offsetWidth)/2 + "px";
+            choLink.style.width = pyramidWidth + "px";
+            selectControls.style.width = pyramidWidth + "px";
+            footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
 
             // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
             const basicLeftPos = actualPyramidLeft + actualPyramidWidth - basicWidth - 20 ;
@@ -2292,6 +2306,9 @@
             menu.style.left = "0px";
             pyramid.style.left = "0px";
             footer.style["margin-left"] = "0px";
+            const actualPyramidRight = actualPyramidLeft + actualPyramidWidth -20;
+            choLink.style.width = actualPyramidRight + "px";
+            selectControls.style.width = actualPyramidRight + "px";
 
             // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
             const svgFixedWidth = 1108;
@@ -2305,6 +2322,10 @@
               const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2 -50 ;
               pyramidContainer.style.marginLeft = pyramidContainerLeft + "px";
 
+              titleContainer.style["text-align"] = "center";
+              h1Title.style["margin-left"] = "0px"; 
+              h2Title.style["margin-left"] = "0px";            
+
               // #basic_dataをSVG描画領域内の右下に配置
               const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth + 40;
               const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
@@ -2312,6 +2333,9 @@
               basic.style.top = basicTopPos + "px";
               basic.style.display = "block";
             } else {
+              titleContainer.style["text-align"] = "left";
+              h1Title.style["margin-left"] = (900 - h1Title.offsetWidth) / 2 + "px";
+              h2Title.style["margin-left"] = (900 - h2Title.offsetWidth) / 2 + "px";
               // SVG領域の固定幅より画面幅が小さい場合は非表示
               basic.style.display = "none";
             }
