@@ -94,6 +94,15 @@
               maxWidth: 450,
               interactive: false
             },
+            about_data_source_tooltip: {
+              content: `
+                <p>1. このサイトの人口ピラミッドは、すべて横浜市のWebサイトから取得した年齢別人口統計を利用して作成しています。</p>
+                <p>2. しかし残念ながら、横浜市Webサイトのリニューアルの結果、
+                      行政区別の各歳別人口統計は2003年(平成15年)以降のものしか2025年9月現在の横浜市のWebサイトには掲載されていません。
+                      (本サイトではかつて取得した1993年(平成5年)からのデータを利用。また、住民基本台帳による人口は1995年(平成7年)以降のものが横浜市Webサイトに掲載されている。)</p>
+                <p>3. 人口ピラミッドの下に表示されるURLは、データ取得時のものであり、現在ではリンク切れになってしまったものがありますことをご了承ください。</p>
+              `,
+            },
             info_3kubun_tooltip: {
               content: `
                 <p>1. セレクトボックスで年齢3区分別の人口と構成比を切替えることができます。非表示にもできます。</p>
@@ -156,16 +165,17 @@
             },
             screen_shot_tooltip: {
               content: `
-                <p>1. スクリーンショットの使い道<br>
-                (1) 人口ピラミッドの画像ファイルをダウンロードして、人口ピラミッドをWordやPowerPointなどに貼り付けて利用することができます。<br>
-                (2) 比較したい人口ピラミッドを並べて表示し、見比べることができます。</p>
-                <p>2. スクリーンショットの作成とダウンロードの方法<br>
-                (1) 作成<br>
-                    スクリーンショットボタンをクリックすると、このページの下部にイメージが埋め込まれます。<br>
-                (2) ダウンロード<br>
-                    画像データをダウンロードしたいときは、イメージの右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。<br>
-                (3) 複数の人口ピラミッドの比較<br>
-                    市区や地域を変えたり時点を変えて様々の人口ピラミッドを表示させ、それらのスクリーンショットを撮ってください。<br>
+                <p>1. スクリーンショットの使い道</p>
+                <p>(1) 人口ピラミッドの画像ファイルをダウンロードして、人口ピラミッドをWordやPowerPointなどに貼り付けて利用することができます。</p>
+                <p>(2) 比較したい人口ピラミッドを並べて表示し、見比べることができます。</p>
+                <p>2. 具体的な操作の方法</p>
+                <p>(1) 作成<br>
+                    スクリーンショットボタンをクリックすると、このページの下部にイメージが埋め込まれます。</p>
+                <p>(2) ダウンロード<br>
+                    画像データをダウンロードしたいときは、イメージの右のチェックボックスをチェックしてからダウンロードボタンをクリックしてください。</p>
+                    <p><strong>iPhone、iPad</strong>では、画像を長押しするとメニューが表示されるので、"写真に保存"、"共有"などを選択してください。</p>
+                <p>(3) 複数の人口ピラミッドの比較</p>
+                    <p>市区や地域を変えたり時点を変えて様々の人口ピラミッドを表示させ、それらのスクリーンショットを撮ってください。<br>
                     ページの下の方に撮影したイメージが並んで表示されます。並べることのできる数に制限はありません。</p>
               `,
               placement: "top-start",
@@ -688,8 +698,9 @@
             background: #f6f6ec;
             color: #2c2e30;
             padding: 15px 30px;
-            border-radius: 8px;
-            box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
+            border: 1px solid #d4d4b8;
+            border-radius: 4px;
+            box-shadow: 0 1px 1px  rgba(0, 0, 0, 0.3);
             display: inline-block;
             margin: 20px auto;
             position: relative;
@@ -706,8 +717,9 @@
             background: #f6f6ec;
             color: #2c2e30;
             padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
+            border: 1px solid #d4d4b8;
+            border-radius: 4px;
+            box-shadow: 0px 1px 1px  rgba(0, 0, 0, 0.3);
             display: inline-block;
             position: relative;
             /*margin-left: 260px;*/
@@ -1269,8 +1281,8 @@
           <a
             href="#"
             class="header"
-            data-tooltip="このサイトは午後10時から午前8時までの間はスリープ状態になります。その時間帯にこのサイトにアクセスすると、スリープから復帰するまでに10数秒お待ちいただくことになります。一度動き出せば普通に応答します。30分間アクセスがないと再びスリープ状態に移行します。運用経費を節約するためです。ご不便をおかけしますが、ご了承ください。"
-            >>利用可能時間について</a
+            data-tooltip-id="about_data_source_tooltip"
+            >>データの出典について</a
           >
         </div>
 
@@ -1808,11 +1820,11 @@
               <h3>
                 スクリーンショット
                 <a
-                  href="#"
+                  href="#screen_shot_tooltip"
                   data-tooltip-id="screen_shot_tooltip"
                   style="margin-left: 8px; display: inline-block"
                   ><img src="./image/tooltip-icon.png" class="small-icon"
-                /></a>
+                /></a><a name="screen_shot_tooltip"></a>
               </h3>
               <div class="button-group">
                 <button onClick="screen_shot()" id="screen_shot_button">
