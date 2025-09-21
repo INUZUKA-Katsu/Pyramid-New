@@ -2307,8 +2307,8 @@
             pyramid.style.left = "0px";
             footer.style["margin-left"] = "0px";
             const actualPyramidRight = actualPyramidLeft + actualPyramidWidth -20;
-            choLink.style.width = actualPyramidRight + "px";
-            selectControls.style.width = actualPyramidRight + "px";
+            choLink.style.width = actualPyramidLeft + actualPyramidWidth -20 + "px";
+            selectControls.style.width = actualPyramidLeft + actualPyramidWidth -20 + "px";
 
             // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
             const svgFixedWidth = 1108;
@@ -2343,7 +2343,7 @@
         }
 
         // 初回実行
-        centerContents();
+        //centerContents();
 
         // ウィンドウリサイズ時に再度計算して反映
         window.addEventListener("resize", centerContents);
