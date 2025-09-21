@@ -2186,10 +2186,11 @@ function saveAndClearStyles() {
     
     // SVG要素の場合は、内部の背景rect要素も処理
     if (id === 'pyramid-svg' && element.tagName === 'svg') {
-      const bgRect = element.querySelector('rect[fill]');
-      if (bgRect) {
-        savedStyles[id].bgRectFill = bgRect.getAttribute('fill');
-        bgRect.setAttribute('fill', 'transparent');
+      if (window.pyramidRenderer) {
+        savedStyles[id].svgBackgroundColor = window.pyramidRenderer.options.backgroundColor;
+        window.pyramidRenderer.updateOptions({
+          backgroundColor: 'transparent'
+        });
       }
     }
   });
@@ -2218,12 +2219,11 @@ function restoreColorStyles(savedStyles) {
     element.style.borderBottom = styles.borderBottom;
     element.style.borderLeft = styles.borderLeft;
     
-    // SVG要素の場合は、内部の背景rect要素も復元
-    if (id === 'pyramid-svg' && element.tagName === 'svg' && styles.bgRectFill) {
-      const bgRect = element.querySelector('rect[fill]');
-      if (bgRect) {
-        bgRect.setAttribute('fill', styles.bgRectFill);
-      }
+    // SVG要素の場合は、内部の背景色も復元
+    if (id === 'pyramid-svg' && element.tagName === 'svg' && styles.svgBackgroundColor) {
+      window.pyramidRenderer.updateOptions({
+        backgroundColor: styles.svgBackgroundColor
+      });
     }
   });
   
@@ -2396,6 +2396,7 @@ function screen_shot() {
     allowTaint: true,
     backgroundColor: '#ffffff',
     logging: false
+
   }).then(function (canvas) {
     var imageData = canvas.toDataURL();
 
