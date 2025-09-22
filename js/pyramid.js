@@ -303,15 +303,35 @@ function cho_pyramid(nengetsu) {
 //ローカルデータを読み出して描画処理する.（ピラミッドのみ？町丁名一覧は？）
 //mode: shiku_json, cho_json, cho_csv, cho_list
 function escape_ajax(mode, nengetsu) {
+  function isJson(str) {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   var key = isLocalData(mode, nengetsu);
   if (key != false) {
     //console.log("step1.5-1");
     var response = localStorage_get(key);
+
+    //不正なデータであればローカルデータを削除してAjaxに進む.
+    if (mode == "shiku_json" || mode == "cho_json") {
+      if (isJson(response) == false) {
+        localStorage.removeItem(key);
+        return false;
+      }
+    }else if (/content-type: text\/html/i.test(response)) {
+      //responseがエラーであることを示すhtmlがそのままストレージに保存されてしまうことがある。
+      localStorage.removeItem(key);
+      return false;
+    }
     if (mode == "cho_csv" && response.slice(0, 2) != "町名") {
       response = JSON.parse(response).csv;
     }
     //console.log("step1.5-1-2");
-    console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
+    //console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
     modify_html(response, mode, nengetsu);
     return true;
   } else {
@@ -412,14 +432,11 @@ function modify_html(response, mode, nengetsu) {
       } catch (e) {
         //サーバ側のrubyのJSON作成処理で文字コードに起因するエラーが発生した場合、
         //CSVファイルを返すようにした。CSVはJSON.parseでエラーになるのでリカバリーする.
-        console.warn('catch(e) root');
         if (response.slice(0, 2) == "町名") {
-          console.warn('catch(e) root1');
           //console.log("makePyramidData呼出し");
           var pyramidData = makePyramidData(response);
           change_pyramid(pyramidData);
         } else {
-          console.warn('catch(e) root2');
           myFunc();
           console.log(e.name + "\n" + e.message);
         }
