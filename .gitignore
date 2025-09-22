@@ -50,11 +50,7 @@ nagareyama/
 *コピー*
 *テスト*
 *test*
-<<<<<<< HEAD
 *demo*
 *old*
 *original*
 svg-pyramid-demo.html
-=======
-*old.*
->>>>>>> 815505a (Initial commit: SVGによるPyramid描画エンジンに切替えてリニューアル)
