@@ -417,6 +417,7 @@ function modify_html(response, mode, nengetsu) {
           var pyramidData = makePyramidData(response);
           change_pyramid(pyramidData);
         } else {
+          myFunc();
           console.log(e.name + "\n" + e.message);
         }
       }
