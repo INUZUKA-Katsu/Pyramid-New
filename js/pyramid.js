@@ -605,6 +605,7 @@ function change_pyramid(objectData, animeMode) {
 
   //h2(タイトル)を西暦主体に書き直す.
   h2 = change_seireki_main(h2);
+  h2 = add_gengo_to_syoraisuikei(h2);
   document.getElementById("h2").innerHTML = h2;
   adjust_title_size(h2);
 
@@ -1832,7 +1833,15 @@ function change_seireki_main(hi) {
   //console.log("hi2="+hi);
   return hi;
 }
-
+//西暦年のみの将来推計人口に括弧書きで元号年を追加する。
+function add_gengo_to_syoraisuikei(h2) {
+  if (h2.match(/将来推計人口/)) {
+    ans = h2.match(/\d\d(?=年)/);
+    return `${h2}(令和${ ans[0] - 18 }年)`;
+  }else{
+    return h2;
+  }
+}
 //年齢区分別人口の処理区分（ページ読込時、ピラミッド描画時、セレクトボックス変更時に実行）
 function kubunDisplay() {
   console.log("kubunDisplay開始");
@@ -2480,6 +2489,21 @@ function screen_shot() {
         title.innerHTML = kubun2_title_original;
       }
     }
+    
+    //--#h2要素の表示状態を確実にリセットする
+    const h2Element = document.getElementById("h2");
+    if (h2Element) {
+      // フォントサイズをリセット
+      h2Element.style.fontSize = "";
+      // 幅をリセット（必要に応じて）
+      h2Element.style.width = "";
+      h2Element.style.maxWidth = "";
+      // 強制的に再描画を促す
+      h2Element.offsetHeight; // リフローを強制
+    }
+    
+    //--画面を再配置する.
+    centerContents();
   });
 }
 
