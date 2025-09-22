@@ -311,7 +311,7 @@ function escape_ajax(mode, nengetsu) {
       response = JSON.parse(response).csv;
     }
     //console.log("step1.5-1-2");
-    //console.log(response);
+    console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
     modify_html(response, mode, nengetsu);
     return true;
   } else {
@@ -412,11 +412,14 @@ function modify_html(response, mode, nengetsu) {
       } catch (e) {
         //サーバ側のrubyのJSON作成処理で文字コードに起因するエラーが発生した場合、
         //CSVファイルを返すようにした。CSVはJSON.parseでエラーになるのでリカバリーする.
+        console.warn('catch(e) root');
         if (response.slice(0, 2) == "町名") {
+          console.warn('catch(e) root1');
           //console.log("makePyramidData呼出し");
           var pyramidData = makePyramidData(response);
           change_pyramid(pyramidData);
         } else {
+          console.warn('catch(e) root2');
           myFunc();
           console.log(e.name + "\n" + e.message);
         }
