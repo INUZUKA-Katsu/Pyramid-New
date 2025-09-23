@@ -354,6 +354,20 @@
         h2 {
           margin-left: 0px;
         }
+        #animation-controls {
+          justify-content: flex-start;
+        }
+        #animation-execute-section {
+          align-items: center;
+        }
+        #animation-btn-block {
+          gap: 5px;
+        }
+        #animation-btn-group1,
+        #animation-btn-group2 {
+          flex-direction: row;
+          gap: 5px;
+        }
         /* 親コンテナをflexで横並びにする */
         #container-flex {
           display: flex;
@@ -1279,6 +1293,60 @@
           }
         }
 
+        /* 700px未満のスマホ用 */
+        @media screen and (max-width: 700px) {
+          #animation-btn-block {
+            gap: 5px;
+          }
+          #animation-btn-group1 {
+            flex-direction: column;
+            gap: 10px;            
+          }
+          #animation-btn-group1 button {
+            padding: 4px 16px;
+          }
+          #animation-btn-group2 {
+            flex-direction: column-reverse;
+            gap: 10px;
+          }
+          #animation-btn-group2 button {
+            padding: 4px 27px;
+          }
+        }
+
+        /* 585px未満のスマホ用 */
+        @media screen and (max-width: 585px) {
+          #animation-execute-section {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+          }
+          #animation-settings-block {
+            min-width: auto !important;
+            width: 100% !important;
+          }
+          #animation-btn-block {
+            gap: 5px;
+            width: 100% !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+          }
+          #animation-btn-group1 {
+            flex-direction: row;
+            gap: 5px;            
+          }
+          #animation-btn-group1 button {
+            padding: 4px 16px;
+          }
+          #animation-btn-group2 {
+            flex-direction: row;
+            gap: 5px;
+          }
+          #animation-btn-group2 button {
+            padding: 4px 16px;
+          }
+        }
+
         /* さらに小さなスマホ用：額縁を完全に削除 */
         @media screen and (max-width: 480px) {
           #main {
@@ -1394,7 +1462,7 @@
             人口統計データを読み込んでいます。しばらくお待ちください。
           </div>
         </div>
-
+              
         <div id="container-flex" style="display: none">
           <div id="pyramid-block">
             <!-- 上部コントロール -->
@@ -1410,84 +1478,85 @@
                   id="animation-type-section"
                   style="
                     display: flex;
+                    flex-direction: row;
                     align-items: center;
                     justify-content: flex-start;
-                    gap: 30px;
+                    gap: 1.5em;
                     margin-bottom: 10px;
                     padding: 5px 5px 5px 0;
                   "
                 >
                   <span style="font-weight: bold; min-width: 2em; text-align: center">種類</span>
-                  
-                  <!-- 左側のラジオボタングループ -->
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 15px;
-                      padding: 5px 10px;
-                      border: 1px solid #ced4da;
-                      border-radius: 4px;
-                    "
-                  >
-                    <label style="margin-right: 15px">
-                      <input
-                        type="radio"
-                        name="animation-type-inline"
-                        value="direct"
-                        checked
-                      />
-                      <span>通常タイプ</span>
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="animation-type-inline"
-                        value="interpolation"
-                      />
-                      <span>伸び縮みタイプ</span>
-                    </label>
-                  </div>
-
-                  <!-- 右側のラジオボタングループ（新設） -->
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 15px;
-                      padding: 5px 10px;
-                      border: 1px solid #ced4da;
-                      border-radius: 4px;
-                    "
-                  >
-                    <label style="margin-right: 15px">
-                      <input
-                        type="radio"
-                        name="animation-mode"
-                        value="age-composition"
-                        checked
-                      />
-                      <span>年齢構成</span>
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="animation-mode"
-                        value="age-composition-population"
-                      />
-                      <span>年齢構成 + 人口増減</span>
-                    </label>
+                  <div id="animation-radio-buttons"
+                       style="
+                         display: flex;
+                         flex-direction: row;
+                         gap: 1em;
+                  ">
+                    <!-- 左側のラジオボタングループ -->
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        padding: 5px 10px;
+                        border: 1px solid #ced4da;
+                        border-radius: 4px;
+                      "
+                    >
+                      <label style="margin-right: 1em">
+                        <input
+                          type="radio"
+                          name="animation-type-inline"
+                          value="direct"
+                          checked
+                        />
+                        <span>通常タイプ</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="animation-type-inline"
+                          value="interpolation"
+                        />
+                        <span>伸び縮みタイプ</span>
+                      </label>
+                    </div>
+                    <!-- 右側のラジオボタングループ（新設） -->
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        padding: 5px 10px;
+                        border: 1px solid #ced4da;
+                        border-radius: 4px;
+                      "
+                    >
+                      <label style="margin-right: 1.5em">
+                        <input
+                          type="radio"
+                          name="animation-mode"
+                          value="age-composition"
+                          checked
+                        />
+                        <span>年齢構成</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="animation-mode"
+                          value="age-composition-population"
+                        />
+                        <span>年齢構成 + 人口増減</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
-
                 <!-- 下段: スライドバー・ボタンブロック -->
-                <div
-                  style="
-                    display: flex;
-                    align-items: flex-start;
-                    justify-content: flex-start;
-                    gap: 20px;
-                  "
+                <div  id="animation-execute-section"
+                      style="
+                        display: flex;
+                        justify-content: flex-start;
+                      "
                 >
                   <!-- 左側: スライドバーブロック（上下2段） -->
                   <div
@@ -1514,7 +1583,6 @@
                       />
                       <span>早く</span>
                     </div>
-
                     <!-- 下段: 進捗スライダー -->
                     <div
                       id="animation-progress-controls"
@@ -1558,55 +1626,61 @@
                       </div>
                     </div>
                   </div>
-
                   <!-- 右側: ボタンブロック -->
-                  <div
-                    style="
-                      display: flex;
-                      flex-direction: row;
-                      gap: 10px;
-                      align-items: center;
-                      justify-content: center;
-                      height: 100%;
-                    "
-                  >
-                    <button
-                      type="button"
-                      id="start-animation-btn"
-                      onclick="startAnimationFromControls()"
-                    >
-                      開始
-                    </button>
-                    <button
-                      type="button"
-                      id="pause-animation-btn"
-                      onclick="pauseAnimationFromControls()"
-                    >
-                      一時停止
-                    </button>
-                    <button
-                      type="button"
-                      id="resume-animation-btn"
-                      onclick="resumeAnimationFromControls()"
-                    >
-                      再開
-                    </button>
-                    <button
-                      type="button"
-                      id="stop-animation-btn"
-                      onclick="stopAnimationFromControls()"
-                    >
-                      終了
-                    </button>
-                  </div>
-                  
-                  <!-- ツールチップアイコン -->
-                  <a
-                    href="#"
-                    class="info-icon-right"
-                    data-tooltip-id="info_animation_tooltip"
-                    ><img src="./image/tooltip-icon.png" class="small-icon"
+                  <div id = "animation-btn-block"
+                       style="
+                         display: flex;
+                         flex-direction: row;
+                         align-items: center;
+                         justify-content: center;
+                         height: 100%;
+                  ">
+                    <div id="animation-btn-group1"
+                         style="
+                          display: flex;
+                    ">
+                      <button
+                        type="button"
+                        id="start-animation-btn"
+                        onclick="startAnimationFromControls()"
+                      >
+                        開始
+                      </button>
+                      <button
+                        type="button"
+                        id="pause-animation-btn"
+                        onclick="pauseAnimationFromControls()"
+                      >
+                        一時停止
+                      </button>
+                    </div>
+                    <div id="animation-btn-group2"
+                         style="
+                         display: flex;
+                    ">
+                      <button
+                        type="button"
+                        id="resume-animation-btn"
+                        onclick="resumeAnimationFromControls()"
+                      >
+                        再開
+                      </button>
+                      <button
+                        type="button"
+                        id="stop-animation-btn"
+                        onclick="stopAnimationFromControls()"
+                      >
+                        終了
+                      </button>
+                    </div>
+                    <!-- ツールチップアイコン -->
+                    <a
+                      href="#"
+                      class="info-icon-right"
+                      data-tooltip-id="info_animation_tooltip"
+                      ><img src="./image/tooltip-icon.png" class="small-icon"
                     /></a>
+                  </div>
                 </div>
               </div>
               <!-- #animation-controls ここまで -->
@@ -2929,6 +3003,7 @@
           checkAndClearCacheIfShikuChanged();
 
           showAnimationControls();
+          centerContents();
         }
 
         // ********** 画面デザイン（各要素の配置位置） **********
@@ -2973,7 +3048,8 @@
           const totalWidth = menuWidth + pyramidWidth + gap + framePadding;
           const menuLeftPos = Math.max(0, (availableWidth - totalWidth) / 2);
           const pyramidLeftPos = Math.max(0, menuLeftPos + menuWidth + gap);
-          const pyramidTopPos = pyramid.offsetTop; // ピラミッドの縦位置は自動的に決まる固定値
+
+          const pyramidTopPos = pyramid.offsetTop;
 
           console.log(`availableWidth:, ${availableWidth}、totalWidth:, ${totalWidth}`);
           console.log(`menuLeftPos:, ${menuLeftPos}、pyramidLeftPos:, ${pyramidLeftPos}`);
