@@ -354,11 +354,11 @@
           border-radius: 5px;
         }*/
         #title-container {
-          text-align: left;
+          text-align: center;
         }
         h1,
         h2 {
-          margin-left: 250px;
+          margin-left: 0px;
         }
         /* 親コンテナをflexで横並びにする */
         #container-flex {
@@ -1299,7 +1299,7 @@
             text-align: center;
             padding: 60px 20px;
             color: #6c757d;
-            margin-left: 250px;
+            margin-left: 0px;
             max-width: 1408px;
           "
         >
@@ -1319,7 +1319,7 @@
             データを読み込み中です...
           </div>
           <div style="font-size: 14px; color: #adb5bd">
-            人口統計データを取得しています。しばらくお待ちください。
+            人口統計データを読み込んでいます。しばらくお待ちください。
           </div>
         </div>
 
@@ -1557,7 +1557,6 @@
               <!-- #市区、年月セレクトボックス -->
               <div id="select-controls">
                 <div id="comment" data-html2canvas-ignore="true">
-                  データを取得中です.
                 </div>
                 <div id="hitoku" data-html2canvas-ignore="true">
                   数字が著しく小さいために秘匿処理(統計表では"X"表記)されたデータがありました。ここでは便宜上"X"を0(ゼロ)として取り扱っています。
@@ -2264,6 +2263,7 @@
           const selectControls = document.querySelector("#select-controls");
           const footer = document.querySelector("#footer");
           const basic = document.querySelector("#basic_data");
+          const loading = document.querySelector("#loading-container");
 
           // スクロール位置に依存しない固定位置計算を使用
           const menuWidth = menu.offsetWidth;
@@ -2300,9 +2300,11 @@
             menu.style.top = menuTopPos + "px";
 
             // タイトル、トップコントロール、フッター
-            titleContainer.style["text-align"] = "left";
-            h1Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h1Title.offsetWidth)/2 + "px";
-            h2Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h2Title.offsetWidth)/2 + "px";
+            if (pyramidContainer){
+              titleContainer.style["text-align"] = "left";
+              h1Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h1Title.offsetWidth)/2 + "px";
+              h2Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h2Title.offsetWidth)/2 + "px";
+            }
             choLink.style.width = pyramidWidth + "px";
             selectControls.style.width = pyramidWidth + "px";
             footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
@@ -2344,10 +2346,13 @@
               basic.style.left = basicLeftPos + "px";
               basic.style.top = basicTopPos + "px";
               basic.style.display = "block";
+           
             } else {
-              titleContainer.style["text-align"] = "left";
-              h1Title.style["margin-left"] = (900 - h1Title.offsetWidth) / 2 + "px";
-              h2Title.style["margin-left"] = (900 - h2Title.offsetWidth) / 2 + "px";
+              if (pyramidContainer){
+                titleContainer.style["text-align"] = "left";
+                h1Title.style["margin-left"] = (900 - h1Title.offsetWidth) / 2 + "px";
+                h2Title.style["margin-left"] = (900 - h2Title.offsetWidth) / 2 + "px";
+              }
               // SVG領域の固定幅より画面幅が小さい場合は非表示
               basic.style.display = "none";
             }
