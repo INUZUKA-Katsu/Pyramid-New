@@ -852,8 +852,8 @@ function adjust_title_size(title) {
 //市区の選択が横浜市か区かを判別して、町丁一覧の表示・非表示を切り替える処理.
 function cho_list() {
   console.log("cho_list開始");
-  var index = document.forms[0].shiku.selectedIndex;
-  var shiku = document.forms[0].shiku.options[index].value;
+  var index = document.getElementById('shiku').selectedIndex;
+  var shiku = document.getElementById('shiku').options[index].value;
   if (shiku == "age") {
     document.getElementById("cho_list").innerHTML = "";
     document.getElementById("cho").style.display = "none";
@@ -1044,8 +1044,8 @@ function get_SendData(mode, nengetsu) {
 
 //市区セレクトボックスで選択されている市区情報を取得する.
 function get_selected_shiku() {
-  var index = document.forms[0].shiku.selectedIndex;
-  var cmb_value = document.forms[0].shiku.options[index].value;
+  var index = document.getElementById('shiku').selectedIndex;
+  var cmb_value = document.getElementById('shiku').options[index].value;
   return cmb_value;
 }
 
@@ -1083,12 +1083,12 @@ function get_selected_nengetsu(pyramode) {
   console.log(`🔍 get_selected_nengetsu: pyramode = "${pyramode}"`);
   try {
     if (pyramode == "shiku") {
-      var index = document.forms[0].shiku_year.selectedIndex;
-      var cmb_value = document.forms[0].shiku_year.options[index].value;
+      var index = document.getElementById('shiku_year').selectedIndex;
+      var cmb_value = document.getElementById('shiku_year').options[index].value;
       console.log(`🔍 get_selected_nengetsu: shiku_year selectedIndex = ${index}, value = "${cmb_value}"`);
     } else if (pyramode == "cho") {
-      var index = document.forms[0].cho_year.selectedIndex;
-      var cmb_value = document.forms[0].cho_year.options[index].value;
+      var index = document.getElementById('cho_year').selectedIndex;
+      var cmb_value = document.getElementById('cho_year').options[index].value;
       console.log(`🔍 get_selected_nengetsu: cho_year selectedIndex = ${index}, value = "${cmb_value}"`);
     }
   } catch (e) {

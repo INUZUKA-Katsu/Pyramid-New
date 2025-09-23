@@ -344,15 +344,9 @@
           color: #007bff !important;
         }
 
-        /*.controls {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 15px;
-          margin-bottom: 30px;
+        #main {
           padding: 20px;
-          background: #f8f9fa;
-          border-radius: 5px;
-        }*/
+        }
         #title-container {
           text-align: center;
         }
@@ -364,11 +358,7 @@
         #container-flex {
           display: flex;
           align-items: flex-start;
-          /*display: grid;
-          grid-template-columns: 1fr 1fr;*/
           justify-content: center;
-          /*width: 100%;*/
-          /*height: 100vh;*/
           gap: 20px;
           padding: 10px;
         }
@@ -385,21 +375,21 @@
         }
         #pyramid-container {
           text-align: left;
-          #pyramid-container {
-            width: 1108px;
-            max-width: 100%;
-            overflow: hidden;
-            position: relative;
+          max-width: 1108px;
+          width: 100%;
+          /*max-width: 100%;*/
+          overflow: hidden;
+          position: relative;
           }
-          /*border: 1px solid #ddd;
-            border-radius: 5px;
-            background: white;
-            min-height: 600px;
-            margin-left: 20px;
-            margin-right: auto;
-            margin-bottom: 20px;
-            overflow: auto;*/
-        }
+        /*border: 1px solid #ddd;
+          border-radius: 5px;
+          background: white;
+          min-height: 600px;
+          margin-left: 20px;
+          margin-right: auto;
+          margin-bottom: 20px;
+          overflow: auto;*/
+        
         /* 描画領域上部に並ぶコントロール */
         #top-controls {
           height: auto;
@@ -506,7 +496,7 @@
 
         #footer {
           margin-top: 30px;
-          margin-left: 260px;
+          /*margin-left: 260px;*/
           z-index: 1000;
         }
 
@@ -767,7 +757,7 @@
             display: none;
             text-align: center;
             width: 100%;
-            padding: 0;
+            padding-left: 100px;
             background-color: transparent;
             border-radius: 0;
             box-shadow: none;
@@ -943,7 +933,7 @@
           }
           div.footer {
             text-align: center;
-            width: 1100px;
+            width: 100%;
             margin-left: auto;
             margin-right: auto;
             font-size: 11pt;
@@ -1198,7 +1188,7 @@
           box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3),
             0 8px 25px rgba(0, 0, 0, 0.4), 0 0 0 3px #8b7355, 0 0 0 6px #d4af37;
           margin: 20px auto;
-          max-width: 1200px;
+          max-width: 1108px;
           position: relative;
         }
 
@@ -1234,7 +1224,89 @@
           #loading-container {
             margin-left: 0 !important;
           }
+          #main {
+            padding: 10px;
+          }
+          #container-flex {
+            padding: 0;
+          }
         }
+
+        @media screen and (max-width: 850px) {
+          div#animation-controls {
+            padding-left: 50px;
+          }
+        }
+
+        /* スマホ用：額縁を最小限にしてSVGを大きく表示 */
+        @media screen and (max-width: 768px) {
+          #main {
+            padding: 5px;
+          }
+          h1 {
+            font-size: 140%;
+            margin-top: 0px;
+            margin-bottom: 5px;
+            box-shadow:none;
+          }
+          h2 {
+            font-size: 120%;
+            margin-top: 0px;
+            margin-bottom: 10px;
+            box-shadow:none;
+          }
+          div#animation-controls {
+            padding-left: 0px;
+          }
+          #container-flex {
+            padding: 0;
+          }
+          #pyramid-container {
+            padding: 5px; /* 20px → 5px に縮小 */
+            margin: 10px auto; /* 20px → 10px に縮小 */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2), /* 影も軽く */
+              0 4px 15px rgba(0, 0, 0, 0.3), 
+              0 0 0 2px #8b7355, /* 3px → 2px */
+              0 0 0 4px #d4af37; /* 6px → 4px */
+          }
+          
+          #pyramid-container::before {
+            top: 5px;    /* 10px → 5px */
+            left: 5px;   /* 10px → 5px */
+            right: 5px;  /* 10px → 5px */
+            bottom: 5px; /* 10px → 5px */
+            border-width: 1px; /* 2px → 1px */
+          }
+        }
+
+        /* さらに小さなスマホ用：額縁を完全に削除 */
+        @media screen and (max-width: 480px) {
+          #main {
+            padding: 0;
+          }
+          h1 {
+            font-size: 120%;
+          }
+          h2 {
+            font-size: 95%;
+          }
+
+          #container-flex {
+            padding: 0;
+          }
+          #pyramid-container {
+            padding: 0; /* 額縁を完全に削除 */
+            margin: 5px auto;
+            background: transparent; /* 背景も削除 */
+            box-shadow: none; /* 影も削除 */
+            border-radius: 0; /* 角の丸みも削除 */
+          }
+          
+          #pyramid-container::before {
+            display: none; /* 内側枠も削除 */
+          }
+        }
+
       </style>
     </head>
     <body
@@ -1249,7 +1321,7 @@
       <input type="hidden" id="save" />
       <input type="hidden" id="clear" checked />
 
-      <div id="main" style="padding: 20px">
+      <div id="main">
         <div id="header" data-html2canvas-ignore="true">
           <a
             href="#"
@@ -1332,8 +1404,7 @@
                    style="
                       width: 800px; 
                       margin: 0 auto;
-                      padding-left:100px;"
-                   >
+                   ">
                 <!-- 上段: アニメーションの種類ブロック -->
                 <div
                   id="animation-type-section"
@@ -1561,120 +1632,103 @@
                 <div id="hitoku" data-html2canvas-ignore="true">
                   数字が著しく小さいために秘匿処理(統計表では"X"表記)されたデータがありました。ここでは便宜上"X"を0(ゼロ)として取り扱っています。
                 </div>
-                <div id="caption" data-html2canvas-ignore="true">
-                  <form name="Form" id="form0">
-                    <!-- 市区・年月セレクトボックス、動画ボタン -->
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        justify-content: flex-end;
-                        gap: 10px;
-                        flex-wrap: wrap;
-                      "
+                <!-- 市区・年月セレクトボックス、動画ボタン -->
+                <div
+                  style="
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                  "
+                >
+                  <!-- 市区セレクトボックス -->
+                  <select onChange="change_shiku()" name="shiku" id="shiku">
+                    <option selected="selected" value="age">横浜市</option>
+                    <option value="tsurumi">鶴見区</option>
+                    <option value="kanagawa">神奈川区</option>
+                    <option value="nishi">西区</option>
+                    <option value="naka">中区</option>
+                    <option value="minami">南区</option>
+                    <option value="konan">港南区</option>
+                    <option value="hodogaya">保土ケ谷区</option>
+                    <option value="asahi">旭区</option>
+                    <option value="isogo">磯子区</option>
+                    <option value="kanazawa">金沢区</option>
+                    <option value="kohoku">港北区</option>
+                    <option value="midori">緑区</option>
+                    <option value="aoba">青葉区</option>
+                    <option value="tsuzuki">都筑区</option>
+                    <option value="totsuka">戸塚区</option>
+                    <option value="sakae">栄区</option>
+                    <option value="izumi">泉区</option>
+                    <option value="seya">瀬谷区</option>
+                  </select>
+                  <div id="shiku_year_container"
+                       style="display: flex;
+                              flex-direction: column;
+                              align-items: center;
+                              justify-content: center;
+                              gap: 2px;
+                              flex-wrap: nowrap;"
+                  >
+                    <!-- 年月セレクトボックス（市区ピラミッド用） -->
+                    <select
+                      onChange="change_shiku_year()"
+                      name="shiku_year"
+                      id="shiku_year"
                     >
-                      <!-- 市区セレクトボックス -->
-                      <select onChange="change_shiku()" name="shiku" id="shiku">
-                        <option selected="selected" value="age">横浜市</option>
-                        <option value="tsurumi">鶴見区</option>
-                        <option value="kanagawa">神奈川区</option>
-                        <option value="nishi">西区</option>
-                        <option value="naka">中区</option>
-                        <option value="minami">南区</option>
-                        <option value="konan">港南区</option>
-                        <option value="hodogaya">保土ケ谷区</option>
-                        <option value="asahi">旭区</option>
-                        <option value="isogo">磯子区</option>
-                        <option value="kanazawa">金沢区</option>
-                        <option value="kohoku">港北区</option>
-                        <option value="midori">緑区</option>
-                        <option value="aoba">青葉区</option>
-                        <option value="tsuzuki">都筑区</option>
-                        <option value="totsuka">戸塚区</option>
-                        <option value="sakae">栄区</option>
-                        <option value="izumi">泉区</option>
-                        <option value="seya">瀬谷区</option>
-                      </select>
-
-                      <!-- 年月セレクトボックス（市区ピラミッド用） -->
-                      <select
-                        onChange="change_shiku_year()"
-                        name="shiku_year"
-                        id="shiku_year"
-                      >
-                        <!-- 動的オプション読み込み用プレースホルダー -->
-                        <option value="new" selected>　　 最新</option>
-                      </select>
-
-                      <!-- 年月セレクトボックス（町丁別ピラミッド用） -->
-                      <select
-                        onChange="change_cho_year()"
-                        name="cho_year"
-                        id="cho_year"
-                      >
-                      <option value="202109">令和６年9月30日現在</option>
-                      <option value="202109">令和５年9月30日現在</option>
-                      <option value="202109">令和４年9月30日現在</option>
-                      <option value="202109">令和３年9月30日現在</option>
-                        <option value="202009">令和２年9月30日現在</option>
-                        <option value="201909">
-                          平成31・令和元年9月30日現在
-                        </option>
-                        <option value="201809">平成30年9月30日現在</option>
-                        <option value="201709">平成29年9月30日現在</option>
-                        <option value="201609">平成28年9月30日現在</option>
-                        <option value="201509">平成27年9月30日現在</option>
-                        <option value="201409">平成26年9月30日現在</option>
-                        <option value="201309">平成25年9月30日現在</option>
-                        <option value="201209">平成24年9月30日現在</option>
-                        <option value="201109">平成23年9月30日現在</option>
-                        <option value="201009">平成22年9月30日現在</option>
-                        <option value="200909">平成21年9月30日現在</option>
-                        <option value="200809">平成20年9月30日現在</option>
-                        <option value="200709">平成19年9月30日現在</option>
-                        <option value="200609">平成18年9月30日現在</option>
-                        <option value="200509">平成17年9月30日現在</option>
-                        <option value="200409">平成16年9月30日現在</option>
-                        <option value="200309">平成15年9月30日現在</option>
-                        <option value="200209">平成14年9月30日現在</option>
-                        <option value="200109">平成13年9月30日現在</option>
-                        <option value="200009">平成12年9月30日現在</option>
-                        <option value="199909">平成11年9月30日現在</option>
-                        <option value="199809">平成10年9月30日現在</option>
-                      </select>
-
-                      <!-- 動画ボタン -->
-                      <button
-                        onClick="toggleAnimationPanel()"
-                        name="animation"
-                        type="button"
-                        id="doga"
-                      >
-                        動画
-                      </button>
-
-                      <!-- ツールチップアイコン -->
-                      <a
-                        href="#"
-                        class="info-icon-right"
-                        data-tooltip-id="doga_button_tooltip"
-                        ><img src="./image/tooltip-icon.png" class="small-icon"
-                      /></a>
-                    </div>
-
+                      <!-- 動的オプション読み込み用プレースホルダー -->
+                      <option value="new" selected>　　 最新</option>
+                    </select>
+                    <!-- 年月セレクトボックス（町丁別ピラミッド用） -->
+                    <select
+                      onChange="change_cho_year()"
+                      name="cho_year"
+                      id="cho_year"
+                    >
+                    <option value="202109">令和６年9月30日現在</option>
+                    <option value="202109">令和５年9月30日現在</option>
+                    <option value="202109">令和４年9月30日現在</option>
+                    <option value="202109">令和３年9月30日現在</option>
+                      <option value="202009">令和２年9月30日現在</option>
+                      <option value="201909">
+                        平成31・令和元年9月30日現在
+                      </option>
+                      <option value="201809">平成30年9月30日現在</option>
+                      <option value="201709">平成29年9月30日現在</option>
+                      <option value="201609">平成28年9月30日現在</option>
+                      <option value="201509">平成27年9月30日現在</option>
+                      <option value="201409">平成26年9月30日現在</option>
+                      <option value="201309">平成25年9月30日現在</option>
+                      <option value="201209">平成24年9月30日現在</option>
+                      <option value="201109">平成23年9月30日現在</option>
+                      <option value="201009">平成22年9月30日現在</option>
+                      <option value="200909">平成21年9月30日現在</option>
+                      <option value="200809">平成20年9月30日現在</option>
+                      <option value="200709">平成19年9月30日現在</option>
+                      <option value="200609">平成18年9月30日現在</option>
+                      <option value="200509">平成17年9月30日現在</option>
+                      <option value="200409">平成16年9月30日現在</option>
+                      <option value="200309">平成15年9月30日現在</option>
+                      <option value="200209">平成14年9月30日現在</option>
+                      <option value="200109">平成13年9月30日現在</option>
+                      <option value="200009">平成12年9月30日現在</option>
+                      <option value="199909">平成11年9月30日現在</option>
+                      <option value="199809">平成10年9月30日現在</option>
+                    </select>
                     <!-- スライドバー1（市区ピラミッド用） -->
                     <div
                       id="shiku-year-slider-container"
                       style="display: none; 
                              margin-top: 5px;
-                             text-align: right;
-                             margin-right: 90px;"
+                             text-align: right;"
                     >
                       <div
                         style="
                           display: inline-flex;
                           align-items: center;
-                          gap: 10px;
+                          gap: 0px;
                           font-size: 12px;
                         "
                       >
@@ -1685,7 +1739,7 @@
                           min="0"
                           max="100"
                           value="0"
-                          style="width: 200px"
+                          style="width: 190px"
                         />
                         <span>将来</span>
                         <!-- 機能的に必要：削除しないでください -->
@@ -1696,20 +1750,19 @@
                         >
                       </div>
                     </div>
-
+                     
                     <!-- スライドバー2（町丁別ピラミッド用） -->
                     <div
                       id="cho-year-slider-container"
                       style="display: none; 
                              margin-top: 5px;
-                             text-align: right;
-                             margin-right: 90px;"
+                             text-align: right;"
                     >
                       <div
                         style="
                           display: inline-flex;
                           align-items: center;
-                          gap: 10px;
+                          gap: 0px;
                           font-size: 12px;
                         "
                       >
@@ -1720,7 +1773,7 @@
                           min="0"
                           max="100"
                           value="0"
-                          style="width: 200px"
+                          style="width: 190px"
                         />
                         <span>最新</span>
                         <!-- 機能的に必要：削除しないでください -->
@@ -1729,8 +1782,26 @@
                         >
                       </div>
                     </div>
-
-                  </form>
+                  </div>
+                  <!-- 動画ボタンとツールチップアイコン -->
+                  <div id="doga_button">
+                    <!-- 動画ボタン -->
+                    <button
+                      onClick="toggleAnimationPanel()"
+                      name="animation"
+                      type="button"
+                      id="doga"
+                    >
+                      動画
+                    </button>
+                    <!-- ツールチップアイコン -->
+                    <a
+                      href="#"
+                      class="info-icon-right"
+                      data-tooltip-id="doga_button_tooltip"
+                      ><img src="./image/tooltip-icon.png" class="small-icon"
+                    /></a>
+                  </div>
                 </div>
               </div>
               <!-- #select-controls ここまで -->
@@ -2251,121 +2322,6 @@
         console.log("loadDemoData:", typeof loadDemoData);
         console.log("renderPyramid:", typeof renderPyramid);
 
-        // ********** 画面デザイン（各要素の配置位置） **********
-        function centerContents() {
-          const menu = document.querySelector(".left-controls");
-          const pyramidContainer = document.querySelector("#pyramid-container");
-          const pyramid = document.querySelector("#pyramid-block");
-          const titleContainer = document.querySelector("#title-container");
-          const h1Title = document.querySelector("#h1");
-          const h2Title = document.querySelector("#h2");
-          const choLink = document.querySelector("#link");
-          const selectControls = document.querySelector("#select-controls");
-          const footer = document.querySelector("#footer");
-          const basic = document.querySelector("#basic_data");
-          const loading = document.querySelector("#loading-container");
-
-          // スクロール位置に依存しない固定位置計算を使用
-          const menuWidth = menu.offsetWidth;
-          const pyramidWidth = pyramid.offsetWidth;  //画面に見えている範囲のピラミッドの幅
-          console.log("pyramidWidth:", pyramidWidth);
-          const windowWidth = window.innerWidth;
-          const basicWidth = basic.offsetWidth;
-
-          // 実際のピラミッドコンテナの位置を使用（#basic_dataの位置決めに使用）
-          const actualPyramidLeft = pyramidContainer.offsetLeft;   //画面の左にあるときはマイナス値になる
-          const actualPyramidWidth = pyramidContainer.offsetWidth; //画面に収まっていなくても常に1148px
-
-          // パディングを考慮（#main: 20px + #container-flex: 10px = 30px）
-          const totalPadding = 30;
-          const availableWidth = windowWidth - (totalPadding * 2); // 左右のパディングを引く
-
-          // 画面中央に配置（ウィンドウ中央 - (メニュー幅 + ピラミッド幅 + すき間)の半分）
-          const gap = 20; // コントロールとSVGの間のすき間
-          const framePadding = 40; // 額縁の太さ（左右各20px）
-          const totalWidth = menuWidth + pyramidWidth + gap + framePadding;
-          //const menuLeftPos = Math.max(0, (windowWidth - totalWidth) / 2);
-          const menuLeftPos = Math.max(0, (availableWidth - totalWidth) / 2);
-          const pyramidLeftPos = Math.max(0, menuLeftPos + menuWidth + gap);
-
-          if (windowWidth >= 1200) {
-            menu.style.left = menuLeftPos + "px";
-            pyramid.style.left = pyramidLeftPos + "px";
-
-            // 左コントロールをSVG領域と縦の中央揃えにする（スクロール位置に依存しない固定位置）
-            const pyramidContainerTop = pyramidContainer.offsetTop; // getBoundingClientRect()の代わりにoffsetTopを使用
-            const pyramidHeight = pyramidContainer.offsetHeight;
-            const menuHeight = menu.offsetHeight;
-            const menuTopPos = pyramidContainerTop + (pyramidHeight - menuHeight) / 2;
-            menu.style.top = menuTopPos + "px";
-
-            // タイトル、トップコントロール、フッター
-            if (pyramidContainer){
-              titleContainer.style["text-align"] = "left";
-              h1Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h1Title.offsetWidth)/2 + "px";
-              h2Title.style["margin-left"] = actualPyramidLeft + (actualPyramidWidth - h2Title.offsetWidth)/2 + "px";
-            }
-            choLink.style.width = pyramidWidth + "px";
-            selectControls.style.width = pyramidWidth + "px";
-            footer.style["margin-left"] = pyramidLeftPos - 10 + "px";
-
-            // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
-            const basicLeftPos = actualPyramidLeft + actualPyramidWidth - basicWidth - 20 ;
-            const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
-            basic.style.left = basicLeftPos + "px";
-            basic.style.top = basicTopPos + "px";
-            basic.style.display = "block";
-
-          } else if (windowWidth < 1200) {
-            menu.style.left = "0px";
-            pyramid.style.left = "0px";
-            footer.style["margin-left"] = "0px";
-            const actualPyramidRight = actualPyramidLeft + actualPyramidWidth -20;
-            choLink.style.width = actualPyramidLeft + actualPyramidWidth -20 + "px";
-            selectControls.style.width = actualPyramidLeft + actualPyramidWidth -20 + "px";
-
-            // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
-            const svgFixedWidth = 1108;
-            //if (windowWidth > svgFixedWidth) {
-            if (windowWidth > 900) {
-              // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
-              const pyramidContainerTop = pyramidContainer.offsetTop;
-              const pyramidHeight = pyramidContainer.offsetHeight;
-                            
-              // SVG領域を画面中央に配置（左右の余白を均等にする）
-              const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2 -50 ;
-              pyramidContainer.style.marginLeft = pyramidContainerLeft + "px";
-
-              titleContainer.style["text-align"] = "center";
-              h1Title.style["margin-left"] = "0px"; 
-              h2Title.style["margin-left"] = "0px";            
-
-              // #basic_dataをSVG描画領域内の右下に配置
-              const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth + 40;
-              const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
-              basic.style.left = basicLeftPos + "px";
-              basic.style.top = basicTopPos + "px";
-              basic.style.display = "block";
-           
-            } else {
-              if (pyramidContainer){
-                titleContainer.style["text-align"] = "left";
-                h1Title.style["margin-left"] = (900 - h1Title.offsetWidth) / 2 + "px";
-                h2Title.style["margin-left"] = (900 - h2Title.offsetWidth) / 2 + "px";
-              }
-              // SVG領域の固定幅より画面幅が小さい場合は非表示
-              basic.style.display = "none";
-            }
-          }
-        }
-
-        // 初回実行
-        //centerContents();
-
-        // ウィンドウリサイズ時に再度計算して反映
-        window.addEventListener("resize", centerContents);
-
-
         // アニメーション制御のイベントリスナー
         document.addEventListener("DOMContentLoaded", function () {
           // UI同期機能を初期化
@@ -2849,8 +2805,8 @@
 
         // 現在選択されている市区を日本語表記で取得
         function get_selected_shiku_japanese() {
-          const index = document.forms[0].shiku.selectedIndex;
-          const text = document.forms[0].shiku.options[index].text;
+          const index = document.getElementById('shiku').selectedIndex;
+          const text = document.getElementById('shiku').options[index].text;
           return text;
         }
 
@@ -2974,6 +2930,224 @@
 
           showAnimationControls();
         }
+
+        // ********** 画面デザイン（各要素の配置位置） **********
+        function centerContents() {
+          const main = document.querySelector("#main");
+          const containerFlex = document.querySelector("#container-flex");
+          const menu = document.querySelector(".left-controls");
+          const pyramid = document.querySelector("#pyramid-container");
+          //const pyramid = document.querySelector("#pyramid-block");
+          const titleContainer = document.querySelector("#title-container");
+          const h1Title = document.querySelector("#h1");
+          const h2Title = document.querySelector("#h2");
+          const choLink = document.querySelector("#link");
+          const selectControls = document.querySelector("#select-controls");
+          const topControls = document.querySelector("#top-controls");
+          const basic = document.querySelector("#basic_data");
+          const loading = document.querySelector("#loading-container");
+
+          //ピラミッドの幅は原則として100%(=1108px)
+          pyramid.style.width = "100%";
+
+          // スクロール位置に依存しない固定位置計算を使用
+          const menuWidth = menu.offsetWidth;
+          const windowWidth = window.innerWidth;
+          const basicWidth = basic.offsetWidth;
+          const basicHeight = basic.offsetHeight;
+
+          // ピラミッドの横幅の初期値(可変)
+          let pyramidWidth = pyramid.offsetWidth;
+
+          // 実際のピラミッドコンテナの位置を使用（#basic_dataの位置決めに使用）
+          let pyramidLeft = pyramid.offsetLeft;   //画面の左にあるときはマイナス値になる
+
+          // パディングを考慮（#main: 20px + #container-flex: 10px = 30px）
+          const totalPadding = main.style.padding + containerFlex.style.padding;
+          const availableWidth = windowWidth - (totalPadding * 2); // 左右のパディングを引く
+
+          //コントロールとピラミッドの横位置を計算
+          // 画面中央に配置（ウィンドウ中央 - (メニュー幅 + ピラミッド幅 + すき間)の半分）
+          const gap = 20; // コントロールとSVGの間のすき間
+          const framePadding = 40; // 額縁の太さ（左右各20px）
+          const totalWidth = menuWidth + pyramidWidth + gap + framePadding;
+          const menuLeftPos = Math.max(0, (availableWidth - totalWidth) / 2);
+          const pyramidLeftPos = Math.max(0, menuLeftPos + menuWidth + gap);
+          const pyramidTopPos = pyramid.offsetTop; // ピラミッドの縦位置は自動的に決まる固定値
+
+          console.log(`availableWidth:, ${availableWidth}、totalWidth:, ${totalWidth}`);
+          console.log(`menuLeftPos:, ${menuLeftPos}、pyramidLeftPos:, ${pyramidLeftPos}`);
+
+          if (availableWidth >= totalWidth) {
+                //コントロールの横位置をセット
+                menu.style.left = menuLeftPos + "px";
+                //ピラミッドの横位置をセット
+                pyramid.offsetLeft = pyramidLeftPos + "px";
+                 
+                //左コントロールの縦位置をセット
+                // SVG領域と縦の中央揃えにする（スクロール位置に依存しない固定位置）
+                const pyramidHeight = pyramid.offsetHeight;
+                const menuHeight = menu.offsetHeight;
+                const menuTopPos = pyramidTopPos + (pyramidHeight - menuHeight) / 2;
+                menu.style.top = menuTopPos + "px";
+                 
+                // タイトル、トップコントロール、フッターの横位置をセット
+                if (pyramid){
+                  titleContainer.style["text-align"] = "left";
+                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
+                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
+                }
+                topControls.style.width = pyramidWidth + "px";
+                choLink.style.width = pyramidWidth + "px";
+                selectControls.style.width = pyramidWidth + "px";
+                     
+                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+                const basicLeftPos = pyramidLeftPos + pyramidWidth - basicWidth - 20 ;
+                const basicTopPos = pyramidTopPos + pyramidHeight - basicHeight - 25;
+                basic.style.left = basicLeftPos + "px";
+                basic.style.top = basicTopPos + "px";
+                basic.style.display = "block";
+          
+            } else if (windowWidth > 1200) {
+                // ピラミッドを画面幅に合わせる
+                pyramidWidth = availableWidth - menuWidth - 100 ;
+                pyramid.style.width = pyramidWidth + "px";
+                // ピラミッドの横位置をセット
+                pyramid.offsetLeft = menu.offsetLeft + menuWidth + 5 + "px";
+                // タイトルの横位置をセット
+                if (pyramid){
+                  titleContainer.style["text-align"] = "left";
+                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
+                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
+                }
+                //トップコントロールの横位置をセット
+                choLink.style["margin-left"] = "0px";
+                choLink.offsetLeft = pyramid.offsetLeft;
+                choLink.style.width = pyramidWidth + 40 + "px";
+                selectControls.style["margin-left"] = "0px";
+                selectControls.offsetLeft = pyramid.offsetLeft;
+                selectControls.style.width = pyramidWidth + 40 + "px";
+
+                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+                const basicLeftPos = pyramid.offsetLeft + pyramidWidth - basicWidth + 20;
+                const basicTopPos = pyramidTopPos + pyramid.offsetHeight - basicHeight - 25;
+                basic.style.left = basicLeftPos + "px";
+                basic.style.top = basicTopPos + "px";
+                basic.style.display = "block";
+
+            } else if (windowWidth > 768) {
+                // ピラミッドを画面幅に合わせる
+                pyramidWidth = windowWidth - 90 ;
+                pyramid.style.width = pyramidWidth + "px";
+                // ピラミッドの横位置をセット
+                pyramid.offsetLeft = "0px";
+                // タイトルの横位置をセット
+                if (pyramid){
+                  titleContainer.style["text-align"] = "left";
+                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
+                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
+                }
+                //トップコントロールの横位置をセット
+                choLink.offsetLeft = "";
+                selectControls.offsetLeft = "";
+                choLink.style["margin-left"] = "0px";
+                choLink.offsetLeft = "0px";
+                choLink.style.width = pyramidWidth + 30 + "px";
+                selectControls.style["margin-left"] = "0px";
+                selectControls.offsetLeft = "0px";
+                selectControls.style.width = pyramidWidth + 30 + "px";
+                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+                const basicLeftPos = pyramid.offsetLeft + pyramidWidth - basicWidth + 20;
+                const basicTopPos = pyramidTopPos + pyramid.offsetHeight - basicHeight - 25;
+                basic.style.left = basicLeftPos + "px";
+                basic.style.top = basicTopPos + "px";
+                basic.style.display = "block";
+
+              } else if (windowWidth > 480) {
+                // ピラミッドを画面幅に合わせる
+                pyramidWidth = windowWidth - 50 ;
+                pyramid.style.width = pyramidWidth + "px";
+                
+                // ピラミッドの横位置をセット
+                pyramid.offsetLeft = "0px";
+                
+                // タイトルの横位置をセット
+                if (pyramid){
+                  titleContainer.style["text-align"] = "left";
+                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
+                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
+                }
+                //トップコントロールの横位置をセット
+                choLink.style["margin-left"] = "0px";
+                choLink.style.width = pyramidWidth + 10 + "px";
+                choLink.offsetLeft = "0px";
+                selectControls.style["margin-left"] = "0px";
+                selectControls.style.width = pyramidWidth + 10 + "px";
+                selectControls.offsetLeft = "0px";
+
+                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+                if (windowWidth > 690){
+                  const basicLeftPos = pyramid.offsetLeft + pyramidWidth - basicWidth + 5;
+                  const basicTopPos = pyramidTopPos + pyramid.offsetHeight - basicHeight - 10;
+                  basic.style.left = basicLeftPos + "px";
+                  basic.style.top = basicTopPos + "px";
+                  basic.style.display = "block";
+                }else{
+                  basic.style.display = "none";
+                }
+
+
+
+          //} else if (windowWidth < 1200) {
+          //      //コントロールの横位置をセット
+          //      menu.style.left = "0px";
+          //      //ピラミッドの横位置をセット
+          //      pyramid.style.left = "0px";
+          //      //フッターの横位置をセット
+          //      footer.style["margin-left"] = "0px";
+          //      //トップコントロールの横位置をセット
+          //      lst pyramidRilst pyramidLlst pyramidWidth -20;
+          //      choLink.style.wilst pyramidLlst pyramidWidth -20 + "px";
+          //      selectControls.style.wilst pyramidLlst pyramidWidth -20 + "px";
+          //        
+          //      // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
+          //      const svgFixedWidth = 1108;
+          //      //if (windowWidth > svgFixedWidth) {
+          //  if (windowWidth > 900) {
+          //      // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
+          //      const pyramidContainerTop = pyramidContainer.offsetTop;
+          //      const pyramidHeight = pyramidContainer.offsetHeight;
+          //                    
+          //      // SVG領域を画面中央に配置（左右の余白を均等にする）
+          //      //ピラミッドの横位置
+          //      const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2 -50 ;
+          //      //pyramidContainer.style.marginLeft = pyramidContainerLeft + "px";
+          //        
+          //      titleContainer.style["text-align"] = "center";
+          //      h1Title.style["margin-left"] = "0px"; 
+          //      h2Title.style["margin-left"] = "0px";            
+          //          
+          //      // #basic_dataをSVG描画領域内の右下に配置
+          //      const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth + 40;
+          //      const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
+          //      basic.style.left = basicLeftPos + "px";
+          //      basic.style.top = basicTopPos + "px";
+          //      basic.style.display = "block";
+          //    
+          //  } else {
+          //    if (pyramidContainer){
+          //      titleContainer.style["text-align"] = "left";
+          //      h1Title.style["margin-left"] = (900 - h1Title.offsetWidth) / 2 + "px";
+          //      h2Title.style["margin-left"] = (900 - h2Title.offsetWidth) / 2 + "px";
+          //    }
+          //    // SVG領域の固定幅より画面幅が小さい場合は非表示
+          //    basic.style.display = "none";
+          //}
+          }
+        }
+
+        // ウィンドウリサイズ時に再度計算して反映
+        window.addEventListener("resize", centerContents);
       </script>
     </body>
   </html>

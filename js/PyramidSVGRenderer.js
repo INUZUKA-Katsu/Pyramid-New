@@ -65,12 +65,15 @@ class PyramidSVGRenderer {
     // SVG要素を作成
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     this.svg.setAttribute('id', 'pyramid-svg');
+    this.svg.setAttribute('style', 'width:100%; max-width:1108px; height:auto;');
+    this.svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    //preserveAspectRatio="xMidYMid meet"
 
     //console.log('this.options.width', this.options.width);
     //console.log('this.options.height', this.options.height);
     
-    this.svg.setAttribute('width', this.options.width);
-    this.svg.setAttribute('height', this.options.height);
+    //this.svg.setAttribute('width', this.options.width);
+    //this.svg.setAttribute('height', this.options.height);
     // viewBoxは動的に設定
     this.svg.setAttribute('viewBox', `0 0 ${this.options.width} ${this.options.height}`);
     this.svg.style.backgroundColor = this.options.backgroundColor;
