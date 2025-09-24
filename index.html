@@ -109,6 +109,17 @@
                 <p>3. 人口ピラミッドの下に表示されるURLは、データ取得時のものであり、現在ではリンク切れになってしまったものがありますことをご了承ください。</p>
               `,
             },
+            about_browser_tooltip: {
+              content: `
+                <p>PC、Mac、iPhone、iPadで動作を確認しています。</p>
+                <p>ブラウザは、Chrome、Firefox、Safari、Microsoft Edgeで動作確認しています。</p>
+                <p>今のところ、MacのSafariでスクリーンショットの画像が崩れてしまう不具合を確認しています。</p>
+                <p>Macをお使いの方は、ChromeなどSafari以外のブラウザをご利用ください。</p>
+              `,
+              placement: "bottom-end",
+              maxWidth: 450,
+              interactive: false,
+            },
             info_3kubun_tooltip: {
               content: `
                 <p>1. セレクトボックスで年齢3区分別の人口と構成比を切替えることができます。非表示にもできます。</p>
@@ -1065,7 +1076,9 @@
         #pyramid-container.screenshot-mode::before {
           border: none;
         }
-
+        #loading-container {
+          margin-left: 260px;
+        }
         /* ローディングスピナーアニメーション */
         @keyframes spin {
           0% {
@@ -1077,6 +1090,9 @@
         }
         /* 幅が狭い場合（例: 1380px以下）にfixed解除して縦並びに */
         @media (max-width: 1380px) {
+          #loading-container {
+            margin-left: 0;
+          }
           #title-container {
             text-align: center;
             margin-left: 0;
@@ -1147,9 +1163,6 @@
 
         /* ローディング表示のレスポンシブ対応 */
         @media screen and(max-width: 1200px) {
-          #loading-container {
-            margin-left: 0 !important;
-          }
           #main {
             padding: 10px;
           }
@@ -1329,7 +1342,7 @@
           <a
             href="#"
             class="header"
-            data-tooltip="PC、Mac、Androidスマホ、iPhone、iPadで動作を確認しています。ブラウザは、Google Chrome、Firefox、Safari、Microsoft Edgeで動作確認しています。インターネットエクスプローラーには対応していません。Windows PCの方は、Edge、Chrome、Firefoxなどでご覧ください"
+            data-tooltip-id="about_browser_tooltip"
           >
             >端末、ブラウザの対応状況について
           </a>
@@ -1351,8 +1364,7 @@
             text-align: center;
             padding: 60px 20px;
             color: #6c757d;
-            margin-left: 0px;
-            max-width: 1408px;
+            max-width: 100%;
           "
         >
           <div style="font-size: 18px; margin-bottom: 20px">
