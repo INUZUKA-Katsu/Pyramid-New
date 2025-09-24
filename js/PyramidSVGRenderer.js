@@ -41,6 +41,12 @@ class PyramidSVGRenderer {
     this.isFirstAnimationFrame = false; // アニメーションの最初のフレームかどうか   
     this.maxBarLengthForAnimation = null; // 固定面積モード用の最大BarLengthを保存する変数
     
+    // 人数表示位置の重なり回避用の変数を追加
+    this.previousLabelPositions = {
+      male: { x: null, width: 0 },
+      female: { x: null, width: 0 }
+    };
+    
     //console.log('this.data', this.data);
     this.options.unitSize = this.calculateUnitSize(this.data);
     this.options.barHeight = this.options.height * 0.95 / 105; // 目盛ラベル用のスペースを確保
@@ -731,6 +737,69 @@ class PyramidSVGRenderer {
     staticElements.forEach(element => element.remove());
   }
 
+  // 人数表示位置を計算する関数（重なり回避）
+  calculateLabelPosition(gender, barEndX, labelWidth, previousPosition) {
+    const minSpacing = 5; // 最小間隔（ピクセル）
+    const defaultOffset = 5; // デフォルトの棒からの距離を5pxに変更
+    
+    let idealX;
+    if (gender === 'male') {
+      // 男性：棒の左端から左側に表示
+      idealX = barEndX - defaultOffset;
+    } else {
+      // 女性：棒の右端から右側に表示
+      idealX = barEndX + defaultOffset;
+    }
+    
+    // 前のラベルとの重なりをチェック
+    if (previousPosition.x !== null) {
+      const overlap = this.checkLabelOverlap(idealX, labelWidth, previousPosition);
+      
+      if (overlap) {
+        // 重なりの場合、棒の側に寄せることを第一候補とする
+        let adjustedX;
+        if (gender === 'male') {
+          // 男性：棒の左端により近づける
+          adjustedX = barEndX - minSpacing;
+          // それでも重なる場合は棒から遠ざかる
+          if (this.checkLabelOverlap(adjustedX, labelWidth, previousPosition)) {
+            adjustedX = previousPosition.x - labelWidth - minSpacing;
+          }
+        } else {
+          // 女性：棒の右端により近づける
+          adjustedX = barEndX + minSpacing;
+          // それでも重なる場合は棒から遠ざかる
+          if (this.checkLabelOverlap(adjustedX, labelWidth, previousPosition)) {
+            adjustedX = previousPosition.x + previousPosition.width + minSpacing;
+          }
+        }
+        return adjustedX;
+      }
+    }
+    
+    return idealX;
+  }
+  
+  // ラベルの重なりをチェックする関数
+  checkLabelOverlap(x, width, previousPosition) {
+    if (previousPosition.x === null) return false;
+    
+    const currentStart = x;
+    const currentEnd = x + width;
+    const previousStart = previousPosition.x;
+    const previousEnd = previousPosition.x + previousPosition.width;
+    
+    // 重なりの判定
+    return !(currentEnd <= previousStart || currentStart >= previousEnd);
+  }
+  
+  // テキストの幅を推定する関数
+  estimateTextWidth(text, fontSize) {
+    // 簡易的な文字幅の推定（実際のフォントに依存するが、概算として使用）
+    const avgCharWidth = fontSize * 0.5; // フォントサイズの60%を文字幅として推定
+    return text.length * avgCharWidth;
+  }
+
   drawAgeBar(age, maleCount, femaleCount, unitSize, barHeight, yearSpan=1) {
 
     // 現在のviewBoxのサイズの棒の使用（動的に計算）
@@ -773,14 +842,29 @@ class PyramidSVGRenderer {
     // 人数ラベル（アニメーション中は非表示、人口0の場合は非表示）
     if (this.options.showNumbers && maleCount > 0 && !this.isAnimation) {
       const maleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      maleLabel.setAttribute('x', viewBoxWidth / 2 - maleWidth - 15); // 棒の左端から5px左
-      maleLabel.setAttribute('y', agePosition + (barHeight * yearSpan) / 2);
+      const maleLabelText = maleCount.toLocaleString();
+      const maleLabelWidth = this.estimateTextWidth(maleLabelText, this.options.fontSize - 3);
+      
+      // 男性の棒の左端位置
+      const maleBarEndX = viewBoxWidth / 2 - maleWidth - 10;
+      
+      // 重なりを避けた位置を計算
+      const maleLabelX = this.calculateLabelPosition('male', maleBarEndX, maleLabelWidth, this.previousLabelPositions.male);
+      
+      maleLabel.setAttribute('x', maleLabelX);
+      maleLabel.setAttribute('y', agePosition + (barHeight * yearSpan) / 2 + 3); // 縦位置を3px下に調整
       maleLabel.setAttribute('text-anchor', 'end');
       maleLabel.setAttribute('fill', this.options.textColor);
       maleLabel.setAttribute('font-size', this.options.fontSize - 3);
       maleLabel.setAttribute('class', 'population-label');
-      maleLabel.textContent = maleCount.toLocaleString();
+      maleLabel.textContent = maleLabelText;
       this.dynamicGroup.appendChild(maleLabel);
+      
+      // 次のラベルのために位置を記録
+      this.previousLabelPositions.male = { x: maleLabelX, width: maleLabelWidth };
+    } else {
+      // ラベルが表示されない場合は位置をリセット
+      this.previousLabelPositions.male = { x: null, width: 0 };
     }
     
     // 女性の棒を描画（右側）- 中央線から10px離す（人口0でも描画）
@@ -816,20 +900,41 @@ class PyramidSVGRenderer {
     // 人数ラベル（アニメーション中は非表示、人口0の場合は非表示）
     if (this.options.showNumbers && femaleCount > 0 && !this.isAnimation) {
       const femaleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      femaleLabel.setAttribute('x', viewBoxWidth / 2 + femaleWidth + 15); // 棒の右端から5px右
-      femaleLabel.setAttribute('y', agePosition + (barHeight * yearSpan) / 2);
+      const femaleLabelText = femaleCount.toLocaleString();
+      const femaleLabelWidth = this.estimateTextWidth(femaleLabelText, this.options.fontSize - 3);
+      
+      // 女性の棒の右端位置
+      const femaleBarEndX = viewBoxWidth / 2 + femaleWidth + 10;
+      
+      // 重なりを避けた位置を計算
+      const femaleLabelX = this.calculateLabelPosition('female', femaleBarEndX, femaleLabelWidth, this.previousLabelPositions.female);
+      
+      femaleLabel.setAttribute('x', femaleLabelX);
+      femaleLabel.setAttribute('y', agePosition + (barHeight * yearSpan) / 2 + 3); // 縦位置を3px下に調整
       femaleLabel.setAttribute('text-anchor', 'start');
       femaleLabel.setAttribute('fill', this.options.textColor);
       femaleLabel.setAttribute('font-size', this.options.fontSize - 3);
       femaleLabel.setAttribute('class', 'population-label');
-      femaleLabel.textContent = femaleCount.toLocaleString();
+      femaleLabel.textContent = femaleLabelText;
       this.dynamicGroup.appendChild(femaleLabel);
+      
+      // 次のラベルのために位置を記録
+      this.previousLabelPositions.female = { x: femaleLabelX, width: femaleLabelWidth };
+    } else {
+      // ラベルが表示されない場合は位置をリセット
+      this.previousLabelPositions.female = { x: null, width: 0 };
     }
   }
 
   render(animeMode) {
     console.log('render開始');
     //console.log('this.options.zoomScale', this.options.zoomScale);
+
+    // 人数表示位置の記録をリセット
+    this.previousLabelPositions = {
+      male: { x: null, width: 0 },
+      female: { x: null, width: 0 }
+    };
 
     let isInterpolation = false;
     let isVariableAreaMode = false;
