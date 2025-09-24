@@ -875,12 +875,8 @@ function adjust_title_size(title) {
   const preSize = h2Eelement.style.fontSize;
   if (title.replace(/<[^>]*>?/g, '').length > 50) {
     h2Eelement.style.fontSize = "90%";
-    // 前回のフォントサイズが90%でない場合は画面を再配置する.(年齢３区分の高さを調整するため)
-    if (preSize != "90%") centerContents();
   }else{
     h2Eelement.style.fontSize = "";
-    // 前回のフォントサイズが90%の場合は画面を再配置する.
-    if (preSize == "90%") centerContents();
   }
 }
 //市区の選択が横浜市か区かを判別して、町丁一覧の表示・非表示を切り替える処理.
@@ -2534,10 +2530,7 @@ function screen_shot() {
       h2Element.style.maxWidth = "";
       // 強制的に再描画を促す
       h2Element.offsetHeight; // リフローを強制
-    }
-    
-    //--画面を再配置する.
-    centerContents();
+    }    
   });
 }
 
