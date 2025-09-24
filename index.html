@@ -28,9 +28,15 @@
       <script type="text/javascript" src="./js/PyramidSVGRenderer.js"></script>
       <script type="text/javascript" src="./js/streaming-animation.js"></script>
       <script type="text/javascript" src="./js/ui-synchronizer.js"></script>
-      <script type="text/javascript" src="./js/interpolation-animation.js"></script>
+      <script
+        type="text/javascript"
+        src="./js/interpolation-animation.js"
+      ></script>
       <script type="text/javascript" src="./js/jquery-3.1.1.js"></script>
-      <script type="text/javascript" src="./js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+      <script
+        type="text/javascript"
+        src="./js/jquery-ui-1.12.1/jquery-ui.min.js"
+      ></script>
       <!-- Tippy.js JavaScript -->
       <script src="https://unpkg.com/@popperjs/core@2"></script>
       <script src="https://unpkg.com/tippy.js@6"></script>
@@ -49,7 +55,7 @@
 
         function initializeTooltips() {
           // ツールチップコンテンツの定義（複数行で自然に記述）
-          // placement: 
+          // placement:
           //   top, top-start, top-end
           //   bottom, bottom-start, bottom-end
           //   left, left-start, left-end
@@ -66,7 +72,7 @@
               `,
               placement: "bottom-start",
               maxWidth: 450,
-              interactive: false
+              interactive: false,
             },
             about_site_tooltip: {
               content: `
@@ -77,7 +83,7 @@
               `,
               placement: "bottom-start",
               maxWidth: 450,
-              interactive: false
+              interactive: false,
             },
             info_pyramid_size_tooltip: {
               content: `
@@ -92,7 +98,7 @@
               `,
               placement: "bottom-start",
               maxWidth: 450,
-              interactive: false
+              interactive: false,
             },
             about_data_source_tooltip: {
               content: `
@@ -112,9 +118,9 @@
               `,
               placement: "top-start",
               maxWidth: 450,
-              interactive: false
+              interactive: false,
             },
-            info_animation_tooltip: { 
+            info_animation_tooltip: {
               content: `
                 <p>1. アニメーションの種類について</p>
                 <p>(1) <通常タイプ> と <伸び縮みタイプ><br>
@@ -133,7 +139,7 @@
               `,
               placement: "bottom-start",
               maxWidth: 450,
-              interactive: false
+              interactive: false,
             },
             cho_link_tooltip: {
               content: `
@@ -148,9 +154,9 @@
                   　町丁選択パネル上部にある[市区全体の人口ピラミッド]ボタンをクリックすると表示中の地域を含む区全体の人口ピラミッドを表示します。<br>
                   　人口ピラミッド上部の市区選択セレクトボックスで横浜市や他の区を選択しても、市または区の人口ピラミッドに戻ることができます。</p>
                `,
-               placement: "bottom-start",
-               maxWidth: 450,
-               interactive: false
+              placement: "bottom-start",
+              maxWidth: 450,
+              interactive: false,
             },
             doga_button_tooltip: {
               content: `
@@ -161,7 +167,7 @@
               `,
               placement: "top-end",
               maxWidth: 450,
-              interactive: false
+              interactive: false,
             },
             screen_shot_tooltip: {
               content: `
@@ -180,7 +186,7 @@
               `,
               placement: "top-start",
               maxWidth: 450,
-              interactive: false
+              interactive: false,
             },
             info_cho_pyramid_tooltip: {
               content: `
@@ -191,8 +197,8 @@
               `,
               placement: "top-end",
               maxWidth: 450,
-              interactive: false
-            }
+              interactive: false,
+            },
           };
           // ヘッダーツールチップ（クリック表示）
           $(".header").each(function () {
@@ -211,7 +217,7 @@
                 onShow(instance) {
                   // HTMLタグが正しく表示されるように再設定
                   instance.setContent(tooltipText);
-                }
+                },
               });
             }
           });
@@ -223,11 +229,11 @@
             // data-tooltip-id属性がある場合は、定義されたコンテンツを使用
             const tooltipId = $(this).attr("data-tooltip-id");
             let tooltipConfig;
-            
+
             if (tooltipId && tooltipContents[tooltipId]) {
               const config = tooltipContents[tooltipId];
               // 新しいオブジェクト構造か従来の文字列かを判定
-              if (typeof config === 'object' && config.content) {
+              if (typeof config === "object" && config.content) {
                 tooltipConfig = config;
               } else {
                 // 従来の文字列形式
@@ -238,11 +244,11 @@
               const tooltipText = $(this).attr("data-tooltip");
               tooltipConfig = { content: tooltipText };
             }
-            
+
             if (tooltipConfig && tooltipConfig.content) {
               // 表示方向の決定（優先順位: オブジェクト設定 > data-placement > クラス名 > デフォルト）
               let placement = tooltipConfig.placement || "bottom"; // デフォルト
-              
+
               // data-placement属性をチェック（オブジェクト設定がない場合のみ）
               if (!tooltipConfig.placement) {
                 const dataPlacement = $(this).attr("data-placement");
@@ -267,7 +273,7 @@
                   }
                 }
               }
-              
+
               // Tippy.jsの設定を構築
               const tippyOptions = {
                 content: tooltipConfig.content,
@@ -282,13 +288,12 @@
                 onShow(instance) {
                   // HTMLタグが正しく表示されるように再設定
                   instance.setContent(tooltipConfig.content);
-                }
+                },
               };
-              
+
               tippy(this, tippyOptions);
             }
           });
-
         }
 
         function device(pc, mobile) {
@@ -312,6 +317,10 @@
       </script>
       <!--link type="text/css" href="./css/pyramid.css" rel="stylesheet"-->
       <style type="text/css">
+        * {
+          box-sizing: border-box; /* ボックスサイズにパディングやボーダーを含める */
+        }
+
         /* Tippy.js カスタムスタイル */
         .tippy-box[data-theme~="light"] {
           background-color: #fff;
@@ -349,51 +358,125 @@
         }
         #title-container {
           text-align: center;
+          margin-left: 260px;
         }
-        h1,
-        h2 {
-          margin-left: 0px;
+        /* 描画領域上部に並ぶコントロール */
+        #top-controls {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
+          justify-content: center;
+          align-items: start;
+          gap: 10px;
+          height: auto;
+          min-height: 100px;
+        }
+        #link {
+          grid-column: 1/2;
+          grid-row: 1/2;
+          align-self: center ;
+          justify-self: end;
+        }
+        #select-controls {
+          grid-column: 1/2;
+          grid-row: 2/3;
+          align-self: center ;
+          justify-self: end;
+          height: auto;
         }
         #animation-controls {
+          visibility: hidden;
+          grid-column: 1/2;
+          grid-row: 1/3;
+          justify-self: center;
+          align-self: start;
+          text-align: center;
+          margin: 0 auto;
+          background-color: transparent;
+          border-radius: 0;
+          box-shadow: none;
+        }
+        #animation-type-section {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
           justify-content: flex-start;
+          gap: 1.5em;
+          margin-bottom: 10px;
+          padding: 5px 5px 5px 0;
+        }
+        #animation-radio-buttons {
+          display: flex;
+          flex-direction: row;
+          gap: 1em;
         }
         #animation-execute-section {
           align-items: center;
         }
+        #animation-settings-block {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          min-width: 300px;
+          align-items: flex-start;
+        }
         #animation-btn-block {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
           gap: 5px;
         }
         #animation-btn-group1,
         #animation-btn-group2 {
+          display: flex;
           flex-direction: row;
           gap: 5px;
         }
-        /* 親コンテナをflexで横並びにする */
+        /* #pyramid-blockと#left-controlsのコンテナ */
+        /* 子要素をflexで横並びにする */
         #container-flex {
           display: flex;
+          flex-direction: row-reverse;
           align-items: flex-start;
           justify-content: center;
           gap: 20px;
           padding: 10px;
         }
+        /*#container-flexの子要素1*/
         #pyramid-block {
-          /*position: absolute;
-          left: 250px;
-          top: 160px;*/
           display: flex;
           flex-direction: column;
-          width: 1148px;
-          /*text-align: left;*/
-          margin-left: 260px;
+          max-width: 1148px;
           margin-bottom: 20px;
         }
+        /*#container-flexの子要素2*/
+        /* 左端に縦に並ぶコントロール用のスタイル */
+        .left-controls {
+          width: 250px;
+          min-width: 200px;
+          margin-top: 70px;
+          gap: 10px;
+        }
+        /* SVGと#basic_dataのコンテナ */
         #pyramid-container {
-          text-align: left;
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
           max-width: 1108px;
           width: 100%;
-          /*max-width: 100%;*/
-          overflow: hidden;
-          position: relative;
+          height: auto;
+        }
+        #basic_data {
+            grid-column: 1/2;
+            grid-row: 1/2;
+            z-index: 1000;
+            align-self: flex-end;
+            justify-self: flex-end;
+            font-size: 11pt;
+            text-align: right;
+            display: block;
           }
         /*border: 1px solid #ddd;
           border-radius: 5px;
@@ -403,33 +486,6 @@
           margin-right: auto;
           margin-bottom: 20px;
           overflow: auto;*/
-        
-        /* 描画領域上部に並ぶコントロール */
-        #top-controls {
-          height: auto;
-          min-height: 100px;
-          margin-bottom: 10px;
-        }
-
-        /* 左端に縦に並ぶコントロール用のスタイル */
-        .left-controls {
-          /*position: fixed;
-          right: 20px;
-          top: 50%;
-          transform: translateY(-50%);
-          max-width: 250px;*/
-          position: absolute;
-          left: 5px;
-          top: 160px;
-          width: 250px;
-          /*display: flex;
-          flex-direction: column;*/
-          gap: 10px;
-          z-index: 1000;
-          /*  padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #dee2e6;*/
-        }
 
         .left-controls .control-group {
           background: #e6e6d1;
@@ -517,103 +573,6 @@
         /* デモデータコントロールを不可視に */
         .demo-controls {
           display: none !important;
-        }
-
-        /* 幅が狭い場合（例: 1200px以下）にfixed解除して縦並びに */
-        @media (max-width: 1200px) {
-          #title-container {
-            text-align: center;
-          }
-          h1,
-          h2 {
-            margin-left: 0;
-          }
-
-          /* 親コンテナを縦並びへ */
-          #container-flex {
-            flex-direction: column;
-            align-items: stretch;
-          }
-          #pyramid-block {
-            position: static !important;
-            width: 100% !important;
-            left: auto !important;
-            top: auto !important;
-            margin: 0;
-          }
-          /*#footer {
-            position: static;
-          }*/
-          /* fixed解除 */
-          .left-controls {
-            position: static;
-            transform: none;
-            width: 100%;
-            max-width: 100%;
-            margin-top: 1em;
-            box-shadow: none;
-          }
-          /* コントロール各グループを横並びに */
-          .left-controls {
-            display: flex;
-            flex-direction: row; /* 横並び */
-            gap: 30px;
-            align-items: flex-start; /* 上揃え */
-            flex-wrap: wrap; /* 画面狭いとき折り返し可能 */
-          }
-          .left-controls .control-group {
-            width: 220px; /* 必要に応じて調整 */
-            /*height: 150px; /* 高さも指定可能 */
-            box-sizing: border-box; /* paddingやborderが含まれる計算に */
-          }
-          /* ラベルを左寄せ・固定幅など調整 */
-          .left-controls .control-group label {
-            min-width: 80px;
-            white-space: nowrap;
-          }
-
-          /* 入力やボタンは適宜伸縮 */
-          .left-controls .control-group select,
-          .left-controls .control-group input,
-          .left-controls .control-group button {
-            flex: 1 1 auto;
-          }
-          /* pyramid-block幅は画面幅に合わせる */
-          #pyramid-block {
-            width: 100%;
-            margin-left: 0;
-            margin-right: 0;
-          }
-        }
-        div.footer {
-          margin-top: 0px;
-        }
-
-        @media print {
-          div.left {
-            border: 1px solid blue;
-            background-color: blue;
-          }
-          div.right {
-            border: 1px solid red;
-            background-color: red;
-          }
-          #form0,
-          div#link,
-          div#option {
-            display: none !important;
-          }
-          h2 {
-            font-size: 250%;
-            margin-top: 5px;
-            margin-bottom: 2.5em;
-            text-align: center;
-          }
-          div#male_label,
-          div#female_label {
-            color: black;
-            border: 1px solid black;
-          }
         }
 
         @media screen, print {
@@ -704,7 +663,7 @@
             padding: 15px 30px;
             border: 1px solid #d4d4b8;
             border-radius: 4px;
-            box-shadow: 0 1px 1px  rgba(0, 0, 0, 0.3);
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
             display: inline-block;
             margin: 20px auto;
             position: relative;
@@ -723,7 +682,7 @@
             padding: 10px 20px;
             border: 1px solid #d4d4b8;
             border-radius: 4px;
-            box-shadow: 0px 1px 1px  rgba(0, 0, 0, 0.3);
+            box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
             display: inline-block;
             position: relative;
             /*margin-left: 260px;*/
@@ -749,7 +708,7 @@
             margin-right: auto;
           }
           div#select-controls {
-            width: 1148px;
+            width: 100%;
             text-align: right;
             margin-left: auto;
             margin-right: 0px;
@@ -759,25 +718,13 @@
           }
           div#link {
             margin-left: auto;
-            width: 1148px;
+            width: 100%;
             white-space: nowrap;
             display: block;
             text-align: right;
             gap: 8px;
             white-space: nowrap;
             margin-bottom: 0.5m;
-          }
-          div#animation-controls {
-            display: none;
-            text-align: center;
-            width: 100%;
-            padding-left: 100px;
-            background-color: transparent;
-            border-radius: 0;
-            box-shadow: none;
-            margin: 0;
-            z-index: 1000;
-            position: relative;
           }
           div#animation-type-controls {
             text-align: center;
@@ -800,6 +747,7 @@
             text-align: left;
             display: block;
           }
+          /*
           div#male_label {
             position: absolute;
             left: 100px;
@@ -834,7 +782,7 @@
           /*div#age75 span{ vertical-align:20px; }
           div#age65 span{ vertical-align:20px; }
           div#age15 span{ vertical-align:20px; }*/
-          table {
+          /*table {
             min-width: 1108px;
             table-layout: fixed;
             display: inline-block;
@@ -852,13 +800,13 @@
             border: none;
             padding-bottom: 0px;
             white-space: nowrap;
-            /*background-color:#f5f5f5; whitesmoke*/
-            /*height:5px;*/
-            /*line-height: 1;*/
+            background-color:#f5f5f5; whitesmoke
+            height:5px;
+            line-height: 1;
             font-size: 4px;
           }
           tr.line td {
-            border-bottom: 1px solid #b0c4de; /*lightsteelblue*/
+            border-bottom: 1px solid #b0c4de; lightsteelblue
           }
           td.center {
             width: 5em;
@@ -872,7 +820,7 @@
             width: 50%;
           }
           div {
-            /*line-height: 1;*/
+            /*line-height: 1;
             vertical-align: bottom;
           }
           div.nin,
@@ -914,10 +862,9 @@
           }
           div#button {
             text-align: right;
-          }
+          }*/
           div#cho {
-            display: block;
-            width: 1100px;
+            display: inline-block;
             vertical-align: top;
             margin-top: 1em;
             padding: 20px;
@@ -974,15 +921,6 @@
           }
           span.inline-block {
             display: inline-block;
-          }
-          div#basic_data {
-            position: absolute;
-            top: 615px;
-            left: 1090px;
-            width: 420px;
-            font-size: 11pt;
-            text-align: right;
-            z-index: 1000;
           }
           #jinko_sosu {
             display: table;
@@ -1183,9 +1121,30 @@
             border-color: #2b80d5;
           }
         }
-        @media screen and (max-width: 479px) {
-          div#cho_list {
-            text-align: left;
+
+        @media print {
+          div.left {
+            border: 1px solid blue;
+            background-color: blue;
+          }
+          div.right {
+            border: 1px solid red;
+            background-color: red;
+          }
+          div#link,
+          div#option {
+            display: none !important;
+          }
+          h2 {
+            font-size: 250%;
+            margin-top: 5px;
+            margin-bottom: 2.5em;
+            text-align: center;
+          }
+          div#male_label,
+          div#female_label {
+            color: black;
+            border: 1px solid black;
           }
         }
 
@@ -1203,7 +1162,7 @@
             0 8px 25px rgba(0, 0, 0, 0.4), 0 0 0 3px #8b7355, 0 0 0 6px #d4af37;
           margin: 20px auto;
           max-width: 1108px;
-          position: relative;
+          /*position: relative;*/
         }
 
         #pyramid-container::before {
@@ -1232,9 +1191,78 @@
             transform: rotate(360deg);
           }
         }
+        /* 幅が狭い場合（例: 1380px以下）にfixed解除して縦並びに */
+        @media (max-width: 1380px) {
+          #title-container {
+            text-align: center;
+            margin-left: 0;
+          }
+          /* 親コンテナを縦並びへ */
+          #container-flex {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+          }
+          #pyramid-block {
+            width: 100% !important;
+            left: auto !important;
+            top: auto !important;
+            margin: 0;
+          }
+          .left-controls {
+            position: static !important;
+            transform: none;
+            width: 100%;
+            max-width: 100%;
+            margin-top: 1em;
+            box-shadow: none;
+          }
+          /* コントロール各グループを横並びに */
+          .left-controls {
+            display: flex;
+            flex-direction: row; /* 横並び */
+            gap: 30px;
+            align-items: flex-start; /* 上揃え */
+            justify-content: center;
+            flex-wrap: wrap; /* 画面狭いとき折り返し可能 */
+          }
+          .left-controls .control-group {
+            width: 220px; /* 必要に応じて調整 */
+            /*height: 150px; /* 高さも指定可能 */
+            box-sizing: border-box; /* paddingやborderが含まれる計算に */
+          }
+          /* ラベルを左寄せ・固定幅など調整 */
+          .left-controls .control-group label {
+            min-width: 80px;
+            white-space: nowrap;
+          }
+
+          /* 入力やボタンは適宜伸縮 */
+          .left-controls .control-group select,
+          .left-controls .control-group input,
+          .left-controls .control-group button {
+            flex: 1 1 auto;
+          }
+          /* pyramid-block幅は画面幅に合わせる */
+          #pyramid-block {
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+          }
+          div#cho {
+            display: none;
+            width: 100% !important;
+            max-width: 100%;
+            margin: 1em auto;
+            box-sizing: border-box;
+          }
+        }
+        div.footer {
+          margin-top: 0px;
+        }
 
         /* ローディング表示のレスポンシブ対応 */
-        @media (max-width: 1200px) {
+        @media screen and(max-width: 1200px) {
           #loading-container {
             margin-left: 0 !important;
           }
@@ -1247,9 +1275,9 @@
         }
 
         @media screen and (max-width: 850px) {
-          div#animation-controls {
+          /*div#animation-controls {
             padding-left: 50px;
-          }
+          }*/
         }
 
         /* スマホ用：額縁を最小限にしてSVGを大きく表示 */
@@ -1261,13 +1289,13 @@
             font-size: 140%;
             margin-top: 0px;
             margin-bottom: 5px;
-            box-shadow:none;
+            box-shadow: none;
           }
           h2 {
             font-size: 120%;
             margin-top: 0px;
             margin-bottom: 10px;
-            box-shadow:none;
+            box-shadow: none;
           }
           div#animation-controls {
             padding-left: 0px;
@@ -1278,18 +1306,20 @@
           #pyramid-container {
             padding: 5px; /* 20px → 5px に縮小 */
             margin: 10px auto; /* 20px → 10px に縮小 */
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2), /* 影も軽く */
-              0 4px 15px rgba(0, 0, 0, 0.3), 
-              0 0 0 2px #8b7355, /* 3px → 2px */
-              0 0 0 4px #d4af37; /* 6px → 4px */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2),
+              /* 影も軽く */ 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 2px #8b7355,
+              /* 3px → 2px */ 0 0 0 4px #d4af37; /* 6px → 4px */
           }
-          
+
           #pyramid-container::before {
-            top: 5px;    /* 10px → 5px */
-            left: 5px;   /* 10px → 5px */
-            right: 5px;  /* 10px → 5px */
+            top: 5px; /* 10px → 5px */
+            left: 5px; /* 10px → 5px */
+            right: 5px; /* 10px → 5px */
             bottom: 5px; /* 10px → 5px */
             border-width: 1px; /* 2px → 1px */
+          }
+          #basic_data {
+            display: none;
           }
         }
 
@@ -1298,9 +1328,13 @@
           #animation-btn-block {
             gap: 5px;
           }
+          #animation-radio-buttons {
+            flex-direction: column;
+            gap: 5px;
+          }
           #animation-btn-group1 {
             flex-direction: column;
-            gap: 10px;            
+            gap: 10px;
           }
           #animation-btn-group1 button {
             padding: 4px 16px;
@@ -1333,7 +1367,7 @@
           }
           #animation-btn-group1 {
             flex-direction: row;
-            gap: 5px;            
+            gap: 5px;
           }
           #animation-btn-group1 button {
             padding: 4px 16px;
@@ -1369,12 +1403,16 @@
             box-shadow: none; /* 影も削除 */
             border-radius: 0; /* 角の丸みも削除 */
           }
-          
+
           #pyramid-container::before {
             display: none; /* 内側枠も削除 */
           }
         }
-
+        @media screen and (max-width: 479px) {
+          div#cho_list {
+            text-align: left;
+          }
+        }
       </style>
     </head>
     <body
@@ -1391,17 +1429,10 @@
 
       <div id="main">
         <div id="header" data-html2canvas-ignore="true">
-          <a
-            href="#"
-            data-tooltip-id="new_info_tooltip"
-          >
+          <a href="#" data-tooltip-id="new_info_tooltip">
             ><span style="color: red; font-size: 100%">New!</span>
           </a>
-          <a
-            href="#"
-            class="header"
-            data-tooltip-id="about_site_tooltip"
-          >
+          <a href="#" class="header" data-tooltip-id="about_site_tooltip">
             >このサイトについて
           </a>
           <a
@@ -1418,10 +1449,7 @@
           >
             >端末、ブラウザの対応状況について
           </a>
-          <a
-            href="#"
-            class="header"
-            data-tooltip-id="about_data_source_tooltip"
+          <a href="#" class="header" data-tooltip-id="about_data_source_tooltip"
             >>データの出典について</a
           >
         </div>
@@ -1462,46 +1490,33 @@
             人口統計データを読み込んでいます。しばらくお待ちください。
           </div>
         </div>
-              
+
         <div id="container-flex" style="display: none">
           <div id="pyramid-block">
             <!-- 上部コントロール -->
             <div id="top-controls" data-html2canvas-ignore="true">
               <!-- アニメーション用コントロール（通常は非表示） -->
-              <div id="animation-controls" 
-                   style="
-                      width: 800px; 
-                      margin: 0 auto;
-                   ">
+              <div id="animation-controls">
                 <!-- 上段: アニメーションの種類ブロック -->
-                <div
-                  id="animation-type-section"
-                  style="
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: flex-start;
-                    gap: 1.5em;
-                    margin-bottom: 10px;
-                    padding: 5px 5px 5px 0;
-                  "
-                >
-                  <span style="font-weight: bold; min-width: 2em; text-align: center">種類</span>
-                  <div id="animation-radio-buttons"
-                       style="
-                         display: flex;
-                         flex-direction: row;
-                         gap: 1em;
-                  ">
+                <div id="animation-type-section">
+                  <span
+                    style="
+                      font-weight: bold;
+                      min-width: 2em;
+                      text-align: center;
+                    "
+                    >種類</span
+                  >
+                  <div id="animation-radio-buttons">
                     <!-- 左側のラジオボタングループ -->
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        padding: 5px 10px;
-                        border: 1px solid #ced4da;
-                        border-radius: 4px;
-                      "
+                    <div id="animation-radio-buttons-left"
+                         style="
+                           display: flex;
+                           align-items: center;
+                           padding: 5px 10px;
+                           border: 1px solid #ced4da;
+                           border-radius: 4px;
+                         "
                     >
                       <label style="margin-right: 1em">
                         <input
@@ -1521,15 +1536,15 @@
                         <span>伸び縮みタイプ</span>
                       </label>
                     </div>
-                    <!-- 右側のラジオボタングループ（新設） -->
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        padding: 5px 10px;
-                        border: 1px solid #ced4da;
-                        border-radius: 4px;
-                      "
+                    <!-- 右側のラジオボタングループ -->
+                    <div id="animation-radio-buttons-right"
+                         style="
+                           display: flex;
+                           align-items: center;
+                           padding: 5px 10px;
+                           border: 1px solid #ced4da;
+                           border-radius: 4px;
+                         "
                     >
                       <label style="margin-right: 1.5em">
                         <input
@@ -1552,26 +1567,22 @@
                   </div>
                 </div>
                 <!-- 下段: スライドバー・ボタンブロック -->
-                <div  id="animation-execute-section"
-                      style="
-                        display: flex;
-                        justify-content: flex-start;
-                      "
+                <div
+                  id="animation-execute-section"
+                  style="display: flex; justify-content: flex-start"
                 >
                   <!-- 左側: スライドバーブロック（上下2段） -->
-                  <div
-                    id="animation-settings-block"
-                    style="
-                      display: flex;
-                      flex-direction: column;
-                      gap: 8px;
-                      min-width: 300px;
-                      align-items: flex-start;
-                    "
-                  >
+                  <div id="animation-settings-block">
                     <!-- 上段: 速度調節 -->
                     <div style="display: flex; align-items: center; gap: 10px">
-                      <span style="font-weight: bold; min-width: 2em; text-align: center">速度:</span>
+                      <span
+                        style="
+                          font-weight: bold;
+                          min-width: 2em;
+                          text-align: center;
+                        "
+                        >速度:</span
+                      >
                       <span>ゆっくり</span>
                       <input
                         type="range"
@@ -1593,7 +1604,14 @@
                         position: relative;
                       "
                     >
-                      <span style="font-weight: bold; min-width: 2em; text-align: center">進行状況:</span>
+                      <span
+                        style="
+                          font-weight: bold;
+                          min-width: 2em;
+                          text-align: center;
+                        "
+                        >進行状況:</span
+                      >
                       <input
                         type="range"
                         id="animation-progress"
@@ -1627,18 +1645,8 @@
                     </div>
                   </div>
                   <!-- 右側: ボタンブロック -->
-                  <div id = "animation-btn-block"
-                       style="
-                         display: flex;
-                         flex-direction: row;
-                         align-items: center;
-                         justify-content: center;
-                         height: 100%;
-                  ">
-                    <div id="animation-btn-group1"
-                         style="
-                          display: flex;
-                    ">
+                  <div id="animation-btn-block">
+                    <div id="animation-btn-group1">
                       <button
                         type="button"
                         id="start-animation-btn"
@@ -1654,10 +1662,7 @@
                         一時停止
                       </button>
                     </div>
-                    <div id="animation-btn-group2"
-                         style="
-                         display: flex;
-                    ">
+                    <div id="animation-btn-group2">
                       <button
                         type="button"
                         id="resume-animation-btn"
@@ -1684,10 +1689,9 @@
                 </div>
               </div>
               <!-- #animation-controls ここまで -->
-
               <!-- 地域別人口ピラミッドの町丁名指定へのリンク -->
               <div id="link">
-                <a href="#cho"> 地域別人口ピラミッドのための町丁名の指定 </a>
+                <a href="#" onclick="showChoSection(); return false;"> 地域別人口ピラミッドのための町丁名の指定 </a>
                 <span
                   class="info-icon-right"
                   data-tooltip-id="cho_link_tooltip"
@@ -1696,13 +1700,10 @@
                   <img src="./image/tooltip-icon.png" class="small-icon"
                 /></span>
               </div>
-              <br />
               <!-- #link ここまで -->
-
               <!-- #市区、年月セレクトボックス -->
               <div id="select-controls">
-                <div id="comment" data-html2canvas-ignore="true">
-                </div>
+                <div id="comment" data-html2canvas-ignore="true"></div>
                 <div id="hitoku" data-html2canvas-ignore="true">
                   数字が著しく小さいために秘匿処理(統計表では"X"表記)されたデータがありました。ここでは便宜上"X"を0(ゼロ)として取り扱っています。
                 </div>
@@ -1738,13 +1739,16 @@
                     <option value="izumi">泉区</option>
                     <option value="seya">瀬谷区</option>
                   </select>
-                  <div id="shiku_year_container"
-                       style="display: flex;
-                              flex-direction: column;
-                              align-items: center;
-                              justify-content: center;
-                              gap: 2px;
-                              flex-wrap: nowrap;"
+                  <div
+                    id="shiku_year_container"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      justify-content: center;
+                      gap: 2px;
+                      flex-wrap: nowrap;
+                    "
                   >
                     <!-- 年月セレクトボックス（市区ピラミッド用） -->
                     <select
@@ -1761,10 +1765,10 @@
                       name="cho_year"
                       id="cho_year"
                     >
-                    <option value="202109">令和６年9月30日現在</option>
-                    <option value="202109">令和５年9月30日現在</option>
-                    <option value="202109">令和４年9月30日現在</option>
-                    <option value="202109">令和３年9月30日現在</option>
+                      <option value="202109">令和６年9月30日現在</option>
+                      <option value="202109">令和５年9月30日現在</option>
+                      <option value="202109">令和４年9月30日現在</option>
+                      <option value="202109">令和３年9月30日現在</option>
                       <option value="202009">令和２年9月30日現在</option>
                       <option value="201909">
                         平成31・令和元年9月30日現在
@@ -1794,9 +1798,7 @@
                     <!-- スライドバー1（市区ピラミッド用） -->
                     <div
                       id="shiku-year-slider-container"
-                      style="display: none; 
-                             margin-top: 5px;
-                             text-align: right;"
+                      style="display: none; margin-top: 5px; text-align: right"
                     >
                       <div
                         style="
@@ -1819,18 +1821,16 @@
                         <!-- 機能的に必要：削除しないでください -->
                         <span
                           id="shiku-year-slider-display"
-                          style="display: none;"
+                          style="display: none"
                           >将来</span
                         >
                       </div>
                     </div>
-                     
+
                     <!-- スライドバー2（町丁別ピラミッド用） -->
                     <div
                       id="cho-year-slider-container"
-                      style="display: none; 
-                             margin-top: 5px;
-                             text-align: right;"
+                      style="display: none; margin-top: 5px; text-align: right"
                     >
                       <div
                         style="
@@ -1883,7 +1883,127 @@
             <!-- #top-controls ここまで -->
 
             <!-- #SVG描画領域 -->
-            <div id="pyramid-container"></div>
+            <div id="pyramid-container">
+              <!-- 基本データ(人口と3区分別人口) -->
+              <div id="basic_data">
+                <div id="jinko_sosu">
+                  <span class="tr">
+                    <span class="td"></span>
+                    <span class="td">人口</span>
+                    <span class="td" id="sosu">xxx,xxx人</span>
+                    <span class="td"></span>
+                  </span>
+                  <span class="tr">
+                    <span class="td"></span>
+                    <span class="td">男</span>
+                    <span class="td" id="male">xxx,xxx人</span>
+                    <span class="td"></span>
+                  </span>
+                  <span class="tr">
+                    <span class="td"></span>
+                    <span class="td">女</span>
+                    <span class="td" id="female">xxx,xxx人</span>
+                    <span class="td"></span>
+                  </span>
+                </div>
+                <!--jinko_sosu ここまで-->
+                <div id="select" data-html2canvas-ignore="true">
+                  <select id="kubun_unit" onchange="kubunDisplay()">
+                    <option value="構成比" selected="selected">
+                      年齢3区分別構成比
+                    </option>
+                    <option value="人口">年齢3区分別人口</option>
+                    <option value="非表示">年齢3区分別人口/構成比非表示</option>
+                  </select>
+                  <span
+                    id="info_3kubun"
+                    class="info-icon-3kubun"
+                    data-tooltip-id="info_3kubun_tooltip"
+                    style="cursor: pointer"
+                    ><img src="./image/tooltip-icon.png" class="small-icon"
+                  /></span>
+                  <input
+                    id="kubun_button"
+                    type="submit"
+                    value="3区分表示"
+                    onclick="kubunSelectDisp()"
+                  />
+                  <input id="kubun_selected" type="hidden" value="" />
+                </div>
+                <div id="nenrei_3kubun">
+                  <span class="tr">
+                    <span class="td">年 齢 区 分</span>
+                    <span class="td">総数</span>
+                    <span class="td">男</span>
+                    <span class="td">女</span>
+                  </span>
+                  <span class="tr">
+                    <span class="td">
+                      <span id="heigher">75</span>
+                      歳以上
+                    </span>
+                    <span class="td" id="ku3_sosu">xxx,xxx人</span>
+                    <span class="td" id="ku3_male">xxx,xxx人</span>
+                    <span class="td" id="ku3_female">xxx,xxx人</span>
+                  </span>
+                  <span class="tr">
+                    <span class="td" id="kubun2_title">
+                      <div class="age-cell-container">
+                        <span class="age-text">　</span>
+                        <div class="age-input-container">
+                          <span class="age-display" id="startAgeDisplay"
+                            >15</span
+                          >
+                          <input
+                            type="number"
+                            id="smiddle"
+                            class="age-input"
+                            value="15"
+                            min="0"
+                            max="99"
+                            onchange="kubunChange(); updateAgeDisplay('start', this.value)"
+                            oninput="validateAgeInput(this); updateAgeDisplay('start', this.value)"
+                            title="開始年齢（0-99歳）"
+                          />
+                        </div>
+                        <span class="age-text">〜</span>
+                        <span class="age-text">　</span>
+                        <div class="age-input-container">
+                          <span class="age-display" id="endAgeDisplay">64</span>
+                          <input
+                            type="number"
+                            id="emiddle"
+                            class="age-input"
+                            value="64"
+                            min="0"
+                            max="99"
+                            onchange="kubunChange(); updateAgeDisplay('end', this.value)"
+                            oninput="validateAgeInput(this); updateAgeDisplay('end', this.value)"
+                            title="終了年齢（0-99歳）"
+                          />
+                        </div>
+                        <span class="age-text">歳</span>
+                      </div>
+                    </span>
+                    <span class="td" id="ku2_sosu">xx,xxx人</span>
+                    <span class="td" id="ku2_male">xx,xxx人</span>
+                    <span class="td" id="ku2_female">xx,xxx人</span>
+                  </span>
+                  <span class="tr">
+                    <span class="td">
+                      0〜
+                      <span id="lower">14</span>
+                      歳
+                    </span>
+                    <span class="td" id="ku1_sosu">xx,xxx人</span>
+                    <span class="td" id="ku1_male">xx,xxx人</span>
+                    <span class="td" id="ku1_female">xx,xxx人</span>
+                  </span>
+                </div>
+                <!--#nenrei_3kuibun ここまで-->
+              </div>
+              <!--#basic_data ここまで-->
+            </div>
             <!-- #pyramid-container ここまで -->
 
             <!-- 現在の年次表示 -->
@@ -1967,8 +2087,8 @@
                   href="#screen_shot_tooltip"
                   data-tooltip-id="screen_shot_tooltip"
                   style="margin-left: 8px; display: inline-block"
-                  ><img src="./image/tooltip-icon.png" class="small-icon"
-                /></a><a name="screen_shot_tooltip"></a>
+                  ><img src="./image/tooltip-icon.png" class="small-icon" /></a
+                ><a name="screen_shot_tooltip"></a>
               </h3>
               <div class="button-group">
                 <button onClick="screen_shot()" id="screen_shot_button">
@@ -2028,124 +2148,6 @@
             </div>
           </div>
           <!-- #left-controls ここまで -->
-
-          <!-- 基本データ(人口と3区分別人口) -->
-          <div id="basic_data">
-            <div id="jinko_sosu">
-              <span class="tr">
-                <span class="td"></span>
-                <span class="td">人口</span>
-                <span class="td" id="sosu">xxx,xxx人</span>
-                <span class="td"></span>
-              </span>
-              <span class="tr">
-                <span class="td"></span>
-                <span class="td">男</span>
-                <span class="td" id="male">xxx,xxx人</span>
-                <span class="td"></span>
-              </span>
-              <span class="tr">
-                <span class="td"></span>
-                <span class="td">女</span>
-                <span class="td" id="female">xxx,xxx人</span>
-                <span class="td"></span>
-              </span>
-            </div>
-            <!--jinko_sosu ここまで-->
-            <div id="select" data-html2canvas-ignore="true">
-              <select id="kubun_unit" onchange="kubunDisplay()">
-                <option value="構成比" selected="selected">
-                  年齢3区分別構成比
-                </option>
-                <option value="人口">年齢3区分別人口</option>
-                <option value="非表示">年齢3区分別人口/構成比非表示</option>
-              </select>
-              <span
-                id="info_3kubun"
-                class="info-icon-3kubun"
-                data-tooltip-id="info_3kubun_tooltip"
-                style="cursor: pointer"
-                ><img src="./image/tooltip-icon.png" class="small-icon"
-              /></span>
-              <input
-                id="kubun_button"
-                type="submit"
-                value="3区分表示"
-                onclick="kubunSelectDisp()"
-              />
-              <input id="kubun_selected" type="hidden" value="" />
-            </div>
-            <div id="nenrei_3kubun">
-              <span class="tr">
-                <span class="td">年 齢 区 分</span>
-                <span class="td">総数</span>
-                <span class="td">男</span>
-                <span class="td">女</span>
-              </span>
-              <span class="tr">
-                <span class="td">
-                  <span id="heigher">75</span>
-                  歳以上
-                </span>
-                <span class="td" id="ku3_sosu">xxx,xxx人</span>
-                <span class="td" id="ku3_male">xxx,xxx人</span>
-                <span class="td" id="ku3_female">xxx,xxx人</span>
-              </span>
-              <span class="tr">
-                <span class="td" id="kubun2_title">
-                  <div class="age-cell-container">
-                    <span class="age-text">　</span>
-                    <div class="age-input-container">
-                      <span class="age-display" id="startAgeDisplay">15</span>
-                      <input
-                        type="number"
-                        id="smiddle"
-                        class="age-input"
-                        value="15"
-                        min="0"
-                        max="99"
-                        onchange="kubunChange(); updateAgeDisplay('start', this.value)"
-                        oninput="validateAgeInput(this); updateAgeDisplay('start', this.value)"
-                        title="開始年齢（0-99歳）"
-                      />
-                    </div>
-                    <span class="age-text">〜</span>
-                    <span class="age-text">　</span>
-                    <div class="age-input-container">
-                      <span class="age-display" id="endAgeDisplay">64</span>
-                      <input
-                        type="number"
-                        id="emiddle"
-                        class="age-input"
-                        value="64"
-                        min="0"
-                        max="99"
-                        onchange="kubunChange(); updateAgeDisplay('end', this.value)"
-                        oninput="validateAgeInput(this); updateAgeDisplay('end', this.value)"
-                        title="終了年齢（0-99歳）"
-                      />
-                    </div>
-                    <span class="age-text">歳</span>
-                  </div>
-                </span>
-                <span class="td" id="ku2_sosu">xx,xxx人</span>
-                <span class="td" id="ku2_male">xx,xxx人</span>
-                <span class="td" id="ku2_female">xx,xxx人</span>
-              </span>
-              <span class="tr">
-                <span class="td">
-                  0〜
-                  <span id="lower">14</span>
-                  歳
-                </span>
-                <span class="td" id="ku1_sosu">xx,xxx人</span>
-                <span class="td" id="ku1_male">xx,xxx人</span>
-                <span class="td" id="ku1_female">xx,xxx人</span>
-              </span>
-            </div>
-            <!--#nenrei_3kuibun ここまで-->
-          </div>
-          <!--#basic_data ここまで-->
         </div>
         <!-- #container-flex ここまで -->
       </div>
@@ -2200,7 +2202,7 @@
         document.addEventListener("DOMContentLoaded", function () {
           // アニメーション進行スライダーの初期化
           setupAnimationProgressSlider();
-          
+
           // セレクトボックスのイベントリスナーを設定
           //const demoDataSelect = document.getElementById("demoData");
           //demoDataSelect.addEventListener("change", changeDemoData);
@@ -2289,7 +2291,7 @@
 
           if (basicData.style.display === "none") {
             // 非表示の場合は表示に
-            basicData.style.display = "block";
+            basicData.style.display = "";　//初期状態に戻す。ここでblockにするとレスポンシブデザインが無効になってしまう。
             toggleButton.textContent = "年齢３区分別等表示ON/OFF";
           } else {
             // 表示の場合は非表示に
@@ -2298,24 +2300,8 @@
           }
         }
 
-        // ハイブリッドリサイズの適用
-        //function applyHybridResize() {
-        //  if (!window.pyramidRenderer) return;
-        // 
-        //  const barHeight = parseFloat(
-        //    document.getElementById("barHeightSlider").value
-        //  );
-        //  const newHeight = Math.floor(101 * barHeight + 100); // 101年齢 × barHeight + 100pxマージン
-        // 
-        //  window.pyramidRenderer.resize({
-        //    barHeight: barHeight,
-        //    height: newHeight,
-        //  });
-        //}
-
         // ピラミッドの描画
         function renderPyramid(data, animeMode) {
-          
           let isAnimation = false;
           if (animeMode != undefined) {
             isAnimation = true;
@@ -2481,47 +2467,45 @@
 
         // アニメーションコントロールの表示切り替え
         function showAnimationControls() {
-          const linkElement = document.getElementById("link");
-          const selectControlsElement = document.getElementById("select-controls");
+          const selectLinkElement        = document.getElementById("link");
+          const selectControlsElement    = document.getElementById("select-controls");
           const animationControlsElement = document.getElementById("animation-controls");
-          const topControlsElement = document.getElementById("top-controls");
-          
+          const topControlsElement       = document.getElementById("top-controls");
+
           // 要素を非表示にするが、レイアウト上の高さは保持
           // hiddenでは一瞬の間が空くため、opacity=0で即時に非表示にする
-          selectControlsElement.style.opacity = "0"; 
-          linkElement.style.opacity = "0";
+          selectLinkElement.style.opacity = "0";
+          selectLinkElement.style.visibility = "hidden";
+          selectControlsElement.style.opacity = "0";
           selectControlsElement.style.visibility = "hidden";
-          linkElement.style.visibility = "hidden";
-          
-          // アニメーションコントロールの高さを0にする
-          animationControlsElement.style.height = "0";
 
           // アニメーションコントロールを表示
-          animationControlsElement.style.display = "block";
-          
+          animationControlsElement.style.visibility = "visible";
+          animationControlsElement.style.opacity = "1";
+
           // 進捗スライダーを初期化
           setupAnimationProgressSlider();
         }
 
         function hideAnimationControls() {
-          const linkElement = document.getElementById("link");
-          const selectControlsElement = document.getElementById("select-controls");
+          const selectLinkElement        = document.getElementById("link");
+          const selectControlsElement    = document.getElementById("select-controls");
           const animationControlsElement = document.getElementById("animation-controls");
-          const topControlsElement = document.getElementById("top-controls");
-          const shikuSelectControl = document.getElementById("shiku");
-          
-          // アニメーションコントロールの高さを元に戻す
-          animationControlsElement.style.height = "";
-          
+          const topControlsElement       = document.getElementById("top-controls");
+          const shikuSelectControl       = document.getElementById("shiku");
+
+          // アニメーションコントロールを非表示
+          animationControlsElement.style.visibility = "hidden";
+          animationControlsElement.style.opacity = "0";
+
           // 元の状態に戻す
-          if (shikuSelectControl.value !="age"){
-            linkElement.style.visibility = "visible";
+          if (shikuSelectControl.value != "age") {
+            selectLinkElement.style.opacity = "1";
+            selectLinkElement.style.visibility = "visible";
           }
-          selectControlsElement.style.visibility = "visible";
-          linkElement.style.opacity = "1";
           selectControlsElement.style.opacity = "1";
-          
-          animationControlsElement.style.display = "none";
+          selectControlsElement.style.visibility = "visible";
+                    
         }
 
         // アニメーション開始
@@ -2550,8 +2534,12 @@
           const animationMode = document.querySelector(
             'input[name="animation-mode"]:checked'
           ).value;
-          const useVariableAreaMode = animationMode === "age-composition-population";
-          console.warn("ラジオボタン選択: アニメーションモード =", animationMode);
+          const useVariableAreaMode =
+            animationMode === "age-composition-population";
+          console.warn(
+            "ラジオボタン選択: アニメーションモード =",
+            animationMode
+          );
           console.warn("可変面積モード =", useVariableAreaMode);
 
           // アニメーション設定を更新
@@ -2879,8 +2867,8 @@
 
         // 現在選択されている市区を日本語表記で取得
         function get_selected_shiku_japanese() {
-          const index = document.getElementById('shiku').selectedIndex;
-          const text = document.getElementById('shiku').options[index].text;
+          const index = document.getElementById("shiku").selectedIndex;
+          const text = document.getElementById("shiku").options[index].text;
           return text;
         }
 
@@ -3008,6 +2996,7 @@
 
         // ********** 画面デザイン（各要素の配置位置） **********
         function centerContents() {
+          return;
           const main = document.querySelector("#main");
           const containerFlex = document.querySelector("#container-flex");
           const menu = document.querySelector(".left-controls");
@@ -3035,11 +3024,11 @@
           let pyramidWidth = pyramid.offsetWidth;
 
           // 実際のピラミッドコンテナの位置を使用（#basic_dataの位置決めに使用）
-          let pyramidLeft = pyramid.offsetLeft;   //画面の左にあるときはマイナス値になる
+          let pyramidLeft = pyramid.offsetLeft; //画面の左にあるときはマイナス値になる
 
           // パディングを考慮（#main: 20px + #container-flex: 10px = 30px）
           const totalPadding = main.style.padding + containerFlex.style.padding;
-          const availableWidth = windowWidth - (totalPadding * 2); // 左右のパディングを引く
+          const availableWidth = windowWidth - totalPadding * 2; // 左右のパディングを引く
 
           //コントロールとピラミッドの横位置を計算
           // 画面中央に配置（ウィンドウ中央 - (メニュー幅 + ピラミッド幅 + すき間)の半分）
@@ -3051,174 +3040,205 @@
 
           const pyramidTopPos = pyramid.offsetTop;
 
-          console.log(`availableWidth:, ${availableWidth}、totalWidth:, ${totalWidth}`);
-          console.log(`menuLeftPos:, ${menuLeftPos}、pyramidLeftPos:, ${pyramidLeftPos}`);
+          console.log(
+            `availableWidth:, ${availableWidth}、totalWidth:, ${totalWidth}`
+          );
+          console.log(
+            `menuLeftPos:, ${menuLeftPos}、pyramidLeftPos:, ${pyramidLeftPos}`
+          );
 
           if (availableWidth >= totalWidth) {
-                //コントロールの横位置をセット
-                menu.style.left = menuLeftPos + "px";
-                //ピラミッドの横位置をセット
-                pyramid.offsetLeft = pyramidLeftPos + "px";
-                 
-                //左コントロールの縦位置をセット
-                // SVG領域と縦の中央揃えにする（スクロール位置に依存しない固定位置）
-                const pyramidHeight = pyramid.offsetHeight;
-                const menuHeight = menu.offsetHeight;
-                const menuTopPos = pyramidTopPos + (pyramidHeight - menuHeight) / 2;
-                menu.style.top = menuTopPos + "px";
-                 
-                // タイトル、トップコントロール、フッターの横位置をセット
-                if (pyramid){
-                  titleContainer.style["text-align"] = "left";
-                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
-                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
-                }
-                topControls.style.width = pyramidWidth + "px";
-                choLink.style.width = pyramidWidth + "px";
-                selectControls.style.width = pyramidWidth + "px";
-                     
-                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
-                const basicLeftPos = pyramidLeftPos + pyramidWidth - basicWidth - 20 ;
-                const basicTopPos = pyramidTopPos + pyramidHeight - basicHeight - 25;
-                basic.style.left = basicLeftPos + "px";
-                basic.style.top = basicTopPos + "px";
-                basic.style.display = "block";
-          
-            } else if (windowWidth > 1200) {
-                // ピラミッドを画面幅に合わせる
-                pyramidWidth = availableWidth - menuWidth - 100 ;
-                pyramid.style.width = pyramidWidth + "px";
-                // ピラミッドの横位置をセット
-                pyramid.offsetLeft = menu.offsetLeft + menuWidth + 5 + "px";
-                // タイトルの横位置をセット
-                if (pyramid){
-                  titleContainer.style["text-align"] = "left";
-                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
-                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
-                }
-                //トップコントロールの横位置をセット
-                choLink.style["margin-left"] = "0px";
-                choLink.offsetLeft = pyramid.offsetLeft;
-                choLink.style.width = pyramidWidth + 40 + "px";
-                selectControls.style["margin-left"] = "0px";
-                selectControls.offsetLeft = pyramid.offsetLeft;
-                selectControls.style.width = pyramidWidth + 40 + "px";
+            //コントロールの横位置をセット
+            menu.style.left = menuLeftPos + "px";
+            //ピラミッドの横位置をセット
+            pyramid.offsetLeft = pyramidLeftPos + "px";
 
-                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
-                const basicLeftPos = pyramid.offsetLeft + pyramidWidth - basicWidth + 20;
-                const basicTopPos = pyramidTopPos + pyramid.offsetHeight - basicHeight - 25;
-                basic.style.left = basicLeftPos + "px";
-                basic.style.top = basicTopPos + "px";
-                basic.style.display = "block";
+            //左コントロールの縦位置をセット
+            // SVG領域と縦の中央揃えにする（スクロール位置に依存しない固定位置）
+            const pyramidHeight = pyramid.offsetHeight;
+            const menuHeight = menu.offsetHeight;
+            const menuTopPos = pyramidTopPos + (pyramidHeight - menuHeight) / 2;
+            menu.style.top = menuTopPos + "px";
 
-            } else if (windowWidth > 768) {
-                // ピラミッドを画面幅に合わせる
-                pyramidWidth = windowWidth - 90 ;
-                pyramid.style.width = pyramidWidth + "px";
-                // ピラミッドの横位置をセット
-                pyramid.offsetLeft = "0px";
-                // タイトルの横位置をセット
-                if (pyramid){
-                  titleContainer.style["text-align"] = "left";
-                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
-                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
-                }
-                //トップコントロールの横位置をセット
-                choLink.offsetLeft = "";
-                selectControls.offsetLeft = "";
-                choLink.style["margin-left"] = "0px";
-                choLink.offsetLeft = "0px";
-                choLink.style.width = pyramidWidth + 30 + "px";
-                selectControls.style["margin-left"] = "0px";
-                selectControls.offsetLeft = "0px";
-                selectControls.style.width = pyramidWidth + 30 + "px";
-                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
-                const basicLeftPos = pyramid.offsetLeft + pyramidWidth - basicWidth + 20;
-                const basicTopPos = pyramidTopPos + pyramid.offsetHeight - basicHeight - 25;
-                basic.style.left = basicLeftPos + "px";
-                basic.style.top = basicTopPos + "px";
-                basic.style.display = "block";
+            // タイトル、トップコントロール、フッターの横位置をセット
+            if (pyramid) {
+              titleContainer.style["text-align"] = "left";
+              h1Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h1Title.offsetWidth) / 2 +
+                "px";
+              h2Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h2Title.offsetWidth) / 2 +
+                "px";
+            }
+            topControls.style.width = pyramidWidth + "px";
+            choLink.style.width = pyramidWidth + "px";
+            selectControls.style.width = pyramidWidth + "px";
 
-              } else if (windowWidth > 480) {
-                // ピラミッドを画面幅に合わせる
-                pyramidWidth = windowWidth - 50 ;
-                pyramid.style.width = pyramidWidth + "px";
-                
-                // ピラミッドの横位置をセット
-                pyramid.offsetLeft = "0px";
-                
-                // タイトルの横位置をセット
-                if (pyramid){
-                  titleContainer.style["text-align"] = "left";
-                  h1Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h1Title.offsetWidth)/2 + "px";
-                  h2Title.style["margin-left"] = pyramid.offsetLeft + (pyramid.offsetWidth - h2Title.offsetWidth)/2 + "px";
-                }
-                //トップコントロールの横位置をセット
-                choLink.style["margin-left"] = "0px";
-                choLink.style.width = pyramidWidth + 10 + "px";
-                choLink.offsetLeft = "0px";
-                selectControls.style["margin-left"] = "0px";
-                selectControls.style.width = pyramidWidth + 10 + "px";
-                selectControls.offsetLeft = "0px";
+            // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+            const basicLeftPos =
+              pyramidLeftPos + pyramidWidth - basicWidth - 20;
+            const basicTopPos =
+              pyramidTopPos + pyramidHeight - basicHeight - 25;
+            basic.style.left = basicLeftPos + "px";
+            basic.style.top = basicTopPos + "px";
+            basic.style.display = "block";
+          } else if (windowWidth > 1200) {
+            // ピラミッドを画面幅に合わせる
+            pyramidWidth = availableWidth - menuWidth - 100;
+            pyramid.style.width = pyramidWidth + "px";
+            // ピラミッドの横位置をセット
+            pyramid.offsetLeft = menu.offsetLeft + menuWidth + 5 + "px";
+            // タイトルの横位置をセット
+            if (pyramid) {
+              titleContainer.style["text-align"] = "left";
+              h1Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h1Title.offsetWidth) / 2 +
+                "px";
+              h2Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h2Title.offsetWidth) / 2 +
+                "px";
+            }
+            //トップコントロールの横位置をセット
+            choLink.style["margin-left"] = "0px";
+            choLink.offsetLeft = pyramid.offsetLeft;
+            choLink.style.width = pyramidWidth + 40 + "px";
+            selectControls.style["margin-left"] = "0px";
+            selectControls.offsetLeft = pyramid.offsetLeft;
+            selectControls.style.width = pyramidWidth + 40 + "px";
 
-                // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
-                if (windowWidth > 690){
-                  const basicLeftPos = pyramid.offsetLeft + pyramidWidth - basicWidth + 5;
-                  const basicTopPos = pyramidTopPos + pyramid.offsetHeight - basicHeight - 10;
-                  basic.style.left = basicLeftPos + "px";
-                  basic.style.top = basicTopPos + "px";
-                  basic.style.display = "block";
-                }else{
-                  basic.style.display = "none";
-                }
+            // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+            const basicLeftPos =
+              pyramid.offsetLeft + pyramidWidth - basicWidth + 20;
+            const basicTopPos =
+              pyramidTopPos + pyramid.offsetHeight - basicHeight - 25;
+            basic.style.left = basicLeftPos + "px";
+            basic.style.top = basicTopPos + "px";
+            basic.style.display = "block";
+          } else if (windowWidth > 768) {
+            // ピラミッドを画面幅に合わせる
+            pyramidWidth = windowWidth - 90;
+            pyramid.style.width = pyramidWidth + "px";
+            // ピラミッドの横位置をセット
+            pyramid.offsetLeft = "0px";
+            // タイトルの横位置をセット
+            if (pyramid) {
+              titleContainer.style["text-align"] = "left";
+              h1Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h1Title.offsetWidth) / 2 +
+                "px";
+              h2Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h2Title.offsetWidth) / 2 +
+                "px";
+            }
+            //トップコントロールの横位置をセット
+            choLink.offsetLeft = "";
+            selectControls.offsetLeft = "";
+            choLink.style["margin-left"] = "0px";
+            choLink.offsetLeft = "0px";
+            choLink.style.width = pyramidWidth + 30 + "px";
+            selectControls.style["margin-left"] = "0px";
+            selectControls.offsetLeft = "0px";
+            selectControls.style.width = pyramidWidth + 30 + "px";
+            // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+            const basicLeftPos =
+              pyramid.offsetLeft + pyramidWidth - basicWidth + 20;
+            const basicTopPos =
+              pyramidTopPos + pyramid.offsetHeight - basicHeight - 25;
+            basic.style.left = basicLeftPos + "px";
+            basic.style.top = basicTopPos + "px";
+            basic.style.display = "block";
+          } else if (windowWidth > 480) {
+            // ピラミッドを画面幅に合わせる
+            pyramidWidth = windowWidth - 50;
+            pyramid.style.width = pyramidWidth + "px";
 
+            // ピラミッドの横位置をセット
+            pyramid.offsetLeft = "0px";
 
+            // タイトルの横位置をセット
+            if (pyramid) {
+              titleContainer.style["text-align"] = "left";
+              h1Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h1Title.offsetWidth) / 2 +
+                "px";
+              h2Title.style["margin-left"] =
+                pyramid.offsetLeft +
+                (pyramid.offsetWidth - h2Title.offsetWidth) / 2 +
+                "px";
+            }
+            //トップコントロールの横位置をセット
+            choLink.style["margin-left"] = "0px";
+            choLink.style.width = pyramidWidth + 10 + "px";
+            choLink.offsetLeft = "0px";
+            selectControls.style["margin-left"] = "0px";
+            selectControls.style.width = pyramidWidth + 10 + "px";
+            selectControls.offsetLeft = "0px";
 
-          //} else if (windowWidth < 1200) {
-          //      //コントロールの横位置をセット
-          //      menu.style.left = "0px";
-          //      //ピラミッドの横位置をセット
-          //      pyramid.style.left = "0px";
-          //      //フッターの横位置をセット
-          //      footer.style["margin-left"] = "0px";
-          //      //トップコントロールの横位置をセット
-          //      lst pyramidRilst pyramidLlst pyramidWidth -20;
-          //      choLink.style.wilst pyramidLlst pyramidWidth -20 + "px";
-          //      selectControls.style.wilst pyramidLlst pyramidWidth -20 + "px";
-          //        
-          //      // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
-          //      const svgFixedWidth = 1108;
-          //      //if (windowWidth > svgFixedWidth) {
-          //  if (windowWidth > 900) {
-          //      // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
-          //      const pyramidContainerTop = pyramidContainer.offsetTop;
-          //      const pyramidHeight = pyramidContainer.offsetHeight;
-          //                    
-          //      // SVG領域を画面中央に配置（左右の余白を均等にする）
-          //      //ピラミッドの横位置
-          //      const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2 -50 ;
-          //      //pyramidContainer.style.marginLeft = pyramidContainerLeft + "px";
-          //        
-          //      titleContainer.style["text-align"] = "center";
-          //      h1Title.style["margin-left"] = "0px"; 
-          //      h2Title.style["margin-left"] = "0px";            
-          //          
-          //      // #basic_dataをSVG描画領域内の右下に配置
-          //      const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth + 40;
-          //      const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
-          //      basic.style.left = basicLeftPos + "px";
-          //      basic.style.top = basicTopPos + "px";
-          //      basic.style.display = "block";
-          //    
-          //  } else {
-          //    if (pyramidContainer){
-          //      titleContainer.style["text-align"] = "left";
-          //      h1Title.style["margin-left"] = (900 - h1Title.offsetWidth) / 2 + "px";
-          //      h2Title.style["margin-left"] = (900 - h2Title.offsetWidth) / 2 + "px";
-          //    }
-          //    // SVG領域の固定幅より画面幅が小さい場合は非表示
-          //    basic.style.display = "none";
-          //}
+            // #basic_dataをSVG描画領域内の右下に配置（実際のピラミッドコンテナの位置を使用）
+            if (windowWidth > 690) {
+              const basicLeftPos =
+                pyramid.offsetLeft + pyramidWidth - basicWidth + 5;
+              const basicTopPos =
+                pyramidTopPos + pyramid.offsetHeight - basicHeight - 10;
+              basic.style.left = basicLeftPos + "px";
+              basic.style.top = basicTopPos + "px";
+              basic.style.display = "block";
+            } else {
+              basic.style.display = "none";
+            }
+
+            //} else if (windowWidth < 1200) {
+            //      //コントロールの横位置をセット
+            //      menu.style.left = "0px";
+            //      //ピラミッドの横位置をセット
+            //      pyramid.style.left = "0px";
+            //      //フッターの横位置をセット
+            //      footer.style["margin-left"] = "0px";
+            //      //トップコントロールの横位置をセット
+            //      lst pyramidRilst pyramidLlst pyramidWidth -20;
+            //      choLink.style.wilst pyramidLlst pyramidWidth -20 + "px";
+            //      selectControls.style.wilst pyramidLlst pyramidWidth -20 + "px";
+            //
+            //      // SVG領域の固定幅（1108px）より画面幅が大きい場合は#basic_dataを表示
+            //      const svgFixedWidth = 1108;
+            //      //if (windowWidth > svgFixedWidth) {
+            //  if (windowWidth > 900) {
+            //      // #basic_dataをSVG描画領域内の右下に配置（スクロール位置に依存しない固定位置）
+            //      const pyramidContainerTop = pyramidContainer.offsetTop;
+            //      const pyramidHeight = pyramidContainer.offsetHeight;
+            //
+            //      // SVG領域を画面中央に配置（左右の余白を均等にする）
+            //      //ピラミッドの横位置
+            //      const pyramidContainerLeft = (windowWidth - svgFixedWidth) / 2 -50 ;
+            //      //pyramidContainer.style.marginLeft = pyramidContainerLeft + "px";
+            //
+            //      titleContainer.style["text-align"] = "center";
+            //      h1Title.style["margin-left"] = "0px";
+            //      h2Title.style["margin-left"] = "0px";
+            //
+            //      // #basic_dataをSVG描画領域内の右下に配置
+            //      const basicLeftPos = pyramidContainerLeft + svgFixedWidth - basicWidth + 40;
+            //      const basicTopPos = pyramidContainerTop + pyramidHeight - basic.offsetHeight - 25;
+            //      basic.style.left = basicLeftPos + "px";
+            //      basic.style.top = basicTopPos + "px";
+            //      basic.style.display = "block";
+            //
+            //  } else {
+            //    if (pyramidContainer){
+            //      titleContainer.style["text-align"] = "left";
+            //      h1Title.style["margin-left"] = (900 - h1Title.offsetWidth) / 2 + "px";
+            //      h2Title.style["margin-left"] = (900 - h2Title.offsetWidth) / 2 + "px";
+            //    }
+            //    // SVG領域の固定幅より画面幅が小さい場合は非表示
+            //    basic.style.display = "none";
+            //}
           }
         }
 

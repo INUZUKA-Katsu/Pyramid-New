@@ -60,12 +60,16 @@ class PyramidSVGRenderer {
     //console.warn('this.options.zoomScale', this.options.zoomScale);
 
     // 既存のコンテナをクリア
-    this.container.innerHTML = '';
+    const svg = document.getElementById('pyramid-svg');
+    if (svg) {
+      this.container.removeChild(svg);
+    }
     
     // SVG要素を作成
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     this.svg.setAttribute('id', 'pyramid-svg');
-    this.svg.setAttribute('style', 'width:100%; max-width:1108px; height:auto;');
+    //this.svg.setAttribute('style', 'width:100%; max-width:1108px; height:auto;');
+    this.svg.setAttribute('style', 'grid-column: 1/2; grid-row: 1/2; width:100%; height:100%; z-index: 1;');
     this.svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     //preserveAspectRatio="xMidYMid meet"
 

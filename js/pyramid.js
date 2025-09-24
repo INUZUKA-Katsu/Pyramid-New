@@ -87,7 +87,24 @@ function change_shiku() {
   //alert("change_shiku_option");
   change_display("shiku", $nengetsu);
 }
-
+//「地域別人口ピラミッドのための町丁名の指定」リンクをクリックしたときの処理
+function showChoSection() {
+  const choElement = document.getElementById("cho");
+  const windowWidth = window.innerWidth;
+  
+  if (choElement) {
+    // 1380px以下の場合は#choを表示
+    if (windowWidth <= 1380) {
+      choElement.style.display = "inline-block";
+    }
+    
+    // #choセクションにスクロール
+    choElement.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+}
 //町丁別人口ピラミッドボタンを押したときの処理
 function cho_pyramid_button() {
   scrollTo(0, 0);
@@ -102,11 +119,28 @@ function cho_pyramid_button() {
 //区人口ピラミッドボタンを押したときの処理
 function ku_pyramid_button() {
   scrollTo(0, 0);
+  restore_cho_display();
   if (get_pyramid_mode() == "shiku") {
     return;
   }
   $nengetsu = set_another_nengetsu("shiku");
   change_display("shiku_not_refresh_cholist", $nengetsu);
+
+  function restore_cho_display() {
+    // #choを元の状態に戻す(画面が狭いため非表示だったときは非表示)
+    const choElement = document.getElementById("cho");
+    const windowWidth = window.innerWidth;
+    if (choElement) {
+    
+      if (windowWidth <= 1380) {
+        // 1380px以下の場合は非表示に戻す
+        choElement.style.display = "none";
+      } else {
+        // 1380pxより大きい場合は表示状態に戻す
+        choElement.style.display = "inline-block";
+      }
+    }
+  }
 }
 
 //市区用の年月日セレクトボックスを変更したときの処理
@@ -857,6 +891,7 @@ function cho_list() {
   if (shiku == "age") {
     document.getElementById("cho_list").innerHTML = "";
     document.getElementById("cho").style.display = "none";
+    document.getElementById("link").style.opacity = "0";
     document.getElementById("link").style.visibility = "hidden";
 
   } else {
@@ -865,12 +900,11 @@ function cho_list() {
       //ローカルデータが存在しないときはサーバから取得して描画する.
       ajax("cho_list");
     }
-    document.getElementById("cho").style.display = "inline-block";
+    document.getElementById("cho").style.display = "";
     document.getElementById("cho_year").style.display = "inline-block";
     document.getElementById("link").style.visibility = "visible";
+    document.getElementById("link").style.opacity = "1";
   }
-  //フッターの位置を調整する.
-  //adjustFooterPosition();
 }
 //町丁名一覧を書き換える.
 function change_cho_list(str) {
