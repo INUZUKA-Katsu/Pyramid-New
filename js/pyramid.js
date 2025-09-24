@@ -2393,63 +2393,6 @@ function screen_shot() {
   let window_height = (pyramid_rect.top + pyramid_rect.height) - h2_rect.top;
   let canvas_width = window_width + 50;
   let canvas_height = window_height + 50;
-
-
-//  // 現在の要素の位置とサイズを取得
-//  const h2_rect = elm_h2.getBoundingClientRect();
-//  const basic_data_rect = elm_basic_data.getBoundingClientRect();
-//  const pyramid_svg_rect = elm_pyramid_svg.getBoundingClientRect();
-//
-//  // 撮影範囲のサイズ（ピラミッドが中央に来るように調整）
-//  const canvas_width = 1108 + 50;
-//  const canvas_height = 600 + 150;
-//
-//  // html2canvas用の固定配置（ブラウザレンダリングとの差異を考慮）
-//  const h2_left = 60;  // 左端から25px
-//  const h2_top = 45;   // 上端から35px
-//
-//  // ピラミッドをキャンバス中央に配置（固定値で調整）
-//  const pyramid_svg_left = 0;
-//  const pyramid_svg_top = 300;  // h2の下に固定配置
-//
-//  // basic_dataをピラミッドの右下角に配置（固定値で調整）
-//  const basic_data_left = 700;  // 右寄せの固定位置
-//  const basic_data_top = 540;   // 下寄せの固定位置
-//
-//  // 対象要素を絶対位置に移動
-//  elm_h2.style.position = "absolute";
-//  elm_h2.style.left = h2_left + "px";
-//  elm_h2.style.top = h2_top + "px";
-//
-//  // pyramid-blockを移動（SVG要素を含む）
-//  // まず位置をリセット
-//  elm_pyramid_block.style.position = "absolute";
-//  elm_pyramid_block.style.left = "0px";
-//  elm_pyramid_block.style.top = "0px";
-//  elm_pyramid_block.style.right = "";
-//  elm_pyramid_block.style.bottom = "";
-//  elm_pyramid_block.style.transform = "";
-//  
-//  // 新しい位置に移動
-//  elm_pyramid_block.style.left = pyramid_svg_left + "px";
-//  elm_pyramid_block.style.top = pyramid_svg_top + "px";
-//
-//  // basic_dataを移動
-//  // まず位置をリセット
-//  elm_basic_data.style.position = "absolute";
-//  elm_basic_data.style.left = "0px";
-//  elm_basic_data.style.top = "0px";
-//  elm_basic_data.style.right = "";
-//  elm_basic_data.style.bottom = "";
-//  elm_basic_data.style.transform = "";
-//  elm_basic_data.style.zIndex = "";
-//  elm_basic_data.style.display = "block";
-//  elm_basic_data.style.width = "";
-//  elm_basic_data.style.height = "";
-//  
-//  // 新しい位置に移動
-//  elm_basic_data.style.left = basic_data_left + "px";
-//  elm_basic_data.style.top = basic_data_top + "px";
   
   //***** 3区分別人口の中位階層の入力欄を単純なテキストに *****
   var s = document.getElementById("smiddle");
