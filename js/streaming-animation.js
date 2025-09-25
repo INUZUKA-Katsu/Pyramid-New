@@ -858,8 +858,9 @@ class StreamingAnimationManager {
           // 当年スケールを計算
           const currentYearScale = this.calculateCurrentYearScale(currentYearTotalPopulation);
           
-          // options.zoomScaleに当年スケールをセット
-          window.pyramidRenderer.options.zoomScale = currentYearScale;
+          //pyramidRenderer.currentYearScaleに当年スケールをセット
+          //window.pyramidRenderer.options.zoomScale = currentYearScale;
+          window.pyramidRenderer.currentYearScale = currentYearScale;
           //console.warn(`🎨 当年スケールセット完了: ${currentYearScale.toFixed(3)} (当年スケール: ${currentYearScale}、総人口: ${currentYearTotalPopulation.toLocaleString()}, データタイプ: ${dataType})`);
         }
       }
@@ -1222,7 +1223,7 @@ class StreamingAnimationManager {
         window.pyramidRenderer
        ) 
     {
-      window.pyramidRenderer.options.zoomScale = this.baseZoomScale;
+      //window.pyramidRenderer.options.zoomScale = this.baseZoomScale;
       window.pyramidRenderer.resizeByScale(this.baseZoomScale);
     }
     
@@ -1292,7 +1293,8 @@ class StreamingAnimationManager {
           const currentYearScale = this.calculateCurrentYearScale(currentYearTotalPopulation);
           
           // options.zoomScaleに当年スケールをセット
-          window.pyramidRenderer.options.zoomScale = currentYearScale;
+          //window.pyramidRenderer.options.zoomScale = currentYearScale;
+          window.pyramidRenderer.currentYearScale = currentYearScale;
           //console.warn(`🎨 seekToProgress 当年スケールセット完了: ${currentYearScale.toFixed(3)} (総人口: ${currentYearTotalPopulation.toLocaleString()}, データタイプ: ${dataType})`);
         }
       }

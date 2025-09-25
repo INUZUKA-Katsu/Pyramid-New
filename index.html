@@ -520,8 +520,9 @@
           display: grid;
           grid-template-columns: 1fr;
           grid-template-rows: auto;
-          max-width: 1108px;
-          width: 100%;
+          min-width: 0;         /* SVG内容に引っ張られないようにする */
+          max-width: 1148px;    /* 上限を固定 */
+          width: 1148px;          /* 親の幅にフィット */
           height: auto;
         }
         #basic_data {
@@ -533,6 +534,9 @@
             font-size: 11pt;
             text-align: right;
             display: block;
+          }
+          #source_container {
+            max-width: 1000px;
           }
         /*border: 1px solid #ddd;
           border-radius: 5px;
@@ -1101,7 +1105,6 @@
           box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3),
             0 8px 25px rgba(0, 0, 0, 0.4), 0 0 0 3px #8b7355, 0 0 0 6px #d4af37;
           margin: 20px auto;
-          max-width: 1108px;
           /*position: relative;*/
         }
 
@@ -1153,6 +1156,12 @@
             left: auto !important;
             top: auto !important;
             margin: 0;
+            margin-left: 0;
+            margin-right: 0;
+          }
+          #pyramid-container {
+            max-width: 1148px;
+            width: 100%;
           }
           .left-controls {
             position: static !important;
@@ -1187,12 +1196,6 @@
           .left-controls .control-group input,
           .left-controls .control-group button {
             flex: 1 1 auto;
-          }
-          /* pyramid-block幅は画面幅に合わせる */
-          #pyramid-block {
-            width: 100%;
-            margin-left: 0;
-            margin-right: 0;
           }
           div#cho {
             display: none;

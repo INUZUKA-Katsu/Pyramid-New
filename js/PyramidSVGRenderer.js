@@ -38,6 +38,7 @@ class PyramidSVGRenderer {
     
     this.isAnimation = false; // アニメーション状態を初期化
     this.isVariableAreaMode = false; // 固定面積モードが初期値
+    this.currentYearScale = 1 //可変面積モード時の当年スケールを保存する変数
     this.isFirstAnimationFrame = false; // アニメーションの最初のフレームかどうか   
     this.maxBarLengthForAnimation = null; // 固定面積モード用の最大BarLengthを保存する変数
     
@@ -111,7 +112,10 @@ class PyramidSVGRenderer {
     this.container.appendChild(this.svg);
 
     // ズームを適用
-    if (this.options.zoomScale != 1) {
+    if (this.isAnimation && this.isVariableAreaMode){
+      console.warn('currentYearScale', this.currentYearScale);
+      this.resizeByScale(this.currentYearScale);
+    } else if (this.options.zoomScale != 1) {
       this.resizeByScale(this.options.zoomScale);
     }
   }
@@ -927,7 +931,7 @@ class PyramidSVGRenderer {
   }
 
   render(animeMode) {
-    console.log('render開始');
+    console.warn('🌸 render開始');
     //console.log('this.options.zoomScale', this.options.zoomScale);
 
     // 人数表示位置の記録をリセット
@@ -1032,6 +1036,7 @@ class PyramidSVGRenderer {
 
   // データを差し替えたときに再描画するメソッド
   updateData(newData, animeMode) {
+    console.warn('🌸 updateData開始');
     // アニメーションモードを検出
     let isAnimation = false;
     let isInterpolation = false;
@@ -1062,14 +1067,18 @@ class PyramidSVGRenderer {
       console.warn('アニメーション終了: フラグをクリア');
     }
   
-    let z = this.options.zoomScale;
-  
     // 現在のデータに基づいてunitSizeを再計算
     let originalUnitSize = this.calculateUnitSize(this.data);
     let scale = this.options.unitSizeScale;
     this.options.unitSize = originalUnitSize * scale;
     
-    // zoomScaleが変更されている場合は、resizeByScaleを呼び出してサイズ調整を適用
+    let z = 1;
+    if (this.isAnimation && this.isVariableAreaMode){
+      z = this.currentYearScale;
+    } else {
+      // zoomScaleが変更されている場合は、resizeByScaleを呼び出してサイズ調整を適用
+      z = this.options.zoomScale;
+    }
     if (z != 1) {
       this.resizeByScale(z);
     }
@@ -1113,25 +1122,33 @@ class PyramidSVGRenderer {
   // 方式1: transform属性を使いズーム
   resizeByScale(scale) {
     
-    const baseBox = this.sceneGroup.getBBox();
-
-    let w = baseBox.width * scale ;
-    let h = baseBox.height * scale ;
-    
-    let cx = baseBox.x + baseBox.width / 2;
-    let cy = baseBox.y + baseBox.height / 2;
-
-    let tx = cx - w / 2 ;
-    let ty = cy - h / 2 ;
-    
+    //const baseBox = this.sceneGroup.getBBox();
+    //
+    //let w = baseBox.width * scale ;
+    //let h = baseBox.height * scale ;
+    //
+    //let cx = baseBox.x + baseBox.width / 2;
+    //let cy = baseBox.y + baseBox.height / 2;
+    //
+    //let tx = cx - w / 2 ;
+    //let ty = cy - h / 2 ;
+    const cx = this.options.width / 2;
+    const cy = this.options.height / 2;
     // sceneGroupのtransform属性を更新
-    this.sceneGroup.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);    
+    //this.sceneGroup.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);    
+    this.sceneGroup.setAttribute(
+      'transform', 
+      `translate(${cx},${cy}) scale(${scale}) translate(${-cx}, ${-cy})`
+    );    
 
     // 後続の処理のためにオプションの値を更新
-    this.options = {
-      ...this.options,
-      zoomScale :scale
-    };
+    if (!this.isAnimation || !this.isVariableAreaMode){
+      this.options = {
+        ...this.options,
+        zoomScale :scale
+      };
+    }
+
     console.log('this.options.zoomScale', this.options.zoomScale);
   }
 
