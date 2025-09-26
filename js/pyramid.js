@@ -361,15 +361,22 @@ function escape_ajax(mode, nengetsu) {
       localStorage.removeItem(key);
       return false;
     }
-    alert(response.slice(0,100));
-    return false;
-    
     if (mode == "cho_csv" && response.slice(0, 2) != "町名") {
-      response = JSON.parse(response).csv;
+      try {
+        response = JSON.parse(response).csv;
+      } catch (e) {
+        localStorage.removeItem(key);
+        return false;
+      }
     }
     //console.log("step1.5-1-2");
     //console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
-    modify_html(response, mode, nengetsu);
+    try {
+      modify_html(response, mode, nengetsu);
+    } catch (e) {
+      localStorage.removeItem(key);
+      return false;
+    }
     return true;
   } else {
     //console.log("step1.5-2");
