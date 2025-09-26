@@ -1378,14 +1378,23 @@
 
         /* さらに小さなスマホ用：額縁を完全に削除 */
         @media screen and (max-width: 480px) {
-          #main {
+          div#main {
             padding: 0;
           }
-          h1 {
-            font-size: 120%;
+          div#header {
+            font-size: 65%;
           }
-          h2 {
+          h1#h1 {
+            font-size: 120%;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+          }
+          h2#h2 {
             font-size: 95%;
+            background: transparent;
+            border: none;
+            box-shadow: none;
           }
 
           #container-flex {
@@ -1402,6 +1411,39 @@
           #pyramid-container::before {
             display: none; /* 内側枠も削除 */
           }
+
+          .left-controls {
+            gap: 10px;
+          }
+          .left-controls .control-group {
+            width: 160px;
+            padding: 10px 10px;
+          }
+          .left-controls .control-group h3{
+            font-size: 12px;
+            font-weight: 550;
+          }          
+          .left-controls .control-group label {
+            min-width: 12px;
+            font-size: 80%;
+            font-weight: 550;
+          }
+          .left-controls .control-group label.zoom-label {
+            margin-top: 10px;
+          }
+          .left-controls .control-group button-group {
+            justify-content: center;
+          }
+          .left-controls .control-group button {
+            font-size: 10pt;
+            padding: 4px 8px;
+            width: 100%;
+            justify-self: center;
+          }
+          div#footer {
+            font-size: 75%;
+          }
+
         }
         @media screen and (max-width: 479px) {
           div#cho_list {
@@ -2126,7 +2168,7 @@
                 <button id="zin">＋ 拡大</button>
                 <button id="zout">－ 縮小</button>
               </div>
-              <label>倍率: <span id="scaleLabel">100%</span></label>
+              <label class="zoom-label">倍率: <span id="scaleLabel">100%</span></label>
             </div>
 
             <div class="control-group">
