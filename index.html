@@ -516,6 +516,22 @@
           margin-top: 70px;
           gap: 10px;
         }
+        /* #pyramid-blockの子要素1 */
+        #top-controls {
+          order: 1;
+        }
+        /* #pyramid-blockの子要素2 */
+        #pyramid-container {
+          order: 2;
+        }
+        /* #pyramid-blockの子要素3 */
+        #source_container {
+          order: 3;
+        }
+        /* #pyramid-blockの子要素4 */
+        #cho {
+          order: 4;
+        }
         /* SVGと#basic_dataのコンテナ */
         #pyramid-container {
           display: grid;
@@ -619,6 +635,11 @@
 
         #cho {
           z-index: 1;
+        }
+        #cho-buttons {
+          display: flex;
+          flex-direction: row;
+          gap: 5px;
         }
 
         #source_container {
@@ -1267,8 +1288,24 @@
             bottom: 5px; /* 10px → 5px */
             border-width: 1px; /* 2px → 1px */
           }
-          #basic_data {
-            display: none;
+          /* #pyramid-blockの子要素1 */
+          #top-controls {
+            order: 3;
+          }
+          /* #pyramid-blockの子要素2 */
+          #pyramid-container {
+            order: 1;
+          }
+          /* #pyramid-blockの子要素3 */
+          #source_container {
+            order: 2;
+            font-size:75%;
+          }
+          #cho-buttons {
+            flex-direction: column;
+            max-width: 70%;
+            margin: 0 auto;
+            justify-content: center;
           }
         }
 
@@ -1989,7 +2026,7 @@
             <div id="cho" data-html2canvas-ignore="true">
               <a href="link"></a>
               <form name="chobetsu">
-                <div id="button">
+                <div id="cho-buttons">
                   <input
                     type="button"
                     value="町丁別人口ピラミッド"
