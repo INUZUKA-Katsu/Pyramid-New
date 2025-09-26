@@ -361,6 +361,9 @@ function escape_ajax(mode, nengetsu) {
       localStorage.removeItem(key);
       return false;
     }
+    alert(response.slice(0,100));
+    return false;
+    
     if (mode == "cho_csv" && response.slice(0, 2) != "町名") {
       response = JSON.parse(response).csv;
     }
