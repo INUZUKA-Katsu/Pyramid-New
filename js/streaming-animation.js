@@ -776,6 +776,13 @@ class StreamingAnimationManager {
 
         // 補間アニメーション付きで描画
         await this.renderYear(currentYear, cachedData);
+
+        // 再度フラグチェック
+        if (!this.isAnimating) {
+          //console.log('アニメーション停止フラグが設定されています');
+          return;
+        }
+
         this.currentYearIndex++;
         
         // プログレススライダーを更新
@@ -804,7 +811,9 @@ class StreamingAnimationManager {
       } else {
         // データがまだ読み込まれていない場合は待機
         //console.log(`⏳ 年次 ${currentYear} データ待機中... (${this.currentYearIndex + 1}/${this.allYears.length})`);
-        this.animationInterval = setTimeout(animate, 100);
+        if (this.isAnimating) { 
+          this.animationInterval = setTimeout(animate, 100);
+        }
       }
     };
     
@@ -1239,9 +1248,16 @@ class StreamingAnimationManager {
   // アニメーション一時停止
   pauseAnimation() {
     this.isAnimating = false;
+
+    // 既存のタイマーをクリア
     if (this.animationInterval) {
       clearTimeout(this.animationInterval);
       this.animationInterval = null;
+    }
+
+    // 補間アニメーションも停止
+    if (window.interpolationAnimation && window.interpolationAnimation.isAnimating) {
+      window.interpolationAnimation.stopAnimation();
     }
   }
 
