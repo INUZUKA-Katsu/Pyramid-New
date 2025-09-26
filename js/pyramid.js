@@ -640,8 +640,8 @@ function change_pyramid(objectData, animeMode) {
   //h2(タイトル)を西暦主体に書き直す.
   h2 = change_seireki_main(h2);
   h2 = add_gengo_to_syoraisuikei(h2);
-  document.getElementById("h2").innerHTML = h2;
-  adjust_title_size(h2);
+  document.getElementById("h2-text").innerHTML = h2;
+  adjust_title_size("h2-text");
 
   if (!isInterpolation) {
     document.getElementById("sosu").innerHTML = plus_comma(sosu);
@@ -870,15 +870,17 @@ function makePyramidData(csv) {
 //　その他のHTMLの描画処理  ########################################################
 
 //選択した町丁が多いとき、タイトルのフォントを小さくする.
-function adjust_title_size(title) {
-  const h2Eelement=document.getElementById("h2");
-  const preSize = h2Eelement.style.fontSize;
-  if (title.replace(/<[^>]*>?/g, '').length > 50) {
-    h2Eelement.style.fontSize = "90%";
-  }else{
-    h2Eelement.style.fontSize = "";
+function adjust_title_size(span_id) {
+  const h2Eelement=document.getElementById(span_id);
+  let fontSize = 28;
+  h2Eelement.style.fontSize = fontSize + "px";
+  while (h2Eelement.scrollHeight > h2Eelement.clientHeight && fontSize > 8) {
+    fontSize--;
+    h2Eelement.style.fontSize = fontSize + "px";
   }
+  console.log("adjust_title_size 終了!");
 }
+
 //市区の選択が横浜市か区かを判別して、町丁一覧の表示・非表示を切り替える処理.
 function cho_list() {
   console.log("cho_list開始");
