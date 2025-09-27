@@ -757,67 +757,86 @@ class StreamingAnimationManager {
   // アニメーション実行（非同期対応）
   async startAnimation() {
     this.isAnimating = true;
-    //console.log(`🎬 アニメーション開始: 総年数=${this.allYears.length}, 現在年次インデックス=${this.currentYearIndex}`);
-    //console.log(`🎬 補間アニメーション使用: ${this.useInterpolation}`);
-    //console.warn(`🎬 startAnimation呼び出し: 総年数=${this.allYears.length}, 現在年次インデックス=${this.currentYearIndex}, 補間アニメーション=${this.useInterpolation}`);
+    console.log(`🎬 アニメーション開始: 総年数=${this.allYears.length}, 現在年次インデックス=${this.currentYearIndex}`);
+    console.log(`🎬 補間アニメーション使用: ${this.useInterpolation}`);
     
     const animate = async () => {
+      // 最初にフラグチェック
       if (!this.isAnimating) {
-        //console.log('アニメーション停止フラグが設定されています');
+        console.log('アニメーション停止フラグが設定されています');
         return;
       }
       
       const currentYear = this.allYears[this.currentYearIndex];
-      //console.log(`🎬 アニメーションループ: 年次=${currentYear}, インデックス=${this.currentYearIndex}/${this.allYears.length}, キャッシュサイズ=${Object.keys(this.dataCache).length}`);
+      console.log(`🎬 アニメーションループ: 年次=${currentYear}, インデックス=${this.currentYearIndex}/${this.allYears.length}`);
             
       // データがキャッシュにあるかチェック
       if (currentYear in this.dataCache) {
         const cachedData = this.dataCache[currentYear];
 
-        // 補間アニメーション付きで描画
-        await this.renderYear(currentYear, cachedData);
-
-        // 再度フラグチェック
+        // 描画前に再度フラグチェック
         if (!this.isAnimating) {
-          //console.log('アニメーション停止フラグが設定されています');
+          console.log('描画前にアニメーション停止を検出');
           return;
         }
 
-        this.currentYearIndex++;
+        // 1フレーム分だけ進める
+        const done = await this.renderYearStep(currentYear, cachedData);
         
-        // プログレススライダーを更新
-        const progress = Math.floor((this.currentYearIndex / this.allYears.length) * 100);
-        this.updateProgressSlider(progress);
-        
-        // 次のバッチが必要かチェック
-        if (this.shouldLoadNextBatch()) {
-          //console.log('アニメーションループ: 次のバッチの読み込みを開始');
-          this.loadNextBatch(get_selected_shiku());
-        
-        } else {
-          //console.log('アニメーションループ: 次のバッチの読み込みは不要');
+        if (!this.isAnimating) {
+          console.log('renderYearStep後にアニメーション停止を検出');
+          return;
         }
         
-        // アニメーション継続
-        if (this.currentYearIndex < this.allYears.length) {
-          //console.log(`⏭️ 次の年次へ: ${this.animationSpeed}ms後に継続`);
-          this.animationInterval = setTimeout(animate, this.animationSpeed);
-        } else {
+        if (done) {
+          // 年の描画が完了した場合のみ次の年次へ
+          this.currentYearIndex++;
+          
+          // プログレススライダーを更新
+          const progress = Math.floor((this.currentYearIndex / this.allYears.length) * 100);
+          this.updateProgressSlider(progress);
+          
+          // 次のバッチが必要かチェック
+          if (this.shouldLoadNextBatch()) {
+            console.log('アニメーションループ: 次のバッチの読み込みを開始');
+            this.loadNextBatch(get_selected_shiku());
+          }
+        }
+
+        
+        // アニメーション継続（requestAnimationFrame + 速度制御）
+        if (this.currentYearIndex < this.allYears.length && this.isAnimating) {
+          if (this.animationSpeed > 0) {
+            // 速度制御のための遅延
+            setTimeout(() => {
+              if (this.isAnimating) {
+                requestAnimationFrame(animate);
+              }
+            }, this.animationSpeed);
+          } else {
+            requestAnimationFrame(animate);
+          }
+        } else if (this.currentYearIndex >= this.allYears.length) {
           // アニメーション完了
-          //console.log('🎉 アニメーション完了');
+          console.log('🎉 アニメーション完了');
           this.completeAnimation();
         }
         
       } else {
         // データがまだ読み込まれていない場合は待機
-        //console.log(`⏳ 年次 ${currentYear} データ待機中... (${this.currentYearIndex + 1}/${this.allYears.length})`);
-        if (this.isAnimating) { 
-          this.animationInterval = setTimeout(animate, 100);
+        console.log(`⏳ 年次 ${currentYear} データ待機中... (${this.currentYearIndex + 1}/${this.allYears.length})`);
+        if (this.isAnimating) {
+          setTimeout(() => {
+            if (this.isAnimating) {
+              requestAnimationFrame(animate);
+            }
+          }, 100);
         }
       }
     };
     
-    animate();
+    // 初回実行
+    requestAnimationFrame(animate);
   }
 
   // 次のバッチ読み込みが必要かチェック
@@ -833,6 +852,19 @@ class StreamingAnimationManager {
     //console.log(`shouldLoadNextBatch チェック: キャッシュ内残り年数=${yearsRemainingInCache}, バッファ閾値=${bufferThreshold}, 現在バッチ=${this.currentBatch}, 総バッチ数=${this.totalBatches}, 読み込み中=${this.isLoading}, 結果=${shouldLoad}`);
     
     return shouldLoad;
+  }
+
+  // 1フレーム分の描画処理（改良版）
+  async renderYearStep(currentYear, cachedData) {
+    if (!this.isAnimating) return true;
+    
+    // 1フレーム分の描画処理
+    await this.renderYear(currentYear, cachedData);
+    
+    if (!this.isAnimating) return true;
+    
+    // 簡易版：1フレームで年の描画完了
+    return true;
   }
 
   // 年次データを描画（補間アニメーション対応）
@@ -1200,9 +1232,12 @@ class StreamingAnimationManager {
     }
   }
 
-  // アニメーション終了
+  // アニメーション終了（改良版）
   stopAnimation() {
+    console.log('🛑 アニメーション終了');
     this.isAnimating = false;
+    
+    // 既存のタイマーをクリア
     if (this.animationInterval) {
       clearTimeout(this.animationInterval);
       this.animationInterval = null;
@@ -1225,28 +1260,33 @@ class StreamingAnimationManager {
     const currentYear = this.getCurrentDisplayYear();
     this.syncSelectBoxToCurrentYear(currentYear);
     
-    
     // 可変面積モードの場合は、基準スケールを復元
     if (this.useVariableAreaMode && 
         this.baseZoomScale && 
         window.pyramidRenderer
        ) 
     {
-      //window.pyramidRenderer.options.zoomScale = this.baseZoomScale;
       window.pyramidRenderer.resizeByScale(this.baseZoomScale);
     }
     
-    //// アニメーション終了時に人数ラベルを表示
-    //this.showPopulationLabels();
+    // 年次表示を終了状態に更新
+    const yearDisplay = document.getElementById('current-year-display');
+    if (yearDisplay) {
+      const lastYear = this.allYears[this.allYears.length - 1];
+      yearDisplay.innerHTML = `🛑 アニメーション終了<br><small>最終年次: ${this.formatYear(lastYear)} (${this.allYears.length}年分)</small>`;
+    }
     
     // アニメーションコントロールを非表示
     if (typeof hideAnimationControls === 'function') {
       hideAnimationControls();
     }
+    
+    console.log('🛑 アニメーション終了完了');
   }
 
-  // アニメーション一時停止
+  // アニメーション一時停止（改良版）
   pauseAnimation() {
+    console.log('⏸️ アニメーション一時停止');
     this.isAnimating = false;
 
     // 既存のタイマーをクリア
@@ -1259,6 +1299,24 @@ class StreamingAnimationManager {
     if (window.interpolationAnimation && window.interpolationAnimation.isAnimating) {
       window.interpolationAnimation.stopAnimation();
     }
+
+    // 年次表示を一時停止状態に更新
+    const yearDisplay = document.getElementById('current-year-display');
+    if (yearDisplay) {
+      // アニメーション完了後の場合は安全に処理
+      if (this.currentYearIndex >= this.allYears.length) {
+        const lastYear = this.allYears[this.allYears.length - 1];
+        const formattedYear = this.formatYear(lastYear);
+        yearDisplay.innerHTML = `⏸️ 一時停止: ${formattedYear} (完了後)<br><small>${this.allYears.length} / ${this.allYears.length}</small>`;
+      } else {
+        const currentYear = this.allYears[this.currentYearIndex];
+        const formattedYear = this.formatYear(currentYear);
+        const progress = `${this.currentYearIndex + 1} / ${this.allYears.length}`;
+        yearDisplay.innerHTML = `⏸️ 一時停止: ${formattedYear}<br><small>${progress}</small>`;
+      }
+    }
+
+    console.log('⏸️ アニメーション一時停止完了');
   }
 
   // アニメーション再開
