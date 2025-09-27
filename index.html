@@ -2731,6 +2731,14 @@
             window.streamingAnimation.pauseAnimation();
           }
         }
+        // タッチイベント対応
+        const pauseButton = document.getElementById("pause-animation-btn");
+        pauseButton.addEventListener("touchstart", function () {
+          if (window.streamingAnimation) {
+            window.streamingAnimation.pauseAnimation();
+          }
+        });
+
 
         // アニメーション再開
         function resumeAnimationFromControls() {
