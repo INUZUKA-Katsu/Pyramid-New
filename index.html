@@ -2233,6 +2233,9 @@
           showNumbers: true,
           showGrid: true,
         };
+        if (localStorage_get("show_ninzu") == "hidden") {
+          currentOptions.showNumbers = false;
+        }
 
         // 初期化
         document.addEventListener("DOMContentLoaded", function () {
@@ -2307,7 +2310,11 @@
               showNumbers: currentOptions.showNumbers,
             });
           }
-          localStorage_set("showNumbers", currentOptions.showNumbers);
+          if (currentOptions.showNumbers) {
+            localStorage_set("show_ninzu", "show");
+          } else {
+            localStorage_set("show_ninzu", "hidden");
+          }
         }
 
         // グリッド表示の切り替え
@@ -2379,6 +2386,11 @@
                 "pyramid-container",
                 data
               );
+              if (localStorage_get("show_ninzu") == "hidden") {
+                window.pyramidRenderer.updateOptions({
+                  showNumbers: false,
+                });
+              }
             }
             //document.getElementById('status').textContent =
             //    `SVG描画エンジンが有効です - ${data.shiku} (${data.kijunbi})`;
