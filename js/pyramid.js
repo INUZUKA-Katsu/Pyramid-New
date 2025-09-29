@@ -208,30 +208,6 @@ function localStorage_Setting() {
   });
 }
 
-//人数表示のラジオボタンを変更したときの処理
-function showNinzu_Setting() {
-  if (document.getElementById("show").checked == true) {
-    var opt = ""; //"inline" ;
-    var val = "show";
-  } else {
-    var opt = "none";
-    var val = "hidden";
-  }
-  for (var i = 0; i <= 100; i++) {
-    document.getElementById("mn" + i).style.display = opt;
-    document.getElementById("fn" + i).style.display = opt;
-  }
-  //safari_style();
-  show_ninzu_setting(val);
-}
-
-//動画ボタンを押したときの処理
-function ani_mation() {
-  // 従来の動画機能を実行
-  console.log('従来の動画機能を開始');
-  legacy_animation();
-}
-
 
 //########################################################
 //###　主要な処理  #########################################
@@ -356,7 +332,7 @@ function escape_ajax(mode, nengetsu) {
       localStorage.removeItem(key);
       return false;
     }
-    console.warn(`escape_ajax: step2`);
+    //console.warn(`escape_ajax: step2`);
     if (mode == "cho_csv" && response.slice(0, 2) != "町名") {
       try {
         response = JSON.parse(response).csv;
@@ -365,18 +341,18 @@ function escape_ajax(mode, nengetsu) {
         return false;
       }
     }
-    console.warn(`escape_ajax: step3`);
-    console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
+    //console.warn(`escape_ajax: step3`);
+    //console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
     try {
       modify_html(response, mode, nengetsu);
     } catch (e) {
       localStorage.removeItem(key);
       return false;
     }
-    console.warn(`escape_ajax: step4`);
+    //console.warn(`escape_ajax: step4`);
     return true;
   } else {
-    console.warn(`escape_ajax: step5`);
+    //console.warn(`escape_ajax: step5`);
     //console.log("step1.5-2");
     return false;
   }
@@ -458,7 +434,7 @@ function ajax(mode, nengetsu, i) {
 }
 
 //ローカルまたはサーバから取得したデータを元にHTML変更処理を振り分ける.
-function modify_html(response, mode, nengetsu) {
+function modify_html(response, mode) {
   //s=mode+"の戻り値\n"+nengetsu+"\n"+response;
   switch (mode) {
     case "shiku_json":
@@ -527,8 +503,8 @@ function modify_html(response, mode, nengetsu) {
 
 //ピラミッド描画エンジン(引数isAnm: アニメーション中かどうかのフラグ, isInterpolation: 補間アニメーション中かどうかのフラグ)
 function change_pyramid(objectData, animeMode) {
-  console.log("change_pyramid開始");
-  console.log(objectData["kijunbi"]);
+  //console.log("change_pyramid開始");
+  //console.log(objectData["kijunbi"]);
   
   myFunc();
   
@@ -541,9 +517,9 @@ function change_pyramid(objectData, animeMode) {
     isAnm = false;
     isInterpolation =false ;
   }
-  console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
-  console.warn("1 get_selected_nengetsu()",get_selected_nengetsu());
-  console.warn("1 $nengetsu",$nengetsu);
+  //console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
+  //console.warn("1 get_selected_nengetsu()",get_selected_nengetsu());
+  //console.warn("1 $nengetsu",$nengetsu);
 
 
   //ピラミッドを描画する。
@@ -555,9 +531,9 @@ function change_pyramid(objectData, animeMode) {
 
   //その他の情報
 
-  console.log("change_pyramid step2");
-  console.warn("2 get_selected_nengetsu()",get_selected_nengetsu());
-  console.warn("2 $nengetsu",$nengetsu);  
+  //console.log("change_pyramid step2");
+  //console.warn("2 get_selected_nengetsu()",get_selected_nengetsu());
+  //console.warn("2 $nengetsu",$nengetsu);  
   var shiku = objectData["shiku"];
   var not_exist = objectData["not_exist"];
   var kijunbi = objectData["kijunbi"];
@@ -566,11 +542,11 @@ function change_pyramid(objectData, animeMode) {
   data_key = objectData.hasOwnProperty("kakusai_betsu") ? "kakusai_betsu" : "five_year_age_group";
 
   // デバッグ: kakusai_betsuの構造を確認
-  console.log("change_pyramid: kakusai_betsu配列の長さ:", objectData[data_key].length);
-  console.log("change_pyramid: kakusai_betsu[0]の内容:", objectData[data_key][0]);
-  console.log("change_pyramid: kakusai_betsu[0][1] (総数):", objectData[data_key][0][1]);
-  console.log("change_pyramid: kakusai_betsu[0][2] (男性):", objectData[data_key][0][2]);
-  console.log("change_pyramid: kakusai_betsu[0][3] (女性):", objectData[data_key][0][3]);
+  //console.log("change_pyramid: kakusai_betsu配列の長さ:", objectData[data_key].length);
+  //console.log("change_pyramid: kakusai_betsu[0]の内容:", objectData[data_key][0]);
+  //console.log("change_pyramid: kakusai_betsu[0][1] (総数):", objectData[data_key][0][1]);
+  //console.log("change_pyramid: kakusai_betsu[0][2] (男性):", objectData[data_key][0][2]);
+  //console.log("change_pyramid: kakusai_betsu[0][3] (女性):", objectData[data_key][0][3]);
   
   // 重要な情報をalertで表示
   if (objectData[data_key] && objectData[data_key].length > 0) {
@@ -593,13 +569,13 @@ function change_pyramid(objectData, animeMode) {
     /\d+(以上)?/.test(item[0])
   );
 
-  console.log("change_pyramid step2.1");
-  console.warn("3 get_selected_nengetsu()",get_selected_nengetsu());
-  console.warn("3 $nengetsu",$nengetsu);
+  //console.log("change_pyramid step2.1");
+  //console.warn("3 get_selected_nengetsu()",get_selected_nengetsu());
+  //console.warn("3 $nengetsu",$nengetsu);
   
   if (!isAnm) displey_hitoku_comment(objectData["hitoku"]);
 
-  console.log("change_pyramid step3");
+  //console.log("change_pyramid step3");
 
   // グローバル変数を初期化
   $kakusaiObject = {};
@@ -1415,20 +1391,6 @@ function data_save_setting(opt) {
   }
 }
 
-function show_ninzu_setting(opt) {
-  if (get_browser_usage_of_localStorage() == "not_use") {
-    return;
-  }
-  opt = opt !== undefined ? opt : "get";
-  if (opt == "show") {
-    localStorage_set("show_ninzu", "show");
-  } else if (opt == "hidden") {
-    localStorage_set("show_ninzu", "hidden");
-  } else if (opt == "get") {
-    return localStorage_get("show_ninzu");
-  }
-}
-
 function get_localStorage_keys() {
   if (get_browser_usage_of_localStorage() == "not_use") {
     return;
@@ -1793,14 +1755,14 @@ function redisplay_pyramid() {
       }, 10);
     }
     // 人数表示
-    const showNumbers = localStorage_get("showNumbers");
-    if (showNumbers == "false") {
-      if (window.pyramidRenderer) {
-        window.pyramidRenderer.updateOptions({
-          showNumbers: false
-        });
-      }
-    }
+    //const showNumbers = localStorage_get("show_ninzu");
+    //if (showNumbers == "hidden") {
+    //  if (window.pyramidRenderer) {
+    //    window.pyramidRenderer.updateOptions({
+    //      showNumbers: false
+    //    });
+    //  }
+    //}
     return true;
   } else {
     change_display("shiku");
