@@ -1193,6 +1193,12 @@
             max-width: 1148px;
             width: 100%;
           }
+          #basic_data {
+            font-size: 10pt;
+          }
+          #kubun_unit {
+            font-size: 10pt;
+          }
           .left-controls {
             position: static !important;
             transform: none;
@@ -1289,7 +1295,10 @@
               /* 3px → 2px */ 0 0 0 4px #d4af37; /* 6px → 4px */
           }
           #basic_data {
-            display: none;
+            font-size: 8pt;
+          }
+          #kubun_unit {
+            font-size: 8pt;
           }
           #pyramid-container::before {
             top: 5px; /* 10px → 5px */
@@ -1346,6 +1355,12 @@
 
         /* 585px未満のスマホ用 */
         @media screen and (max-width: 585px) {
+          #basic_data,#kubun_unit {
+            font-size: 7pt;
+          }
+          #nenrei_3kubun span.td {
+            padding: 0px 3px;
+          }
           #animation-execute-section {
             flex-direction: column;
             gap: 10px;
@@ -1412,7 +1427,12 @@
           #pyramid-container::before {
             display: none; /* 内側枠も削除 */
           }
-
+          #basic_data,#kubun_unit {
+            font-size: 6pt;
+          }
+          #nenrei_3kubun span.td {
+            padding: 0px 2px;
+          }
           .left-controls {
             gap: 10px;
           }
