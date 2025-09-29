@@ -196,17 +196,23 @@ class PopulationData
     
     # 非存在期間チェック
     oldest_stat_nengetsu = {
-      "aoba" => "199501",
-      "izumi" => "199010",
+      "tsurumi" => "193010",
+      "kanagawa" => "193010",
+      "naka" => "193010",
+      "hodogaya" => "193010",
+      "isogo" => "193010",
       "kohoku" => "194010",
-      "konan" => "197010",
-      "midori" => "197010",
-      "minami" => "195010",
-      "naka" => "197010",
-      "nishi" => "195010",
-      "sakae" => "199010",
-      "seya" => "197010",
       "totsuka" => "194010",
+      "nishi" => "195010",
+      "minami" => "195010",
+      "kanazawa" => "195010",
+      "konan" => "197010",
+      "asahi" => "197010",
+      "midori" => "197010",
+      "seya" => "197010",
+      "izumi" => "199010",
+      "sakae" => "199010",
+      "aoba" => "199501",
       "tsuzuki" => "199501"
     }
     if oldest_stat_nengetsu.keys.include?(@ku) && @nengetsu < oldest_stat_nengetsu[@ku]
