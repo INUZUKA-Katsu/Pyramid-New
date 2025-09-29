@@ -74,14 +74,13 @@ function change_shiku() {
   $nengetsu = get_selected_nengetsu();
 
   console.log("change_shiku $nengetsu", $nengetsu);
-
-  if ($nengetsu.match(/年/)) {
-    $nengetsu = "9301";
-    document.getElementById("shiku_year").value = $nengetsu;
-  } else if ($nengetsu.match(/^\d{6}$/) && Number($nengetsu) < 199301) {
-    $nengetsu = "199301";
-    document.getElementById("shiku_year").value = $nengetsu;
-  }
+  //if ($nengetsu.match(/年/)) {
+  //  $nengetsu = "9301";
+  //  document.getElementById("shiku_year").value = $nengetsu;
+  //} else if ($nengetsu.match(/^\d{6}$/) && Number($nengetsu) < 199301) {
+  //  $nengetsu = "199301";
+  //  document.getElementById("shiku_year").value = $nengetsu;
+  //}
   //alert("change_shiku");
   change_shiku_option();
   //alert("change_shiku_option");
@@ -307,14 +306,8 @@ function change_display(pyramode, nengetsu) {
 function shiku_pyramid(nengetsu) {
   myFunc()
   //ローカルデータがあればローカルデータで描画する.
-  //console.log("step1");
-  //console.log(nengetsu); //市区を変更したときは、undefined
-
-   var ans = escape_ajax("shiku_json", nengetsu);
-  //console.log("step2");
+  var ans = escape_ajax("shiku_json", nengetsu);
   if (ans === false || ans == undefined) {
-    //ローカルデータが存在しないときはサーバから取得して描画する.
-    //console.log("step3");
     ajax("shiku_json", nengetsu, 1);
   }
 }
@@ -337,6 +330,7 @@ function cho_pyramid(nengetsu) {
 //ローカルデータを読み出して描画処理する.（ピラミッドのみ？町丁名一覧は？）
 //mode: shiku_json, cho_json, cho_csv, cho_list
 function escape_ajax(mode, nengetsu) {
+  //console.warn(`escape_ajax開始: mode=${mode}, nengetsu=${nengetsu}`);
   function isJson(str) {
     try {
       JSON.parse(str);
@@ -346,10 +340,11 @@ function escape_ajax(mode, nengetsu) {
     }
   }
   var key = isLocalData(mode, nengetsu);
+  //console.warn(`escape_ajax: key=${key}`);
   if (key != false) {
     //console.log("step1.5-1");
     var response = localStorage_get(key);
-
+    //console.warn(`escape_ajax: response=${response}`);
     //不正なデータであればローカルデータを削除してAjaxに進む.
     if (mode == "shiku_json" || mode == "cho_json") {
       if (isJson(response) == false) {
@@ -361,6 +356,7 @@ function escape_ajax(mode, nengetsu) {
       localStorage.removeItem(key);
       return false;
     }
+    console.warn(`escape_ajax: step2`);
     if (mode == "cho_csv" && response.slice(0, 2) != "町名") {
       try {
         response = JSON.parse(response).csv;
@@ -369,16 +365,18 @@ function escape_ajax(mode, nengetsu) {
         return false;
       }
     }
-    //console.log("step1.5-1-2");
-    //console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
+    console.warn(`escape_ajax: step3`);
+    console.warn(`mode:${mode}, nengetsu:${nengetsu}, response:${response}`);
     try {
       modify_html(response, mode, nengetsu);
     } catch (e) {
       localStorage.removeItem(key);
       return false;
     }
+    console.warn(`escape_ajax: step4`);
     return true;
   } else {
+    console.warn(`escape_ajax: step5`);
     //console.log("step1.5-2");
     return false;
   }
@@ -635,21 +633,37 @@ function change_pyramid(objectData, animeMode) {
     /10月(1|１)日(現在)?/,
     '10月1日現在<span class="small">(国勢調査結果)</span>'
   );
-
-  if (not_exist != undefined && not_exist != "") {
-    if (not_exist.match(/区$/)) {
-      comment = "はこのころまだありませんでした.";
-    } else {
-      comment =
-        "のデータはありません.住居表示等で新しい町名ができる前と思われます.";
-    }
-    h2 = h2 + "<br><span id='red'>(" + not_exist + comment + ")</span>";
-  }
-  console.log("change_pyramid step5");
-
   //h2(タイトル)を西暦主体に書き直す.
   h2 = change_seireki_main(h2);
   h2 = add_gengo_to_syoraisuikei(h2);
+  
+  KU_START = {
+    港北区: "1939年(昭和14年)4月1日",
+    戸塚区: "1939年(昭和14年)4月1日",
+    南区: "1943年(昭和18年)12月1日",
+    西区: "1944年(昭和19年)4月1日",
+    金沢区: "1948年(昭和23年)5月15日",
+    港南区: "1969年(昭和44年)10月1日",
+    旭区: "1969年(昭和44年)10月1日",
+    緑区: "1969年(昭和44年)10月1日",
+    瀬谷区: "1969年(昭和44年)10月1日",
+    泉区: "1986年(昭和61年)11月3日",
+    栄区: "1986年(昭和61年)11月3日",
+    青葉区: "1994年(平成6年)11月6日",
+    都筑区: "1994年(平成6年)11月6日"
+  }
+
+  if (not_exist != undefined && not_exist != "") {
+    if (not_exist.match(/区$/)) {
+      comment = `${not_exist}はまだありません.${not_exist}は${KU_START[not_exist]}に新設されました.`;
+    } else {
+      comment =
+        `${not_exist}のデータはありません.住居表示等で新しい町名ができる前と思われます.`;
+    }
+    h2 = h2 + "<br><span id='red'>(" + comment + ")</span>";
+  }
+  console.log("change_pyramid step5");
+
   document.getElementById("h2-text").innerHTML = h2;
   adjust_title_size("h2-text");
 
