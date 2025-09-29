@@ -844,7 +844,7 @@ class PyramidSVGRenderer {
     }
     
     // 人数ラベル（アニメーション中は非表示、人口0の場合は非表示）
-    if (this.options.showNumbers && maleCount > 0 && !this.isAnimation) {
+    if (maleCount > 0 && !this.isAnimation) {
       const maleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       const maleLabelText = maleCount.toLocaleString();
       const maleLabelWidth = this.estimateTextWidth(maleLabelText, this.options.fontSize - 3);
@@ -902,7 +902,7 @@ class PyramidSVGRenderer {
     }
     
     // 人数ラベル（アニメーション中は非表示、人口0の場合は非表示）
-    if (this.options.showNumbers && femaleCount > 0 && !this.isAnimation) {
+    if (femaleCount > 0 && !this.isAnimation) {
       const femaleLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       const femaleLabelText = femaleCount.toLocaleString();
       const femaleLabelWidth = this.estimateTextWidth(femaleLabelText, this.options.fontSize - 3);
@@ -934,6 +934,11 @@ class PyramidSVGRenderer {
     console.warn('🌸 render開始');
     //console.log('this.options.zoomScale', this.options.zoomScale);
 
+    // 人数表示の設定を取得
+    //if (animeMode == undefined && localStorage_get("show_ninzu") == "hidden") {
+    //  this.options.showNumbers = false;
+    //}
+
     // 人数表示位置の記録をリセット
     this.previousLabelPositions = {
       male: { x: null, width: 0 },
@@ -942,6 +947,7 @@ class PyramidSVGRenderer {
 
     let isInterpolation = false;
     let isVariableAreaMode = false;
+
     if (animeMode != undefined) {
       isInterpolation = animeMode.isInterpolation;
       isVariableAreaMode = animeMode.isVariableAreaMode;
@@ -1032,6 +1038,11 @@ class PyramidSVGRenderer {
         nextAge = age + yearSpan;
       }
     }
+    if (!this.options.showNumbers) {
+      document.querySelectorAll('.population-label').forEach(label => {
+        label.style.visibility = 'hidden';
+      });
+    }
   }
 
   // データを差し替えたときに再描画するメソッド
@@ -1088,9 +1099,23 @@ class PyramidSVGRenderer {
   // オプションの動的変更
   updateOptions(newOptions) {
     this.options = { ...this.options, ...newOptions };
-    this.init();
-    if (this.data) {
-      this.render();
+    let keys = Object.keys(newOptions);
+    if (keys.length == 1 && keys[0] == "showNumbers") {
+      if (newOptions.showNumbers) {
+        document.querySelectorAll('.population-label').forEach(label => {
+          label.style.visibility = 'visible';
+        });
+      } else {
+        document.querySelectorAll('.population-label').forEach(label => {
+          label.style.visibility = 'hidden';
+        });
+      }
+
+    } else {
+      this.init();      
+      if (this.data) {
+        this.render();
+      }
     }
   }
 
