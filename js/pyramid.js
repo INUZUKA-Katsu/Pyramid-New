@@ -505,14 +505,13 @@ function modify_html(response, mode) {
 function change_pyramid(objectData, animeMode) {
   //console.log("change_pyramid開始");
   //console.log(objectData["kijunbi"]);
-  
-  myFunc();
-  
+    
   let isAnm ;
   let isInterpolation ;
   if ( animeMode != undefined) {
     isAnm = true;
     isInterpolation = animeMode.isInterpolation;
+    $nengetsu = animeMode.nengetsu;
   } else {
     isAnm = false;
     isInterpolation =false ;
@@ -666,53 +665,118 @@ function change_pyramid(objectData, animeMode) {
 
   function source_str(shiku, source) {
     console.log("source_str開始");
-    var str = "データの出典： 横浜市統計ポータルサイト ";
+
+    function get_cho_csv_url(nengetsu) {
+      let year = Number(nengetsu.slice(0,4));
+      let gnen = "";
+      if (year <= 2019) {
+        gnen = "h" + String(year - 2000 + 12);
+      } else {
+        gnen = "r" + String((year - 2000 - 18 ));
+      }
+      return cho_csv_url.replace("<gnen>", gnen);
+    }
+
     var nengetsu = get_selected_nengetsu();
-    if (nengetsu == undefined) {
+    if (nengetsu == undefined || isAnm) {
       nengetsu = $nengetsu;
     }
-    // nengetsuがまだundefinedやnullの場合は空文字列に設定
-    if (nengetsu == undefined || nengetsu == null) {
-      nengetsu = "";
-    }
-    //console.log("source_str nengetsu");
-    //console.log(nengetsu);
-    console.log(`🔍 source_str: nengetsu = "${nengetsu}" (型: ${typeof nengetsu})`);
-    console.log(`🔍 source_str: nengetsu.match(/年/) 実行前`);
-    if (shiku == "横浜市" && nengetsu && typeof nengetsu === 'string' && nengetsu.match(/年/)) {
-      var stat1 = "「横浜市 人口のあゆみ 2010」";
-      var stat2 = "第4表 年齢別各歳別男女別人口";
-      var url =
-        "http://www.city.yokohama.lg.jp/ex/stat/jinko/ayumi/index-j.html";
-      stat = "<a href='" + url + "'>" + stat1 + "</a>" + stat2;
-    } else if (nengetsu && typeof nengetsu === 'string' && nengetsu.match(/\d\d\d\dft/)) {
-      var str = "データの出典： 横浜市政策局ホームページ ";
-      var stat = "横浜市将来推計人口";
-      var url =
-        "https://www.city.yokohama.lg.jp/city-info/seisaku/torikumi/shien/jinkosuikei.html";
-      stat = "<a href='" + url + "'>" + stat + "</a>";
-    } else if (shiku == "横浜市" || shiku.slice(-1) == "区") {
-      if (source.match(/kokusei/)) {
-        var stat = "年齢別男女別人口（国勢調査）";
-      } else {
-        var stat = "年齢別男女別人口（推計人口）";
+
+    console.warn(`🌹source_str shiku: ${shiku}、nengetu: ${nengetsu}、nengetu: ${nengetsu}`);
+    console.warn(`🌹source: ${source}`);
+    
+    //掲載ページ
+    const choki_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/choki.html";
+    const syorai_url ="https://www.city.yokohama.lg.jp/city-info/seisaku/torikumi/shien/jinkosuikei.html";
+    const suikei_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/nenrei/suikei.html";
+    const R2_kokucho_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/kekka/kokusei/r2/r2-01jinko.html";
+    const tokeisyo_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/tokeisho/02.html";
+    const chobetsu_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/";
+    //データファイル
+    const shi_syorai_excel_url = "https://www.city.yokohama.lg.jp/city-info/seisaku/torikumi/shien/jinkosuikei.files/0046_20240326.xlsx";
+    const ku_syorai_excel_url = "https://www.city.yokohama.lg.jp/city-info/seisaku/torikumi/shien/jinkosuikei.files/0048_20240410.xlsx";
+    const cho_csv_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/chocho/nenrei/<gnen>cho-nen.html";
+    const tokeisy_excel_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/tokeisho/02.files/t020500.xlsx";
+
+    let stat_str = "";
+
+    if (shiku == "横浜市" && nengetsu != "new" && nengetsu < "200301") {
+      stat_str = "データの出典： 横浜市統計情報ポータル ";
+      stat_str += `<a href="${choki_url}">長期時系列データ</a>`;
+      stat_str += "「04 年齢(各歳)、男女別人口 - 市」";
+
+    } else if (shiku == "横浜市将来推計人口") {
+      stat_str = `データの出典： <a href="${syorai_url}">横浜市将来推計人口</a>`;
+      stat_str += "「横浜市の男女別・各歳・年齢３区分・年齢４区分・年齢５歳階級別人口」";
+      source = shi_syorai_excel_url;
+
+    } else if (shiku == "横浜市" && (nengetsu == "new" || nengetsu.slice(4,6) == "01")) {
+      stat_str = "データの出典： 横浜市統計情報ポータル ";
+      stat_str += `<a href="${suikei_url}">市・区の年齢別の人口（推計人口による、１月１日現在）</a>`;
+    
+    } else if (shiku == "横浜市" && nengetsu == "202010") {
+      stat_str = "データの出典： 横浜市統計情報ポータル ";
+      stat_str += `<a href="${R2_kokucho_url}">令和2年国勢調査 人口等基本集計結果 第2表</a>`;
+    
+    } else if (shiku.slice(-1) == "区" && nengetsu != "new" && nengetsu < "199301" ){
+      stat_str = "データの出典： 横浜市統計情報ポータル ";
+      stat_str += `<a href="${choki_url}">長期時系列データ</a>`;
+      stat_str += "「05 年齢(5歳階級)、男女別人口 - 区」";
+      
+    } else if (shiku.slice(-7) == "区将来推計人口"){
+      stat_str = `データの出典： <a href="${syorai_url}">横浜市将来推計人口</a>`;
+      stat_str += "「行政区別の男女別・各歳・年齢３区分・年齢４区分・年齢５歳階級別人口」";
+      source = ku_syorai_excel_url;
+
+    } else if (shiku.slice(-1) == "区" && nengetsu >= "200001" ){
+      stat_str = "データの出典： 横浜市統計情報ポータル ";
+      stat_str += `<a href="${suikei_url}">市・区の年齢別の人口（推計人口による、１月１日現在）</a>`;
+      stat_str += `又は<a href="${tokeisyo_url}">「横浜市統計書」</a>第5表`;
+      if (nengetsu <= "200201") {
+        //H12,13,14は、横浜市統計書のページにのみ掲載
+        source = tokeisy_excel_url;
       }
+
+    } else if (shiku.slice(-1) == "区" && nengetsu.slice(4,6) == "01"){
+      stat_str = "データの出典： 横浜市統計ポータルサイト ";
+      stat_str += `<a href="${suikei_url}">市・区の年齢別の人口（推計人口による、１月１日現在）</a>`;
+      stat_str += "（1999年以前のものは現在はホームページ非掲載）"
+      source = "";
+
+    } else if (nengetsu.slice(4,6) == "09"){
+      stat_str = "データの出典： 横浜市統計情報ポータル ";
+      stat_str += `<a href="${chobetsu_url}">町丁別の年齢別人口（住民基本台帳による、３月・９月末現在）</a>`;
+      source = get_cho_csv_url(nengetsu);
+
     } else {
-      var stat = "町丁別年齢別男女別人口（登録者数）";
+      stat_str = "データの出典： 横浜市統計情報ポータル(詳細不明) ";
     }
-    var source_str =
-      str +
-      stat +
-      '<span class="inline-block">' +
-      '（<a href="' +
-      source +
-      '">' +
-      source +
-      "</a>）" +
-      "</span>";
-    //console.log(source_str);
+    //if (shiku == "横浜市" && nengetsu && typeof nengetsu === 'string' && nengetsu.match(/年/)) {
+    //  var stat1 = "「横浜市 人口のあゆみ 2010」";
+    //  var stat2 = "第4表 年齢別各歳別男女別人口";
+    //  var url =
+    //    "http://www.city.yokohama.lg.jp/ex/stat/jinko/ayumi/index-j.html";
+    //  stat = "<a href='" + url + "'>" + stat1 + "</a>" + stat2;
+    //} else if (nengetsu && typeof nengetsu === 'string' && nengetsu.match(/\d\d\d\dft/)) {
+    //  var str = "データの出典： 横浜市政策局ホームページ ";
+    //  var stat = "横浜市将来推計人口";
+    //  var url =
+    //    "https://www.city.yokohama.lg.jp/city-info/seisaku/torikumi/shien/jinkosuikei.html";
+    //  stat = "<a href='" + url + "'>" + stat + "</a>";
+    //} else if (shiku == "横浜市" || shiku.slice(-1) == "区") {
+    //  if (source.match(/kokusei/)) {
+    //    var stat = "年齢別男女別人口（国勢調査）";
+    //  } else {
+    //    var stat = "年齢別男女別人口（推計人口）";
+    //  }
+    //} else {
+    //  var stat = "町丁別年齢別男女別人口（登録者数）";
+    //}
+    var source_str = stat_str ;
+    if (source != "") {
+      source_str += `<span class="inline-block"><a href="${source}">${source}</a></span>`;
+    }
     return source_str;
-    //return source ;
   }
 }
 
