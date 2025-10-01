@@ -181,7 +181,7 @@ class PyramidApp
       puts "PopulationData.new開始"
       obj = PopulationData.new(shiku, nengetsu, level, cho, @s3_client)
       puts "process_main_request:step5"
-      p obj
+      #p obj
       # レスポンスを生成
       generate_response(obj, level)
     rescue => e
@@ -246,7 +246,7 @@ class PyramidApp
         ["text/plain;charset=utf-8", obj.csv || "CSV data not available"]
       else
         p "generate_response"
-        p obj.json
+        #p obj.json
         ["text/json;charset=utf-8", obj.json || "{}"]
       end
     when :cho_csv, :cho_csv_for_save

@@ -1343,5 +1343,25 @@ class PyramidSVGRenderer {
     const labels = ticks.filter((_, i) => i % labelStep === 0);
   
     return { tick, ticksCount, tickCm, ticks, labels };
-  }  
+  }
+  //スクリーンショット時にh2タイトルをSVG領域に表示するためのスペース確保のため縮小
+  makeSpaceForScreenshot() {
+    const scale = 0.95 ;
+    const cx = this.options.width / 2;
+    const cy = this.options.height * 0.95;
+    this.sceneGroup.setAttribute(
+      'transform', 
+      `translate(${cx},${cy}) scale(${scale}) translate(${-cx}, ${-cy})`
+    );
+  }
+  //スクリーンショット前の状態に戻す
+  restoreSpaceForScreenshot() {
+    const scale = this.options.zoomScale;
+    const cx = this.options.width / 2;
+    const cy = this.options.height / 2;
+    this.sceneGroup.setAttribute(
+      'transform', 
+      `translate(${cx},${cy}) scale(${scale}) translate(${-cx}, ${-cy})`
+    );
+  }
 }

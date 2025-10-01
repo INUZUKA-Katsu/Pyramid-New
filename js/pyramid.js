@@ -602,7 +602,7 @@ function change_pyramid(objectData, animeMode) {
     }
   }
 
-  var h2 = shiku + '<span class="inline-block">' + kijunbi + "</span>";
+  var h2 = shiku + '<span>' + kijunbi + "</span>";
   h2 = h2.replace("将来推計人口", '<span class="small">将来推計人口</span>');
   h2 = h2.replace(
     /10月(1|１)日(現在)?/,
@@ -639,8 +639,8 @@ function change_pyramid(objectData, animeMode) {
   }
   console.log("change_pyramid step5");
 
-  document.getElementById("h2-text").innerHTML = h2;
-  adjust_title_size("h2-text");
+  document.getElementById("h2").innerHTML = h2;
+  adjust_title_size("h2");
 
   if (!isInterpolation) {
     document.getElementById("sosu").innerHTML = plus_comma(sosu);
@@ -934,9 +934,9 @@ function makePyramidData(csv) {
 //　その他のHTMLの描画処理  ########################################################
 
 //選択した町丁が多いとき、タイトルのフォントを小さくする.
-function adjust_title_size(span_id) {
-  const h2Eelement=document.getElementById(span_id);
-  let fontSize = 28;
+function adjust_title_size(target_id, base_font_size = 28) {
+  const h2Eelement=document.getElementById(target_id);
+  let fontSize = base_font_size;
   h2Eelement.style.fontSize = fontSize + "px";
   while (h2Eelement.scrollHeight > h2Eelement.clientHeight && fontSize > 8) {
     fontSize--;
@@ -2432,19 +2432,27 @@ function screen_shot() {
   // 対象要素を取得
   const elm_top_controls = document.getElementById("top-controls");
   const elm_h2 = document.getElementById("h2");
+  const elm_capture_title = document.getElementById("capture_title");
   const elm_pyramid = document.getElementById("pyramid-container");
 
-  //top-controlsを非表示
+  //top-controlsを非表示に
   elm_top_controls.style.display = "none";
 
+  //ピラミッドを90%に縮小
+  window.pyramidRenderer.makeSpaceForScreenshot();
+
+  //スクリーンキャプチャ用タイトル
+  elm_capture_title.style.display = "block";
+  elm_capture_title.innerHTML = elm_h2.innerHTML;
+  adjust_title_size("capture_title", 20);
+
 　//h2とpyramid-blockの位置を取得
-  const h2_rect = elm_h2.getBoundingClientRect();
   const pyramid_rect = elm_pyramid.getBoundingClientRect();
 
   let window_width = pyramid_rect.width;
-  let window_height = (pyramid_rect.top + pyramid_rect.height) - h2_rect.top;
-  let canvas_width = window_width + 50;
-  let canvas_height = window_height + 50;
+  let window_height = pyramid_rect.height;
+  let canvas_width = window_width + 20;
+  let canvas_height = window_height +20;
   
   //***** 3区分別人口の中位階層の入力欄を単純なテキストに *****
   var s = document.getElementById("smiddle");
@@ -2460,9 +2468,9 @@ function screen_shot() {
   window.scrollTo(0, 0);
 
   //***** html2canvasによるスクリーンショット実行 *****/
-  html2canvas(document.body, {
-    x: 0,
-    y: 0,
+  html2canvas( elm_pyramid, {
+    x: -10,
+    y: -20,
     width: canvas_width, //生成する画像の幅
     height: canvas_height, //生成する画像の高さ
     windowWidth: window_width, //描画領域の幅
@@ -2471,8 +2479,7 @@ function screen_shot() {
     useCORS: true,
     allowTaint: true,
     backgroundColor: '#ffffff',
-    logging: false
-
+    logging: false,
   }).then(function (canvas) {
     var imageData = canvas.toDataURL();
 
@@ -2514,9 +2521,15 @@ function screen_shot() {
     }, 100);
 
     //***** グラフデザインを元に戻す. *****
-
     //--top-controlsを表示
     elm_top_controls.style.display = "";
+  
+    //ピラミッドの90%縮小を解除(元に戻す)
+    window.pyramidRenderer.restoreSpaceForScreenshot();
+
+    //スクリーンキャプチャ用タイトルを非表示に
+    elm_capture_title.style.display = "none";
+    elm_capture_title.innerHTML = "";
 
     //--スタイルを復元する
     restoreColorStyles(savedColorStyles);
