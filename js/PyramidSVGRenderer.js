@@ -59,7 +59,7 @@ class PyramidSVGRenderer {
   }
 
   init() {
-    //console.warn('init開始');
+    console.warn('init開始');
     //console.warn('this.options.width', this.options.width);
     //console.warn('this.options.height', this.options.height);
     //console.warn('this.options.unitSize', this.options.unitSize);
@@ -113,15 +113,17 @@ class PyramidSVGRenderer {
 
     // ズームを適用
     if (this.isAnimation && this.isVariableAreaMode){
-      console.warn('currentYearScale', this.currentYearScale);
+      console.warn('ズーム適用@init: currentYearScale', this.currentYearScale);
       this.resizeByScale(this.currentYearScale);
     } else if (this.options.zoomScale != 1) {
+      console.warn('ズーム適用@init: zoomScale', this.options.zoomScale);
       this.resizeByScale(this.options.zoomScale);
     }
   }
 
   // 静的要素を描画（アニメーション時と非アニメーション時で動作を分ける）
   drawStaticElements() {
+    console.warn('静的要素の描画@drawStaticElements開始');
     // 背景を描画（常に実行）
     this.drawBackground();
     
@@ -806,6 +808,15 @@ class PyramidSVGRenderer {
 
   drawAgeBar(age, maleCount, femaleCount, unitSize, barHeight, yearSpan=1) {
 
+    //既存のrectの再利用可能性
+    let isReuseable = false;
+    if (this.isAnimation && 
+      yearSpan==1 &&
+      this.dynamicGroup.querySelectorAll('.male-bar').length == 101
+     ){
+      isReuseable = true;
+     }
+
     // 現在のviewBoxのサイズの棒の使用（動的に計算）
     const viewBoxWidth = this.options.width;
     const viewBoxHeight = this.options.height * 0.95;
@@ -815,7 +826,13 @@ class PyramidSVGRenderer {
     
     // 男性の棒を描画（左側）- 中央線から10px離す（人口0でも描画）
     const maleWidth = this.calculateBarWidth(maleCount, unitSize);
-    const maleBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');      
+
+    let maleBar;
+    if (!isReuseable) {
+      maleBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    } else {
+      maleBar = this.dynamicGroup.querySelector(`.male-bar[data-age="${age}"]`);
+    }
     maleBar.setAttribute('x', viewBoxWidth / 2 - maleWidth - 10); // 中央線から10px離す
     maleBar.setAttribute('y', agePosition);
     maleBar.setAttribute('width', maleWidth);
@@ -823,24 +840,32 @@ class PyramidSVGRenderer {
     maleBar.setAttribute('fill', this.options.maleColor);
     maleBar.setAttribute('stroke', this.options.maleStrokeColor);
     maleBar.setAttribute('stroke-width', '1');
-    maleBar.setAttribute('class', 'male-bar age-bar');
-    maleBar.setAttribute('data-age', age);
-    maleBar.setAttribute('data-gender', 'male');
     maleBar.setAttribute('data-population', maleCount);
-    
-    this.dynamicGroup.appendChild(maleBar);
-    
+    if (!isReuseable){
+      maleBar.setAttribute('class', 'male-bar age-bar');
+      maleBar.setAttribute('data-age', age);
+      maleBar.setAttribute('data-gender', 'male');
+      this.dynamicGroup.appendChild(maleBar);
+    }
     // 5歳ごとの棒のボトムラインを太くする
     if (age % 5 === 0) {
-      const bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      let bottomLine;
+      if (!isReuseable){
+        bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      } else {
+        bottomLine = this.dynamicGroup.querySelector(`.male-bottom-line[data-age="${age}"]`);
+      }
       bottomLine.setAttribute('x1', viewBoxWidth / 2 - maleWidth - 10);
       bottomLine.setAttribute('y1', agePosition + (barHeight * yearSpan));
       bottomLine.setAttribute('x2', viewBoxWidth / 2 - 10);
       bottomLine.setAttribute('y2', agePosition + (barHeight * yearSpan));
       bottomLine.setAttribute('stroke', this.options.maleSpecialStrokeColor);
       bottomLine.setAttribute('stroke-width', '1');
-      bottomLine.setAttribute('class', 'male-bottom-line');
-      this.dynamicGroup.appendChild(bottomLine);
+      if (!isReuseable){
+        bottomLine.setAttribute('class', 'male-bottom-line');
+        bottomLine.setAttribute('data-age', age);
+        this.dynamicGroup.appendChild(bottomLine);
+      }
     }
     
     // 人数ラベル（アニメーション中は非表示、人口0の場合は非表示）
@@ -873,7 +898,12 @@ class PyramidSVGRenderer {
     
     // 女性の棒を描画（右側）- 中央線から10px離す（人口0でも描画）
     const femaleWidth = this.calculateBarWidth(femaleCount, unitSize);
-    const femaleBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    let femaleBar;
+    if (!isReuseable) {
+      femaleBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    } else {
+      femaleBar = this.dynamicGroup.querySelector(`.female-bar[data-age="${age}"]`);
+    }
     femaleBar.setAttribute('x', viewBoxWidth / 2 + 10); // 中央線から10px離す
     femaleBar.setAttribute('y', agePosition);
     femaleBar.setAttribute('width', femaleWidth);
@@ -881,24 +911,33 @@ class PyramidSVGRenderer {
     femaleBar.setAttribute('fill', this.options.femaleColor);
     femaleBar.setAttribute('stroke', this.options.femaleStrokeColor);
     femaleBar.setAttribute('stroke-width', '1');
-    femaleBar.setAttribute('class', 'female-bar age-bar');
-    femaleBar.setAttribute('data-age', age);
-    femaleBar.setAttribute('data-gender', 'female');
     femaleBar.setAttribute('data-population', femaleCount);
-    
-    this.dynamicGroup.appendChild(femaleBar);
+    if (!isReuseable){
+      femaleBar.setAttribute('class', 'female-bar age-bar');
+      femaleBar.setAttribute('data-age', age);
+      femaleBar.setAttribute('data-gender', 'female');
+      this.dynamicGroup.appendChild(femaleBar);
+    }
     
     // 5歳ごとの棒のボトムラインを太くする
     if (age % 5 === 0) {
-      const bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      let bottomLine;
+      if (!isReuseable){
+        bottomLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      } else {
+        bottomLine = this.dynamicGroup.querySelector(`.female-bottom-line[data-age="${age}"]`);
+      }
       bottomLine.setAttribute('x1', viewBoxWidth / 2 + 10);
       bottomLine.setAttribute('y1', agePosition + (barHeight * yearSpan));
       bottomLine.setAttribute('x2', viewBoxWidth / 2 + femaleWidth + 10);
       bottomLine.setAttribute('y2', agePosition + (barHeight * yearSpan));
       bottomLine.setAttribute('stroke', this.options.femaleSpecialStrokeColor);
       bottomLine.setAttribute('stroke-width', '1');
-      bottomLine.setAttribute('class', 'female-bottom-line');
-      this.dynamicGroup.appendChild(bottomLine);
+      if (!isReuseable){
+        bottomLine.setAttribute('class', 'female-bottom-line');
+        bottomLine.setAttribute('data-age', age);
+        this.dynamicGroup.appendChild(bottomLine);
+      }
     }
     
     // 人数ラベル（アニメーション中は非表示、人口0の場合は非表示）
@@ -963,9 +1002,10 @@ class PyramidSVGRenderer {
         this.drawStaticElements();
       }
     }
-
-    // 既存のバー要素をクリア
-    this.clearBars();
+    // 既存のバー要素をクリア(各歳別人口のアニメーションでは再利用するのでクリアしない.)
+    if (!this.isAnimation || this.isFiveYearAgeGroup){  
+      this.clearBars();
+    }
     
     let populationMap = new Map();
 
@@ -995,6 +1035,12 @@ class PyramidSVGRenderer {
     } else {
       // 各歳別データの処理（従来の処理）
       //console.log('Processing individual age data');
+
+      // 100歳分のbarがない場合=5歳階級別ピラミッドのbarはクリアする。
+      if (this.dynamicGroup.querySelectorAll('.male-bar').length !=101){
+        this.clearBars();
+      }
+
       // データから年齢別人口のマップを作成
       this.data.forEach((item, index) => {
         const age = item[0];
@@ -1098,9 +1144,12 @@ class PyramidSVGRenderer {
     
   // オプションの動的変更
   updateOptions(newOptions) {
+    // オプション変数を更新
     this.options = { ...this.options, ...newOptions };
+
     let keys = Object.keys(newOptions);
     if (keys.length == 1 && keys[0] == "showNumbers") {
+    // オプションがshowNumbers(人数表示)のみの場合は、.style.visibilityで実際の表示を切り替える.
       if (newOptions.showNumbers) {
         document.querySelectorAll('.population-label').forEach(label => {
           label.style.visibility = 'visible';
@@ -1110,25 +1159,14 @@ class PyramidSVGRenderer {
           label.style.visibility = 'hidden';
         });
       }
-
     } else {
+    //それ以外の場合はSVGを再描画する。
       this.init();      
       if (this.data) {
         this.render();
       }
     }
   }
-
-  // unitSizeを外部から指定して描画
-  //renderWithFixedUnitSize(unitSize) {
-  //  console.log('renderWithFixedUnitSize: unitSize =', unitSize);
-  //  if (unitSize && unitSize > 0) {
-  //    this.options.unitSize = unitSize;
-  //    this.render();
-  //  } else {
-  //    console.warn('renderWithFixedUnitSize: 無効なunitSizeが指定されました:', unitSize);
-  //  }
-  //}
 
   // ピラミッドのサイズ調整（ハイブリッド方式）
   resize(options = {}) {
@@ -1145,37 +1183,40 @@ class PyramidSVGRenderer {
   }
 
   // 方式1: transform属性を使いズーム
-  resizeByScale(scale) {
+  resizeByScale(scale, reset=false) {
     
-    //const baseBox = this.sceneGroup.getBBox();
-    //
-    //let w = baseBox.width * scale ;
-    //let h = baseBox.height * scale ;
-    //
-    //let cx = baseBox.x + baseBox.width / 2;
-    //let cy = baseBox.y + baseBox.height / 2;
-    //
-    //let tx = cx - w / 2 ;
-    //let ty = cy - h / 2 ;
     const cx = this.options.width / 2;
     const cy = this.options.height / 2;
+
+    console.warn('ズーム適用@resizeByScale: scale', scale);
+    console.warn(`options.zoomScale: ${this.options.zoomScale}、currentYearScale: ${this.currentYearScale}`);
+    console.trace();
     // sceneGroupのtransform属性を更新
-    //this.sceneGroup.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);    
     this.sceneGroup.setAttribute(
       'transform', 
       `translate(${cx},${cy}) scale(${scale}) translate(${-cx}, ${-cy})`
     );    
 
     // 後続の処理のためにオプションの値を更新
-    if (!this.isAnimation || !this.isVariableAreaMode){
+    if (reset==false && (!this.isAnimation || !this.isVariableAreaMode)){
       this.options = {
         ...this.options,
         zoomScale :scale
       };
     }
-
     console.log('this.options.zoomScale', this.options.zoomScale);
   }
+  // 可変面積モード時の当年スケールによるズームの解除
+  zoomReset() {
+    const scale = this.options.zoomScale;
+    this.resizeByScale(scale, true);
+  }
+  // 全てのズームを解除(100%に戻す)
+  zoomResetAll() {
+    const scale = 1;
+    this.resizeByScale(scale, true);
+  }
+
 
   // 方式2: 個別パラメータ指定によるリサイズ
   resizeByParameters(options) {
