@@ -231,6 +231,9 @@ class StreamingAnimationManager {
         //console.warn('キャッシュから年齢別最大BarLengthのセット完了');
       }
       
+      // 当年スケールによるズーム状態をリセット(一時停止後モードを変更して開始した場合のため)
+        window.pyramidRenderer.zoomReset();
+
       // アニメーション開始
       this.startAnimation();
       
@@ -807,12 +810,16 @@ class StreamingAnimationManager {
         // アニメーション継続（requestAnimationFrame + 速度制御）
         if (this.currentYearIndex < this.allYears.length && this.isAnimating) {
           if (this.animationSpeed > 0) {
+            // 年数差に応じた描画間隔を計算
+            const dynamicInterval = this.calculateDynamicInterval(this.currentYearIndex);
+
             // 速度制御のための遅延
             setTimeout(() => {
               if (this.isAnimating) {
                 requestAnimationFrame(animate);
               }
-            }, this.animationSpeed);
+            //}, this.animationSpeed);
+            }, dynamicInterval);
           } else {
             requestAnimationFrame(animate);
           }
@@ -963,7 +970,7 @@ class StreamingAnimationManager {
 
   // 直接描画
   renderDirectly(year, data) {
-    //console.warn(`🎬 年次 ${year} 直接描画開始(renderDirectly)`);
+    console.warn(`🎬 年次 ${year} 直接描画開始(renderDirectly)`);
     //console.warn(`🎬 renderDirectly呼び出し: 年次=${year}, データ存在=${data ? 'あり' : 'なし'}, データ型=${typeof data}`);
     try {
       // データ構造を確認
@@ -998,7 +1005,8 @@ class StreamingAnimationManager {
             console.log(`✅ 年次 ${year} リカバリー成功、変換済みデータで描画`);
             let animeMode = {
               isInterpolation: false,
-              isVariableAreaMode: this.useVariableAreaMode
+              isVariableAreaMode: this.useVariableAreaMode,
+              nengetsu:year
             };
             change_pyramid(convertedData, animeMode);
             return;
@@ -1012,7 +1020,8 @@ class StreamingAnimationManager {
 
       let animeMode = {
         isInterpolation: false,
-        isVariableAreaMode: this.useVariableAreaMode
+        isVariableAreaMode: this.useVariableAreaMode,
+        nengetsu: year
       };
       change_pyramid(data, animeMode);
       
@@ -1034,7 +1043,8 @@ class StreamingAnimationManager {
 
             let animeMode = {
               isInterpolation: false,
-              isVariableAreaMode: this.useVariableAreaMode
+              isVariableAreaMode: this.useVariableAreaMode,
+              nengetsu: year
             };
             change_pyramid(convertedData, animeMode);
 
@@ -1070,10 +1080,13 @@ class StreamingAnimationManager {
           //console.warn(`🎬 補間アニメーション データ確認:\n開始年次: ${startYear}\n終了年次: ${endYear}\n開始データkakusai_betsu[0]: ${JSON.stringify(processedStartData.kakusai_betsu?.[0])}\n終了データkakusai_betsu[0]: ${JSON.stringify(processedEndData.kakusai_betsu?.[0])}`);
           
           // 元データの総数を確認
-          const startTotal = processedStartData.kakusai_betsu?.[0]?.[1];
-          const endTotal = processedEndData.kakusai_betsu?.[0]?.[1];
+          //const startTotal = processedStartData.kakusai_betsu?.[0]?.[1];
+          //const endTotal = processedEndData.kakusai_betsu?.[0]?.[1];
           //console.warn(`🔍 元データ総数確認:\n開始年次総数: ${startTotal}\n終了年次総数: ${endTotal}`);
           
+          // 年数差を計算
+          const yearDifference = this.calculateYearDifference(startYear, endYear);
+
           // 補間アニメーション停止時のコールバックを設定
           const originalStopAnimation = window.interpolationAnimation.stopAnimation.bind(window.interpolationAnimation);
           window.interpolationAnimation.stopAnimation = () => {
@@ -1086,7 +1099,7 @@ class StreamingAnimationManager {
           // 補間アニメーションを実行
           console.warn(`補間アニメーションを実行: [${processedStartData["kakusai_betsu"][0][0]}, ${processedStartData["kakusai_betsu"][0][1]}, ${processedStartData["kakusai_betsu"][0][2]}, ${processedStartData["kakusai_betsu"][0][3]}] `);
           window.interpolationAnimation.startInterpolationAnimation(
-            startYear, endYear, processedStartData, processedEndData
+            startYear, endYear, processedStartData, processedEndData, yearDifference
           );
           
           // 補間アニメーション完了を待機
@@ -1260,18 +1273,18 @@ class StreamingAnimationManager {
     const currentYear = this.getCurrentDisplayYear();
     this.syncSelectBoxToCurrentYear(currentYear);
     
-    // 可変面積モードの場合は、基準スケールを復元
+    // 可変面積モードの場合は、基準スケールによるズームに戻す
     if (this.useVariableAreaMode && 
         this.baseZoomScale && 
         window.pyramidRenderer
        ) 
     {
-      window.pyramidRenderer.resizeByScale(this.baseZoomScale);
+      window.pyramidRenderer.zoomReset();
     }
     
     // 年次表示を終了状態に更新
     const yearDisplay = document.getElementById('current-year-display');
-    if (yearDisplay) {
+    if (yearDisplay && this.allYears.length > 0) {
       const lastYear = this.allYears[this.allYears.length - 1];
       yearDisplay.innerHTML = `🛑 アニメーション終了<br><small>最終年次: ${this.formatYear(lastYear)} (${this.allYears.length}年分)</small>`;
     }
@@ -1377,7 +1390,8 @@ class StreamingAnimationManager {
       if (this.dataCache && this.dataCache[targetYear]) {
         let animeMode = {
           isInterpolation: false,
-          isVariableAreaMode: this.useVariableAreaMode
+          isVariableAreaMode: this.useVariableAreaMode,
+          nengetsu: targetYear
         };
         change_pyramid(this.dataCache[targetYear], animeMode);
       } else {
@@ -1432,6 +1446,54 @@ class StreamingAnimationManager {
   // 棒のアニメーション時間を設定
   setBarAnimationDuration(duration) {
     this.barAnimationDuration = duration;
+  }
+
+  // 年数の差を計算するメソッドを追加
+  calculateYearDifference(year1, year2) {
+    // 年次文字列から年数を抽出
+    const extractYear = (yearStr) => {
+      if (yearStr === "new") return null; // newの場合は比較対象外
+      if (yearStr.match(/^\d{6}$/)) {
+        // 6桁の数字（例：202010）
+        return parseInt(yearStr.substring(0, 4));
+      } else if (yearStr.match(/^\d{4}ft$/)) {
+        // 4桁+ft（例：2025ft）
+        return parseInt(yearStr.substring(0, 4));
+      } else if (yearStr.match(/^\d{6}01$/) || yearStr.match(/^\d{6}09$/)) {
+        // 6桁+01または6桁+09（例：202001, 202009）
+        return parseInt(yearStr.substring(0, 4));
+      }
+      return null;
+    };
+
+    const year1Num = extractYear(year1);
+    const year2Num = extractYear(year2);
+
+    if (year1Num === null || year2Num === null) {
+      return 1; // 比較できない場合は1年差として扱う
+    }
+
+    return Math.abs(year2Num - year1Num);
+  }
+
+  // 年数差に応じた動的間隔を計算
+  calculateDynamicInterval(currentYearIndex) {
+    if (currentYearIndex <= 0) {
+      return this.animationSpeed; // 最初の年次は基本間隔
+    }
+
+    const currentYear = this.allYears[currentYearIndex];
+    const previousYear = this.allYears[currentYearIndex - 1];
+    
+    const yearDifference = this.calculateYearDifference(previousYear, currentYear);
+    
+    // 年数差に応じて間隔を調整（最小100ms、最大2000ms）
+    const dynamicInterval = this.animationSpeed * yearDifference;
+    const clampedInterval = Math.max(100, Math.min(2000, dynamicInterval));
+    
+    console.log(`年次間隔調整: ${previousYear} → ${currentYear} (${yearDifference}年差) → ${clampedInterval}ms間隔`);
+    
+    return clampedInterval;
   }
 }
 

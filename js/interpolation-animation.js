@@ -2,41 +2,64 @@
 class InterpolationAnimationManager {
   constructor() {
     this.isAnimating = false;
-    this.animationDuration = 1000; // 補間アニメーション時間（ms）
-    this.interpolationSteps = 10; // 補間ステップ数を減らす（20→10）
+    this.baseAnimationDuration = 1000; // 補間アニメーション時間（ms）
+    this.baseInterpolationSteps = 10; // 補間ステップ数を減らす（20→10）
     this.currentStep = 0;
     this.animationInterval = null;
     this.startData = null;
     this.endData = null;
     this.currentData = null;
     this.minChangeThreshold = 5; // 最小変化閾値（5人未満の変化は表示しない
+    this.yearDifference = 1; // 年数差(デフォルト1年)
+    this.currentInterpolationSteps = 10; // 現在の補間ステップ数
   }
 
   // 2つの年次データ間の補間アニメーションを開始
-  async startInterpolationAnimation(startYear, endYear, startData, endData) {
+  async startInterpolationAnimation(startYear, endYear, startData, endData, yearDifference) {
     if (this.isAnimating) {
       this.stopAnimation();
     }
 
     this.startData = startData;
     this.endData = endData;
+    this.yearDifference = yearDifference;
     this.currentStep = 0;
     this.isAnimating = true;
 
-    console.log(`補間アニメーション開始: ${startYear} → ${endYear}`);
+    this.currentInterpolationSteps = this.calculateDynamicSteps(yearDifference);
+
+    console.log(`補間アニメーション開始: ${startYear} → ${endYear} (${yearDifference}年差)`);
+
+    // 年数差に応じた動的アニメーション時間を計算
+    const dynamicDuration = this.calculateDynamicDuration(yearDifference);
+    console.log(`補間アニメーション時間: ${dynamicDuration}ms`);
 
     // 補間データを生成
     const interpolatedData = this.generateInterpolatedData(startData, endData);
     
     // アニメーション実行
-    this.executeInterpolationAnimation(interpolatedData);
+    this.executeInterpolationAnimation(interpolatedData, dynamicDuration);
+  }
+
+  // 年数差に応じた動的補間ステップ数を計算
+  calculateDynamicSteps(yearDifference) {
+    const dynamicSteps = this.baseInterpolationSteps * yearDifference;
+    const clampedSteps = Math.max(10, Math.min(100, dynamicSteps));
+    return clampedSteps;
+  }
+
+  // 年数差に応じた動的アニメーション時間を計算
+  calculateDynamicDuration(yearDifference) {
+    const dynamicDuration = this.baseAnimationDuration * yearDifference;
+    const clampedDuration = Math.max(500, Math.min(5000, dynamicDuration));
+    return clampedDuration;
   }
 
   // 補間データを生成
   generateInterpolatedData(startData, endData) {
     const interpolatedData = [];
-    for (let step = 0; step <= this.interpolationSteps; step++) {
-      const progress = step / this.interpolationSteps;
+    for (let step = 0; step <= this.currentInterpolationSteps; step++) {
+      const progress = step / this.currentInterpolationSteps;
       const data = this.interpolateData(startData, endData, progress);
       interpolatedData.push(data);
     }
@@ -160,8 +183,8 @@ class InterpolationAnimationManager {
   }
 
   // 補間アニメーション実行
-  executeInterpolationAnimation(interpolatedData) {
-    const stepDuration = this.animationDuration / this.interpolationSteps;
+  executeInterpolationAnimation(interpolatedData, animationDuration = this.baseAnimationDuration) {
+    const stepDuration = animationDuration / this.currentInterpolationSteps;
     let currentStep = 0;
 
     const animate = () => {
@@ -259,6 +282,11 @@ class InterpolationAnimationManager {
   // 補間ステップ数を設定
   setInterpolationSteps(steps) {
     this.interpolationSteps = steps;
+  }
+
+  //　年数差を設定
+  setYearDifference(yearDifference) {
+    this.yearDifference = yearDifference;
   }
 }
 
