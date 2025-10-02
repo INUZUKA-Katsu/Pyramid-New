@@ -428,8 +428,7 @@
           justify-content: center;
           align-items: start;
           gap: 10px;
-          height: auto;
-          min-height: 100px;
+          height: 130px;
         }
         #link {
           grid-column: 1/2;
@@ -1322,9 +1321,11 @@
             bottom: 5px; /* 10px → 5px */
             border-width: 1px; /* 2px → 1px */
           }
+
           /* #pyramid-blockの子要素1 */
           #top-controls {
             order: 3;
+            height: auto !important;
           }
           /* #pyramid-blockの子要素2 */
           #pyramid-container {
