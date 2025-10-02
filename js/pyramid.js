@@ -511,7 +511,9 @@ function change_pyramid(objectData, animeMode) {
   if ( animeMode != undefined) {
     isAnm = true;
     isInterpolation = animeMode.isInterpolation;
-    $nengetsu = animeMode.nengetsu;
+    if (animeMode.nengetsu != undefined) {
+      $nengetsu = animeMode.nengetsu;
+    }
   } else {
     isAnm = false;
     isInterpolation =false ;
@@ -601,55 +603,59 @@ function change_pyramid(objectData, animeMode) {
       shiku = "港北・緑・青葉・都筑４区<span class='small'> (分区直後で区別データなし)</span>";
     }
   }
-
-  var h2 = shiku + '<span>' + kijunbi + "</span>";
-  h2 = h2.replace("将来推計人口", '<span class="small">将来推計人口</span>');
-  h2 = h2.replace(
-    /10月(1|１)日(現在)?/,
-    '10月1日現在<span class="small">(国勢調査結果)</span>'
-  );
-  //h2(タイトル)を西暦主体に書き直す.
-  h2 = change_seireki_main(h2);
-  h2 = add_gengo_to_syoraisuikei(h2);
+  console.warn(`🌹isInterpolation: ${isInterpolation}`);
   
-  KU_START = {
-    港北区: "1939年(昭和14年)4月1日",
-    戸塚区: "1939年(昭和14年)4月1日",
-    南区: "1943年(昭和18年)12月1日",
-    西区: "1944年(昭和19年)4月1日",
-    金沢区: "1948年(昭和23年)5月15日",
-    港南区: "1969年(昭和44年)10月1日",
-    旭区: "1969年(昭和44年)10月1日",
-    緑区: "1969年(昭和44年)10月1日",
-    瀬谷区: "1969年(昭和44年)10月1日",
-    泉区: "1986年(昭和61年)11月3日",
-    栄区: "1986年(昭和61年)11月3日",
-    青葉区: "1994年(平成6年)11月6日",
-    都筑区: "1994年(平成6年)11月6日"
-  }
-
-  if (not_exist != undefined && not_exist != "") {
-    if (not_exist.match(/区$/)) {
-      comment = `${not_exist}はまだありません.${not_exist}は${KU_START[not_exist]}に新設されました.`;
-    } else {
-      comment =
-        `${not_exist}のデータはありません.住居表示等で新しい町名ができる前と思われます.`;
+  // 補間アニメーション中はスキップ
+  if (isInterpolation==undefined ||!isInterpolation) {
+    var h2 = shiku + '<span>' + kijunbi + "</span>";
+    h2 = h2.replace("将来推計人口", '<span class="small">将来推計人口</span>');
+    h2 = h2.replace(
+      /10月(1|１)日(現在)?/,
+      '10月1日現在<span class="small">(国勢調査結果)</span>'
+    );
+    //h2(タイトル)を西暦主体に書き直す.
+    h2 = change_seireki_main(h2);
+    h2 = add_gengo_to_syoraisuikei(h2);
+    
+    KU_START = {
+      港北区: "1939年(昭和14年)4月1日",
+      戸塚区: "1939年(昭和14年)4月1日",
+      南区: "1943年(昭和18年)12月1日",
+      西区: "1944年(昭和19年)4月1日",
+      金沢区: "1948年(昭和23年)5月15日",
+      港南区: "1969年(昭和44年)10月1日",
+      旭区: "1969年(昭和44年)10月1日",
+      緑区: "1969年(昭和44年)10月1日",
+      瀬谷区: "1969年(昭和44年)10月1日",
+      泉区: "1986年(昭和61年)11月3日",
+      栄区: "1986年(昭和61年)11月3日",
+      青葉区: "1994年(平成6年)11月6日",
+      都筑区: "1994年(平成6年)11月6日"
     }
-    h2 = h2 + "<br><span id='red'>(" + comment + ")</span>";
+  
+    if (not_exist != undefined && not_exist != "") {
+      if (not_exist.match(/区$/)) {
+        comment = `${not_exist}はまだありません.${not_exist}は${KU_START[not_exist]}に新設されました.`;
+      } else {
+        comment =
+          `${not_exist}のデータはありません.住居表示等で新しい町名ができる前と思われます.`;
+      }
+      h2 = h2 + "<br><span id='red'>(" + comment + ")</span>";
+    }
+    console.log("change_pyramid step5");
+  
+    document.getElementById("h2").innerHTML = h2;
+    adjust_title_size("h2");
+  
+    if (!isInterpolation) {
+      document.getElementById("sosu").innerHTML = plus_comma(sosu);
+      document.getElementById("male").innerHTML = plus_comma(male);
+      document.getElementById("female").innerHTML = plus_comma(female);
+      document.getElementById("source").innerHTML = source_str(shiku, source);
+    }
+    //年齢３区分別の人口構成比を表示
+    kubunDisplay();
   }
-  console.log("change_pyramid step5");
-
-  document.getElementById("h2").innerHTML = h2;
-  adjust_title_size("h2");
-
-  if (!isInterpolation) {
-    document.getElementById("sosu").innerHTML = plus_comma(sosu);
-    document.getElementById("male").innerHTML = plus_comma(male);
-    document.getElementById("female").innerHTML = plus_comma(female);
-  }
-  document.getElementById("source").innerHTML = source_str(shiku, source);
-
-  //if (!isAnm) basic_data_position();
   
   console.log("change_pyramid step6");
 
@@ -658,10 +664,7 @@ function change_pyramid(objectData, animeMode) {
 
   console.log("change_pyramid step7");
 
-  //年齢３区分別の人口構成比を表示（補間アニメーション中はスキップ）
-  if (!isInterpolation) {
-    kubunDisplay();
-  }
+
 
   function source_str(shiku, source) {
     console.log("source_str開始");
