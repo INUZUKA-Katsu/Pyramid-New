@@ -2,9 +2,14 @@
 // 既存のpyramid.jsとの互換性を保ちながら、SVGによる柔軟な描画を実現
 
 class PyramidSVGRenderer {
-  constructor(containerId, hashData, options = {}) {
-    this.containerId = containerId;
-    this.container = document.getElementById(containerId);
+  constructor(container, hashData, options = {}) {
+    if (container instanceof HTMLElement) {
+      this.container = container;
+      this.containerId = container.id;
+    } else {
+      this.containerId = container;
+      this.container = document.getElementById(container);
+    }
     this.options = {
       width: 1108,
       height: 600,
@@ -56,6 +61,17 @@ class PyramidSVGRenderer {
 
     this.init();
     this.render();
+  }
+
+  // newではなく既存SVGにアタッチする
+  static attach(container, options = {}) {
+    const instance = Object.create(this.prototype);
+    instance.container = container;
+    instance.options = options;
+    instance.sceneGroup = container.querySelector('#pyramid-scene');
+    instance.dynamicGroup = container.querySelector('#pyramid-dynamic');
+    instance.staticGroup = container.querySelector('#pyramid-static');
+    return instance;
   }
 
   init() {
@@ -166,13 +182,20 @@ class PyramidSVGRenderer {
 
   drawBackground() {
     // 背景の矩形（動的座標）
-    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    bg.setAttribute('x', 0);
-    bg.setAttribute('y', 0);
-    bg.setAttribute('width', this.options.width);
-    bg.setAttribute('height', this.options.height);
-    bg.setAttribute('fill', this.options.backgroundColor);
-    this.staticGroup.appendChild(bg);
+    //this.staticGroup = container.querySelector('#pyramid-static');
+    const bgElement = this.staticGroup.querySelector('#background');
+    if (bgElement) {
+      bgElement.setAttribute('fill', this.options.backgroundColor);
+    } else {
+      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bg.setAttribute('x', 0);
+      bg.setAttribute('y', 0);
+      bg.setAttribute('width', this.options.width);
+      bg.setAttribute('height', this.options.height);
+      bg.setAttribute('fill', this.options.backgroundColor);
+      bg.setAttribute('id', 'background');
+      this.staticGroup.appendChild(bg);
+    }
   }
 
   drawGrid() {
@@ -1159,6 +1182,8 @@ class PyramidSVGRenderer {
           label.style.visibility = 'hidden';
         });
       }
+    } else if (keys.length == 1 && keys[0] == "backgroundColor") {
+      this.drawBackground();
     } else {
     //それ以外の場合はSVGを再描画する。
       this.init();      
