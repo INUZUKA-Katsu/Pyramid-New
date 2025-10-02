@@ -611,13 +611,13 @@
         .left-controls .radio-group {
           display: flex;
           flex-direction: row;
-          gap: 8px;
+          gap: 30px;
           margin-top: 10px;
           justify-content: center;
         }
 
         .left-controls .radio-group label {
-          font-size: 12px;
+          font-size: 100%;
         }
 
         .control-group {
@@ -1240,7 +1240,9 @@
             min-width: 80px;
             white-space: nowrap;
           }
-
+          .left-controls .radio-group {
+            gap: 0;
+          }
           /* 入力やボタンは適宜伸縮 */
           .left-controls .control-group select,
           .left-controls .control-group input,
@@ -1476,6 +1478,9 @@
             padding: 4px 8px;
             width: 100%;
             justify-self: center;
+          }
+          .left-controls .radio-group {
+            gap: 15px;
           }
           div#footer {
             font-size: 75%;
