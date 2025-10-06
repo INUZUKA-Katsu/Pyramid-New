@@ -7,13 +7,17 @@ class InterpolationAnimationManager {
     this.baseAnimationDuration = 1000; // 補間アニメーション時間（ms）
     this.baseInterpolationSteps = 10; // 補間ステップ数を減らす（20→10）
     this.currentStep = 0;
-    this.animationInterval = null;
+    this.animationFrameId = null; // requestAnimationFrame ID
     this.startData = null;
     this.endData = null;
     this.currentData = null;
     this.minChangeThreshold = 5; // 最小変化閾値（5人未満の変化は表示しない
     this.yearDifference = 1; // 年数差(デフォルト1年)
     this.currentInterpolationSteps = 10; // 現在の補間ステップ数
+    this.animationStartTime = 0; // アニメーション開始時間
+    this.lastFrameTime = 0; // 前回のフレーム時間
+    this.targetFrameRate = 60; // 目標フレームレート（FPS）
+    this.frameInterval = 1000 / this.targetFrameRate; // フレーム間隔（ms）
   }
 
   // 2つの年次データ間の補間アニメーションを開始
@@ -195,43 +199,73 @@ class InterpolationAnimationManager {
     return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
   }
 
-  // 補間アニメーション実行
+  // 補間アニメーション実行（requestAnimationFrame版）
   executeInterpolationAnimation(interpolatedData, animationDuration = this.baseAnimationDuration) {
-    console.warn(`補間アニメーション実行`);
-    const stepDuration = animationDuration / this.currentInterpolationSteps;
-    if (this.currentIntervalStep == 0) {
-      this.currentIntervalStep = 1; 
-    }
+    console.warn(`補間アニメーション実行（requestAnimationFrame版）`);
+    console.warn(`frameInterval:${this.frameInterval}`);
+    // アニメーション状態を初期化
+    this.currentIntervalStep = 1;
     this.isProcessingInterval = true;
+    this.animationStartTime = performance.now();
+    this.lastFrameTime = this.animationStartTime;
+    this.setFrameRate();
+    
+    const stepDuration = animationDuration / this.currentInterpolationSteps;
+    console.log(`ステップ間隔: ${stepDuration}ms`);
 
-    const animate = () => {
+    const animate = (currentTime) => {
+      // アニメーションが停止されている場合は終了
+      if (!this.isAnimating || !this.isProcessingInterval) {
+        console.warn(`アニメーション停止または区間処理終了`);
+        this.cleanupAnimation();
+        return;
+      }
 
-      console.warn(`currentIntervalStep:${this.currentIntervalStep} / interpolatedData.length:${interpolatedData.length}`);
+      // フレームレート制御
+      const deltaTime = currentTime - this.lastFrameTime;
+      if (deltaTime < this.frameInterval) {
+        this.animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
+      this.lastFrameTime = currentTime;
 
-      if (!this.isProcessingInterval || this.currentIntervalStep > interpolatedData.length) {
-        console.warn(`区間処理終了`);
-        this.currentIntervalStep = 1;       // 初期化
-        this.isProcessingInterval = false;  // 区間処理終了
+      // 現在のステップが範囲外の場合は終了
+      if (this.currentIntervalStep > interpolatedData.length) {
+        console.warn(`区間処理終了: 全ステップ完了`);
+        this.cleanupAnimation();
         return;
       }
 
       // イージングを適用した進行度
-      const rawProgress = this.currentIntervalStep / interpolatedData.length;  // 1番目が1/10, 最後が1になる
+      const rawProgress = this.currentIntervalStep / interpolatedData.length;
       const easedProgress = this.easeInOutCubic(rawProgress);
       
-      // データを描画 (配列番号は0から始まるので、-1する.)
+      // データを描画（配列番号は0から始まるので、-1する）
       console.warn(`currentIntervalStep:${this.currentIntervalStep}、rawProgress:${rawProgress}`);
       this.renderInterpolatedData(interpolatedData[this.currentIntervalStep-1], easedProgress, rawProgress);
       
       this.currentIntervalStep++;
-      this.animationInterval = setTimeout(animate, stepDuration);
+      
+      // 次のフレームをスケジュール
+      this.animationFrameId = requestAnimationFrame(animate);
     };
-    if (this.isAnimating) {  // 補間アニメーション中に一時停止ボタンが押された場合はここでストップ
-      animate();
-    } else {
-      console.warn(`補間アニメーション一時停止: step2`);
-    }
 
+    // アニメーション開始
+    if (this.isAnimating) {
+      this.animationFrameId = requestAnimationFrame(animate);
+    } else {
+      console.warn(`補間アニメーション一時停止: アニメーション未開始`);
+    }
+  }
+
+  // アニメーションクリーンアップ
+  cleanupAnimation() {
+    this.currentIntervalStep = 1;
+    this.isProcessingInterval = false;
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
   }
 
   // 補間データを描画
@@ -277,39 +311,11 @@ class InterpolationAnimationManager {
     }
   }
 
-  // アニメーション完了
-  //completeAnimation() {
-  //  alert('補間アニメーション完了');
-  //  this.isAnimating = false;
-  //  this.animationInterval = null;
-  //  console.log('補間アニメーション完了');
-  //  
-  //  // アニメーション完了後に人数ラベルを表示
-  //  this.showPopulationLabels();
-  //}
-
-  // 人数ラベルを表示
-  //showPopulationLabels() {
-  //  // 現在のデータをchange_pyramidで描画（アニメーション中フラグをtrueのままにして人数ラベルを非表示）
-  //  if (this.currentData && typeof change_pyramid === 'function') {
-  //    change_pyramid(this.currentData, {});
-  //  } else if (this.endData && typeof change_pyramid === 'function') {
-  //    // フォールバック: 現在のデータがない場合は終了データを使用
-  //    change_pyramid(this.endData, {});
-  //  }
-  //}
-
   // アニメーション停止
   stopAnimation() {
-    console.warn(`補間アニメーション一時停止: step1`);
+    console.warn(`補間アニメーション停止`);
     this.isAnimating = false;
-    if (this.animationInterval) {
-      clearTimeout(this.animationInterval);
-      this.animationInterval = null;
-    }
-    
-    // アニメーション停止時に人数ラベルを表示
-    //this.showPopulationLabels();
+    this.cleanupAnimation();
   }
 
   // アニメーション時間を設定
@@ -325,6 +331,13 @@ class InterpolationAnimationManager {
   //　年数差を設定
   setYearDifference(yearDifference) {
     this.yearDifference = yearDifference;
+  }
+
+  // フレームレートを設定
+  setFrameRate() {
+    //animationSpeedは 500ms~50ms => frameIntervalは 150ms~15ms.
+    this.frameInterval = window.streamingAnimation.animationSpeed  *  3 / 10  ;
+    this.targetFrameRate = 1000 / this.frameInterval;
   }
 }
 
