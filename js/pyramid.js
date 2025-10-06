@@ -503,8 +503,8 @@ function modify_html(response, mode) {
 
 //ピラミッド描画エンジン(引数isAnm: アニメーション中かどうかのフラグ, isInterpolation: 補間アニメーション中かどうかのフラグ)
 function change_pyramid(objectData, animeMode) {
-  //console.log("change_pyramid開始");
-  //console.log(objectData["kijunbi"]);
+  console.warn("change_pyramid開始");
+  console.trace();
     
   let isAnm ;
   let isInterpolation ;
@@ -518,7 +518,7 @@ function change_pyramid(objectData, animeMode) {
     isAnm = false;
     isInterpolation =false ;
   }
-  //console.warn(`🎨 change_pyramid呼び出し: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
+  console.warn(`🎨 change_pyramid: isAnm=${isAnm}, isInterpolation=${isInterpolation}, kijunbi=${objectData["kijunbi"]}`);
   //console.warn("1 get_selected_nengetsu()",get_selected_nengetsu());
   //console.warn("1 $nengetsu",$nengetsu);
 
@@ -603,10 +603,13 @@ function change_pyramid(objectData, animeMode) {
       shiku = "港北・緑・青葉・都筑４区<span class='small'> (分区直後で区別データなし)</span>";
     }
   }
-  console.warn(`🌹isInterpolation: ${isInterpolation}`);
+
   
   // 補間アニメーション中はスキップ
   if (isInterpolation==undefined ||!isInterpolation) {
+
+    console.warn(`タイトル、年齢３区分別の人口構成比を更新`);
+
     var h2 = shiku + '<span>' + kijunbi + "</span>";
     h2 = h2.replace("将来推計人口", '<span class="small">将来推計人口</span>');
     h2 = h2.replace(
@@ -647,12 +650,11 @@ function change_pyramid(objectData, animeMode) {
     document.getElementById("h2").innerHTML = h2;
     adjust_title_size("h2");
   
-    if (!isInterpolation) {
-      document.getElementById("sosu").innerHTML = plus_comma(sosu);
-      document.getElementById("male").innerHTML = plus_comma(male);
-      document.getElementById("female").innerHTML = plus_comma(female);
-      document.getElementById("source").innerHTML = source_str(shiku, source);
-    }
+    document.getElementById("sosu").innerHTML = plus_comma(sosu);
+    document.getElementById("male").innerHTML = plus_comma(male);
+    document.getElementById("female").innerHTML = plus_comma(female);
+    document.getElementById("source").innerHTML = source_str(shiku, source);
+    
     //年齢３区分別の人口構成比を表示
     kubunDisplay();
   }
@@ -777,7 +779,7 @@ function change_pyramid(objectData, animeMode) {
     //}
     var source_str = stat_str ;
     if (source != "") {
-      source_str += `<span class="inline-block"><a href="${source}">${source}</a></span>`;
+      source_str += `<br><span class="inline-block"><a href="${source}">${source}</a></span>`;
     }
     return source_str;
   }
