@@ -816,10 +816,9 @@ class StreamingAnimationManager {
         
         // アニメーション継続（requestAnimationFrame + 速度制御）
         if (this.currentYearIndex < this.allYears.length && this.isAnimating) {
-          if (this.animationSpeed > 0) {
+          if (this.animationSpeed > 0 && !this.useInterpolation) {
             // 年数差に応じた描画間隔を計算
             const dynamicInterval = this.calculateDynamicInterval(this.currentYearIndex);
-
             // 速度制御のための遅延
             setTimeout(() => {
               if (this.isAnimating) {
