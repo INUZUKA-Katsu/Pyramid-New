@@ -173,11 +173,12 @@ class PyramidSVGRenderer {
     // 特別な年齢の横線とラベルを描画
     this.drawSpecialAgeLines();
     
-    // X軸と目盛を描画
-    this.drawXAxis();
-    
     // 男女ラベルを描画
     this.drawGenderLabels();
+
+    // X軸と目盛を描画
+    this.drawXAxis();
+
   }
 
   drawBackground() {
@@ -432,6 +433,7 @@ class PyramidSVGRenderer {
         tickLine.setAttribute('y2', xAxisY - 5); // 5px上向き
         tickLine.setAttribute('stroke', '#adb5bd');
         tickLine.setAttribute('stroke-width', '1');
+        tickLine.setAttribute('class', 'tick-line');
         xAxisGroup.appendChild(tickLine);
         
         // 目盛ラベルを描画（X軸の下に表示）
@@ -444,6 +446,7 @@ class PyramidSVGRenderer {
           tickLabel.setAttribute('dominant-baseline', 'top');
           tickLabel.setAttribute('font-size', '10');
           tickLabel.setAttribute('fill', '#6c757d');
+          tickLabel.setAttribute('class', 'tick-label');
           xAxisGroup.appendChild(tickLabel);
         }
       }
@@ -458,6 +461,7 @@ class PyramidSVGRenderer {
         tickLine.setAttribute('y2', xAxisY - 5); // 5px上向き
         tickLine.setAttribute('stroke', '#adb5bd');
         tickLine.setAttribute('stroke-width', '1');
+        tickLine.setAttribute('class', 'tick-line');
         xAxisGroup.appendChild(tickLine);
         
         // 目盛ラベルを描画（X軸の下に表示）
@@ -470,6 +474,7 @@ class PyramidSVGRenderer {
           tickLabel.setAttribute('dominant-baseline', 'top');
           tickLabel.setAttribute('font-size', '10');
           tickLabel.setAttribute('fill', '#6c757d');
+          tickLabel.setAttribute('class', 'tick-label');
           xAxisGroup.appendChild(tickLabel);
         }
       }
@@ -766,6 +771,13 @@ class PyramidSVGRenderer {
     staticElements.forEach(element => element.remove());
   }
 
+  clearXAxis() {
+    const elms = document.querySelectorAll('.x-axis, .tick-line, .tick-label');
+    elms.forEach(elm => {
+      elm.remove();
+    });
+  }
+
   // 人数表示位置を計算する関数（重なり回避）
   calculateLabelPosition(gender, barEndX, labelWidth, previousPosition) {
     const minSpacing = 5; // 最小間隔（ピクセル）
@@ -1019,11 +1031,19 @@ class PyramidSVGRenderer {
     let barHeight = this.options.barHeight;
     
     // 非アニメーション時またはアニメーションの最初のフレーム時または可変面積モード時は固定要素を再描画
-    if (!this.isAnimation || this.isFirstAnimationFrame || isVariableAreaMode) {
+    if (!this.isAnimation || this.isFirstAnimationFrame) {
       // 補間アニメーションの補間データでは静的要素を再描画しない.
       if (!isInterpolation) {
         this.drawStaticElements();
+      } else {
+        // 補間アニメーションの場合でも静的要素のうちX軸と目盛だけは再描画する.
+        this.clearXAxis();
+        this.drawXAxis();
       }
+    } else {
+      // 補間アニメーションの場合でも静的要素のうちX軸と目盛だけは再描画する.
+      this.clearXAxis();
+      this.drawXAxis();
     }
     // 既存のバー要素をクリア(各歳別人口のアニメーションでは再利用するのでクリアしない.)
     if (!this.isAnimation || this.isFiveYearAgeGroup){  
@@ -1107,6 +1127,7 @@ class PyramidSVGRenderer {
         nextAge = age + yearSpan;
       }
     }
+    
     if (!this.options.showNumbers) {
       document.querySelectorAll('.population-label').forEach(label => {
         label.style.visibility = 'hidden';
@@ -1215,7 +1236,7 @@ class PyramidSVGRenderer {
 
     console.warn('ズーム適用@resizeByScale: scale', scale);
     console.warn(`options.zoomScale: ${this.options.zoomScale}、currentYearScale: ${this.currentYearScale}`);
-    console.trace();
+    //console.trace();
     // sceneGroupのtransform属性を更新
     this.sceneGroup.setAttribute(
       'transform', 

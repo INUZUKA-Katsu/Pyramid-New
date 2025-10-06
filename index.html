@@ -2669,6 +2669,7 @@
             // 面積固定モード（補間・非補間共通）
             // 面積固定モードを有効化
             window.streamingAnimation.useVariableAreaMode = false;
+            window.interpolationAnimation = new InterpolationAnimationManager();
             if (window.streamingAnimation) {
               await window.streamingAnimation.startStreamingAnimation();
             } else {
@@ -2786,6 +2787,9 @@
           if (window.streamingAnimation) {
             window.streamingAnimation.pauseAnimation();
           }
+          if (window.interpolationAnimation) {
+            window.interpolationAnimation.pauseAnimation();
+          }
         }
         // タッチイベント対応
         const pauseButton = document.getElementById("pause-animation-btn");
@@ -2793,13 +2797,18 @@
           if (window.streamingAnimation) {
             window.streamingAnimation.pauseAnimation();
           }
+          if (window.interpolationAnimation) {
+            window.interpolationAnimation.pauseAnimation();
+          }
         });
-
 
         // アニメーション再開
         function resumeAnimationFromControls() {
           if (window.streamingAnimation) {
             window.streamingAnimation.resumeAnimation();
+          }
+          if (window.interpolationAnimation) {
+            window.interpolationAnimation.resumeAnimation();
           }
         }
 
@@ -2815,6 +2824,9 @@
           // ストリーミングアニメーションの停止
           if (window.streamingAnimation) {
             window.streamingAnimation.stopAnimation();
+          }
+          if (window.interpolationAnimation) {
+            window.interpolationAnimation.stopAnimation();
           }
 
           // スライダーを無効化

@@ -1,7 +1,6 @@
 // 補間アニメーション管理クラス
 class InterpolationAnimationManager {
   constructor() {
-    this.isAnimating = false;
     this.isProcessingInterval = false; // 個別区間の処理状態
     this.currentIntervalStep = 0;      // 現在の区間内ステップ
     this.baseAnimationDuration = 1000; // 補間アニメーション時間（ms）
@@ -18,19 +17,18 @@ class InterpolationAnimationManager {
     this.lastFrameTime = 0; // 前回のフレーム時間
     this.targetFrameRate = 60; // 目標フレームレート（FPS）
     this.frameInterval = 1000 / this.targetFrameRate; // フレーム間隔（ms）
+    this.paused = false; // アニメーション一時停止フラグ
+    this.stopped = false; // アニメーション終了フラグ
   }
 
   // 2つの年次データ間の補間アニメーションを開始
   async startInterpolationAnimation(startYear, endYear, startData, endData, yearDifference) {
-    //if (this.isAnimating) {
-    //  this.stopAnimation();
-    //}
 
     this.startData = startData;
     this.endData = endData;
     this.yearDifference = yearDifference;
     this.currentStep = 0;
-    this.isAnimating = true;
+    this.stopped = false;
 
     this.currentInterpolationSteps = this.calculateDynamicSteps(yearDifference);
 
@@ -213,10 +211,16 @@ class InterpolationAnimationManager {
     const stepDuration = animationDuration / this.currentInterpolationSteps;
     console.log(`ステップ間隔: ${stepDuration}ms`);
 
-    const animate = (currentTime) => {
+    const animate = async(currentTime) => {
+
+      // 🔸 一時停止中はここで待機（ループを抜けずに止まる）
+      while (this.paused && !this.stopped) {
+        await this. sleep(100);
+      }
+
       // アニメーションが停止されている場合は終了
-      if (!this.isAnimating || !this.isProcessingInterval) {
-        console.warn(`アニメーション停止または区間処理終了`);
+      if (this.stopped || !this.isProcessingInterval) {
+        console.warn(`アニメーション終了または区間処理終了`);
         this.cleanupAnimation();
         return;
       }
@@ -251,11 +255,7 @@ class InterpolationAnimationManager {
     };
 
     // アニメーション開始
-    if (this.isAnimating) {
-      this.animationFrameId = requestAnimationFrame(animate);
-    } else {
-      console.warn(`補間アニメーション一時停止: アニメーション未開始`);
-    }
+    this.animationFrameId = requestAnimationFrame(animate);
   }
 
   // アニメーションクリーンアップ
@@ -311,10 +311,27 @@ class InterpolationAnimationManager {
     }
   }
 
-  // アニメーション停止
+  // 指定時間待機
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // アニメーション一時停止
+  pauseAnimation() {
+    console.warn(`補間アニメーション一時停止`);
+    this.paused = true;
+  }
+
+  // アニメーション再開
+  resumeAnimation() {
+    console.warn(`補間アニメーション再開`);
+    this.paused = false;
+  }
+
+  // アニメーション終了
   stopAnimation() {
-    console.warn(`補間アニメーション停止`);
-    this.isAnimating = false;
+    console.warn(`補間アニメーション終了`);
+    this.stopped = true;
     this.cleanupAnimation();
   }
 
