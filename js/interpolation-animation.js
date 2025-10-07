@@ -39,6 +39,11 @@ class InterpolationAnimationManager {
 
     this.currentInterpolationSteps = this.calculateDynamicSteps(yearDifference);
 
+    // 町丁別ピラミッドは各歳の人口がわずかなので変化量の閾値を設定しない。
+    if (startData.shiku != "横浜市" && startData.shiku.slice(-1)!="区") {
+      this.minChangeThreshold = 1;
+    }
+
     console.log(`補間アニメーション開始: ${startYear} → ${endYear} (${yearDifference}年差)`);
 
     // 年数差に応じた動的アニメーション時間を計算
@@ -86,6 +91,7 @@ class InterpolationAnimationManager {
 
   // データの補間計算
   interpolateData(startData, endData, progress) {
+
     // データ構造を確認して安全に処理
     if (!startData || !endData) {
       console.warn('補間データが不正です:', { startData, endData });
