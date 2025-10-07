@@ -504,7 +504,7 @@ function modify_html(response, mode) {
 //ピラミッド描画エンジン(引数isAnm: アニメーション中かどうかのフラグ, isInterpolation: 補間アニメーション中かどうかのフラグ)
 function change_pyramid(objectData, animeMode) {
   console.warn("change_pyramid開始");
-  console.trace();
+  //console.trace();
     
   let isAnm ;
   let isInterpolation ;

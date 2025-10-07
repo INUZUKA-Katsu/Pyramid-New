@@ -1,12 +1,14 @@
 // 補間アニメーション管理クラス
 class InterpolationAnimationManager {
   constructor() {
+    this.init();
+  }
+  init() {
     this.isProcessingInterval = false; // 個別区間の処理状態
     this.currentIntervalStep = 0;      // 現在の区間内ステップ
     this.baseAnimationDuration = 1000; // 補間アニメーション時間（ms）
     this.baseInterpolationSteps = 10; // 補間ステップ数を減らす（20→10）
     this.currentStep = 0;
-    this.animationFrameId = null; // requestAnimationFrame ID
     this.startData = null;
     this.endData = null;
     this.currentData = null;
@@ -17,13 +19,18 @@ class InterpolationAnimationManager {
     this.lastFrameTime = 0; // 前回のフレーム時間
     this.targetFrameRate = 60; // 目標フレームレート（FPS）
     this.frameInterval = 1000 / this.targetFrameRate; // フレーム間隔（ms）
+
+    // 状態変数
     this.paused = false; // アニメーション一時停止フラグ
     this.stopped = false; // アニメーション終了フラグ
+    this.animationFrameId = null; // requestAnimationFrame ID
+    this.timerId = null; // setTimeout ID
   }
 
   // 2つの年次データ間の補間アニメーションを開始
   async startInterpolationAnimation(startYear, endYear, startData, endData, yearDifference) {
-
+    console.log("startInterpolationAnimation開始:");
+    console.dir(startData);
     this.startData = startData;
     this.endData = endData;
     this.yearDifference = yearDifference;
@@ -217,9 +224,10 @@ class InterpolationAnimationManager {
       while (this.paused && !this.stopped) {
         await this. sleep(100);
       }
+      if (this.stopped) return;
 
       // アニメーションが停止されている場合は終了
-      if (this.stopped || !this.isProcessingInterval) {
+      if (!this.isProcessingInterval) {
         console.warn(`アニメーション終了または区間処理終了`);
         this.cleanupAnimation();
         return;
@@ -250,6 +258,12 @@ class InterpolationAnimationManager {
       
       this.currentIntervalStep++;
       
+      // 🔸 一時停止中はここで待機（ループを抜けずに止まる）
+      while (this.paused && !this.stopped) {
+        await this. sleep(100);
+      }
+      if (this.stopped) return;
+
       // 次のフレームをスケジュール
       this.animationFrameId = requestAnimationFrame(animate);
     };
@@ -320,6 +334,7 @@ class InterpolationAnimationManager {
   pauseAnimation() {
     console.warn(`補間アニメーション一時停止`);
     this.paused = true;
+    console.log("isProcessingInterval:", window.interpolationAnimation.isProcessingInterval);
   }
 
   // アニメーション再開
@@ -331,8 +346,14 @@ class InterpolationAnimationManager {
   // アニメーション終了
   stopAnimation() {
     console.warn(`補間アニメーション終了`);
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    clearTimeout(this.timerId);
+    this.paused = false;
     this.stopped = true;
-    this.cleanupAnimation();
+
   }
 
   // アニメーション時間を設定

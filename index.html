@@ -2601,6 +2601,13 @@
 
         // アニメーション開始
         async function startAnimationFromControls() {
+          if (window.streamingAnimation && window.streamingAnimation.paused) {
+            window.streamingAnimation.stopped = true;
+            window.streamingAnimation.paused = false;
+            const dataCache = window.streamingAnimation.dataCache;
+            window.streamingAnimation.init();
+            window.streamingAnimation.dataCache = dataCache;
+          }
           const animationType = document.querySelector(
             'input[name="animation-type-inline"]:checked'
           ).value;
@@ -2669,7 +2676,6 @@
             // 面積固定モード（補間・非補間共通）
             // 面積固定モードを有効化
             window.streamingAnimation.useVariableAreaMode = false;
-            window.interpolationAnimation = new InterpolationAnimationManager();
             if (window.streamingAnimation) {
               await window.streamingAnimation.startStreamingAnimation();
             } else {
