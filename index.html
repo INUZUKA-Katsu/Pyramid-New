@@ -2493,7 +2493,7 @@
               if (speedDisplay) {
                 speedDisplay.textContent = actualSpeed + "ms";
               }
-
+              
               // アニメーションが初期化されている場合のみ速度を設定
               if (
                 window.streamingAnimation &&
@@ -2553,7 +2553,7 @@
         // 未処理のPromise拒否をキャッチ
         window.addEventListener("unhandledrejection", function (event) {
           console.error("未処理のPromise拒否が発生しました:", event.reason);
-          alert("非同期処理でエラーが発生しました: " + event.reason);
+          //alert("非同期処理でエラーが発生しました: " + event.reason);
         });
 
         // アニメーションコントロールの表示切り替え
@@ -2647,7 +2647,12 @@
               document.getElementById("animation-speed").value
             );
             const currentSpeed = 550 - sliderValue; // スライダー値を逆転
-            window.streamingAnimation.animationSpeed = currentSpeed;
+            const speedDisplay = document.getElementById("speed-display");
+            if (speedDisplay) {
+              speedDisplay.textContent = currentSpeed + "ms";
+            }
+
+            window.streamingAnimation.setAnimationSpeed(currentSpeed);
             window.streamingAnimation.useInterpolation =
               animationType === "interpolation";
             window.streamingAnimation.interpolationDuration = 1000;

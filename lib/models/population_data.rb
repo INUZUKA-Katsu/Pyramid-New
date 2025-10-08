@@ -300,9 +300,30 @@ class PopulationData
     data["not_exist"] = data["shiku"]
     data["kijunbi"] = @data_converter.generate_kijunbi(@nengetsu)
     data["source_url"] = ""
-    data["kakusai_betsu"] = Array.new(101) { ["", "0", "0", "0"] }
-                                 .each_with_index { |sai, i| sai[0] = i.to_s }
-    
+
+    if @nengetsu[0,4].to_i <= 1990
+      data["five_year_age_group"] = Array.new(22) { ["", "0", "0", "0"] }.
+                                    each_with_index do |sai, i|
+                                      if i == 0
+                                        sai[0] = "総数"
+                                      elsif i == 21
+                                        sai[0] = "100歳以上"
+                                      else
+                                       sai[0] = ((i-1)*5).to_s + "～" + (i*5-1).to_s + "歳"
+                                      end
+                                    end
+    else
+      data["kakusai_betsu"] = Array.new(102) { ["", "0", "0", "0"] }.
+                              each_with_index do |sai, i|
+                                if i==0
+                                  sai[0] = "総数"
+                                elsif i==101
+                                  sai[0] = "100歳以上"
+                                else
+                                 sai[0] = (i-1).to_s
+                                end
+                              end
+    end
     JSON.generate(data)
   end
   

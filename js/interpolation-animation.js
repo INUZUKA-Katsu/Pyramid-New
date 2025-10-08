@@ -113,15 +113,20 @@ class InterpolationAnimationManager {
       const male = item[2];
       const female = item[3];
       
-      //if (age.match(/総数|合計|年齢不詳/) || male == null || female == null) {
-      //  return;
-      //}
-      const ageNum = (age === "総数" || age === "合計") ? "総数" : parseInt(age);
+      let ageNum = (age === "総数" || age === "合計") ? "総数" : parseInt(age);
+      if (ageNum > 100) {
+        ageNum = 100; // 101歳以上は100歳に集約するため便宜上100とする.
+      }        
       const maleNum = parseInt(male.toString().replace(/,/g, '')) || 0;
-      const femaleNum = parseInt(female.toString().replace(/,/g, '')) || 0;
+      const femaleNum = parseInt(female.toString().replace(/,/g, '')) || 0;    
       
-      
-      startPopulationMap.set(ageNum, { male: maleNum, female: femaleNum });
+      const existingData = startPopulationMap.get(ageNum) || { male: 0, female: 0 };
+      startPopulationMap.set(ageNum, 
+        { 
+          male: existingData.male + maleNum, 
+          female: existingData.female + femaleNum 
+        }
+      );
     });
 
     // 終了データから年齢別人口マップを作成
@@ -131,15 +136,20 @@ class InterpolationAnimationManager {
       const male = item[2];
       const female = item[3];
       
-      //if (age.match(/総数|合計|年齢不詳/) || male == null || female == null) {
-      //  return;
-      //}
-      const ageNum = (age === "総数" || age === "合計") ? "総数" : parseInt(age);
+      let ageNum = (age === "総数" || age === "合計") ? "総数" : parseInt(age);
+      if (ageNum > 100) {
+        ageNum = 100; // 101歳以上は100歳に集約するため便宜上100とする.
+      }        
       const maleNum = parseInt(male.toString().replace(/,/g, '')) || 0;
       const femaleNum = parseInt(female.toString().replace(/,/g, '')) || 0;
       
-      
-      endPopulationMap.set(ageNum, { male: maleNum, female: femaleNum });
+      const existingData = endPopulationMap.get(ageNum) || { male: 0, female: 0 };
+      endPopulationMap.set(ageNum, 
+        { 
+          male: existingData.male + maleNum, 
+          female: existingData.female + femaleNum
+        }
+      );
     });
 
     // 補間結果のオブジェクトを作成
@@ -227,10 +237,12 @@ class InterpolationAnimationManager {
     const animate = async(currentTime) => {
 
       // 🔸 一時停止中はここで待機（ループを抜けずに止まる）
-      while (this.paused && !this.stopped) {
+      while (this.paused) {
         await this. sleep(100);
       }
-      if (this.stopped) return;
+      if (this.stopped) {
+        return;
+      }
 
       // アニメーションが停止されている場合は終了
       if (!this.isProcessingInterval) {
@@ -240,6 +252,7 @@ class InterpolationAnimationManager {
       }
 
       // フレームレート制御
+      //console.warn(`🌸フレームレート制御: frameInterval:${this.frameInterval}`);
       const deltaTime = currentTime - this.lastFrameTime;
       if (deltaTime < this.frameInterval) {
         this.animationFrameId = requestAnimationFrame(animate);
@@ -257,19 +270,20 @@ class InterpolationAnimationManager {
       // イージングを適用した進行度
       const rawProgress = this.currentIntervalStep / interpolatedData.length;
       const easedProgress = this.easeInOutCubic(rawProgress);
-      
+            
+      // 🔸 一時停止中はここで待機（ループを抜けずに止まる）
+      while (this.paused) {
+        await this. sleep(100);
+      }
+      if (this.stopped) {
+        return;
+      }
       // データを描画（配列番号は0から始まるので、-1する）
       console.warn(`currentIntervalStep:${this.currentIntervalStep}、rawProgress:${rawProgress}`);
       this.renderInterpolatedData(interpolatedData[this.currentIntervalStep-1], easedProgress, rawProgress);
       
       this.currentIntervalStep++;
       
-      // 🔸 一時停止中はここで待機（ループを抜けずに止まる）
-      while (this.paused && !this.stopped) {
-        await this. sleep(100);
-      }
-      if (this.stopped) return;
-
       // 次のフレームをスケジュール
       this.animationFrameId = requestAnimationFrame(animate);
     };
@@ -289,7 +303,7 @@ class InterpolationAnimationManager {
   }
 
   // 補間データを描画
-  renderInterpolatedData(data, progress, rawProgress) {
+  async renderInterpolatedData(data, progress, rawProgress) {
     console.warn(`renderInterpolatedData開始`);
     console.dir(data);
     try {
@@ -309,7 +323,15 @@ class InterpolationAnimationManager {
           isVariableAreaMode: window.streamingAnimation.useVariableAreaMode
         };
         console.warn(`isInterpolation:${animeMode.isInterpolation}`);
-        change_pyramid(data, animeMode);
+        
+        // 🔸 一時停止中はここで待機（ループを抜けずに止まる）
+        while (this.paused) {
+          await this. sleep(100);
+        }
+        if (this.stopped) {
+          return;
+        }
+        change_pyramid(this.currentData, animeMode);
       } else {
         console.error('change_pyramid関数が見つかりません');
       }
@@ -346,6 +368,7 @@ class InterpolationAnimationManager {
   // アニメーション再開
   resumeAnimation() {
     console.warn(`補間アニメーション再開`);
+    this.setFrameRate();
     this.paused = false;
   }
 
@@ -357,9 +380,9 @@ class InterpolationAnimationManager {
       this.animationFrameId = null;
     }
     clearTimeout(this.timerId);
-    this.paused = false;
     this.stopped = true;
-
+    this.sleep(10);
+    this.paused = false;
   }
 
   // アニメーション時間を設定
@@ -380,7 +403,8 @@ class InterpolationAnimationManager {
   // フレームレートを設定
   setFrameRate() {
     //animationSpeedは 500ms~50ms => frameIntervalは 150ms~15ms.
-    this.frameInterval = window.streamingAnimation.animationSpeed  *  3 / 10  ;
+    window.streamingAnimation.setAnimationSpeed()
+    this.frameInterval =  window.streamingAnimation.animationSpeed * 3 / 10  ;
     this.targetFrameRate = 1000 / this.frameInterval;
   }
 }

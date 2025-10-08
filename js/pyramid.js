@@ -502,7 +502,7 @@ function modify_html(response, mode) {
 //#######  ピラミッドを描画するコアプログラム  ##########
 
 //ピラミッド描画エンジン(引数isAnm: アニメーション中かどうかのフラグ, isInterpolation: 補間アニメーション中かどうかのフラグ)
-function change_pyramid(objectData, animeMode) {
+async function change_pyramid(objectData, animeMode) {
   console.warn("change_pyramid開始");
   //console.trace();
     
@@ -522,7 +522,16 @@ function change_pyramid(objectData, animeMode) {
   //console.warn("1 get_selected_nengetsu()",get_selected_nengetsu());
   //console.warn("1 $nengetsu",$nengetsu);
 
-
+  if (isAnm) {
+    // 一時停止
+    while (window.streamingAnimation.paused) {
+      await window.streamingAnimation.sleep(100);
+    }
+    // 一時停止状態で進捗スライダーが操作されたときは既存データは描画せずに終える。
+    if (window.streamingAnimation.stopped) {
+      return;
+    }
+  }
   //ピラミッドを描画する。
   if (window.pyramidRenderer == null) {
     renderPyramid(objectData, animeMode);
@@ -687,8 +696,8 @@ function change_pyramid(objectData, animeMode) {
       nengetsu = $nengetsu;
     }
 
-    console.warn(`🌹source_str shiku: ${shiku}、nengetu: ${nengetsu}、nengetu: ${nengetsu}`);
-    console.warn(`🌹source: ${source}`);
+    //console.warn(`🌹source_str shiku: ${shiku}、nengetu: ${nengetsu}、nengetu: ${nengetsu}`);
+    //console.warn(`🌹source: ${source}`);
     
     //掲載ページ
     const choki_url = "https://www.city.yokohama.lg.jp/city-info/yokohamashi/tokei-chosa/portal/jinko/choki.html";
