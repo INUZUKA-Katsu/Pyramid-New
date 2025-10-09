@@ -215,9 +215,11 @@ class StreamingAnimationManager {
     this.cleanupAnimation();
     console.log("isProcessingInterval:", window.interpolationAnimation.isProcessingInterval);
 
-    // アニメーション開始前の人数表示状態を保存
-    const showElement = document.getElementById("show");
-    this.initialShowNumbers = showElement ? showElement.checked : false;
+    // アニメーション開始前の人数表示状態を保存し、表示されてるときは非表示にする
+    this.initialShowNumbers = currentOptions.showNumbers;
+    if (this.initialShowNumbers) {
+      this.showNinzu_Setting('hidden');
+    }
     
     const pyramode = get_pyramid_mode();
     const shiku = get_selected_shiku();
@@ -816,16 +818,10 @@ class StreamingAnimationManager {
 
     const animate = async (currentTime) => {
 
-      const allYearsSets = [];
-
       if (this.useInterpolation) {
         if (this.interPolationYears.length == 0) {
           this.interPolationYears = this.selectInterpolationYears();
         }
-        allYearsSets.push(...this.interPolationYears);
-        console.log(`🌹🌹🌹 allYearsSets:${allYearsSets}、this.interPolationYears:${this.interPolationYears}`);
-      } else {
-        allYearsSets.push(...this.allYears);
       }
   
       // 最初にフラグチェック
@@ -837,23 +833,31 @@ class StreamingAnimationManager {
       // 終了フラグ => 終了
       if (this.stopped) return;
       
-      const currentYear = allYearsSets[this.currentYearIndex];
+      const currentYear = this.currentYearOfIndex(this.currentYearIndex);
 
+      // ***********************************************************************
+      // スピード制御（フレームレート制御）: 描画すべきタイミングになっていなければ描画せずに、次のリクエスト予約をしてこの関数を終了する。
       if (this.animationSpeed > 0 && !this.useInterpolation) {
-        // 時間調整（フレームレート制御） 年数差に応じた描画間隔を計算
+      
+        // 年数差に応じた描画間隔を計算
         const dynamicInterval = this.calculateDynamicInterval(this.currentYearIndex);
         const deltaTime = currentTime - this.lastFrameTime;
+       
         if (deltaTime < dynamicInterval) {
           this.animationFrameId = requestAnimationFrame(animate); // 次のブラウザ描画タイミングでanimateを呼び出す予約
           return; // この関数を終了
         }
+        
         this.lastFrameTime = currentTime;
-        console.log(`🎬 アニメーションループ: 年次=${currentYear}, インデックス=${this.currentYearIndex}/${allYearsSets.length}`);
+        //console.log(`🎬 アニメーションループ: 年次=${currentYear}, インデックス=${this.currentYearIndex}/${this.allYearsSets().length}`);
       }
-            
+      // スピード制御ここまで
+      // ***********************************************************************
+
       // データがキャッシュにあるかチェック
-      console.warn(`🎬 データがキャッシュにあるかチェック: 年次=${currentYear} in this.dataCache:${currentYear in this.dataCache}`);
-      console.dir(this.dataCache);
+      //console.warn(`🎬 データがキャッシュにあるかチェック: 年次=${currentYear} in this.dataCache:${currentYear in this.dataCache}`);
+      //console.dir(this.dataCache);
+
       if (currentYear in this.dataCache) {
         const cachedData = this.dataCache[currentYear];
 
@@ -878,7 +882,7 @@ class StreamingAnimationManager {
           console.warn(`次のcurrentYearIndex:${this.currentYearIndex}`);
           
           // プログレススライダーを更新
-          const progress = Math.floor((this.currentYearIndex / allYearsSets.length) * 100);
+          const progress = Math.floor((this.currentYearIndex / this.allYearsSets().length) * 100);
           this.updateProgressSlider(progress);
           
           // 次のバッチが必要かチェック
@@ -889,7 +893,7 @@ class StreamingAnimationManager {
         }
         
         // アニメーション継続（requestAnimationFrame + 速度制御）
-        if (this.currentYearIndex < allYearsSets.length && !this.stopped) {
+        if (this.currentYearIndex < this.allYearsSets().length && !this.stopped) {
           if (this.animationSpeed > 0 && !this.useInterpolation) {
             // 年数差に応じた描画間隔を計算
             //const dynamicInterval = this.calculateDynamicInterval(this.currentYearIndex);
@@ -913,7 +917,7 @@ class StreamingAnimationManager {
 
             this.animationFrameId = requestAnimationFrame(animate);
           }
-        } else if (this.currentYearIndex >= allYearsSets.length) {
+        } else if (this.currentYearIndex >= this.allYearsSets().length) {
           // アニメーション完了
           console.log('🎉 アニメーション完了');
           this.completeAnimation();
@@ -921,19 +925,12 @@ class StreamingAnimationManager {
         
       } else {
         // データがまだ読み込まれていない場合は待機
-        console.log(`⏳ 年次 ${currentYear} データ待機中... (${this.currentYearIndex + 1}/${allYearsSets.length})`);
+        console.log(`⏳ 年次 ${currentYear} データ待機中... (${this.currentYearIndex + 1}/${this.allYearsSets().length})`);
         
           if (this.currentYearIndex == undefined) {
             this.currentYearIndex = 1;
           }
-          if (allYearsSets.length == 0) {
-            if (this.useInterpolation) {
-              allYearsSets.push(...this.interPolationYears);
-            } else {
-              allYearsSets.push(...this.allYears);
-            }
-          }
-          console.dir(this.dataCache);
+          //console.dir(this.dataCache);
 
         await this.sleep(100);
         while (this.paused && !this.stopped) {
@@ -1273,6 +1270,8 @@ class StreamingAnimationManager {
         }
       }
     });
+    console.warn(`selectInterpolationYears:${interPolationYears}`);
+    console.dir(interPolationYears);
     return interPolationYears;
   }
 
@@ -1322,32 +1321,38 @@ class StreamingAnimationManager {
     this.updateProgressSlider(100);
   }
 
-  // 人数ラベルを表示
+  // 人数ラベルの表示を元に戻す
   showPopulationLabels() {
-    // 現在の年次を取得
-    const currentYear = this.getCurrentDisplayYear();
-    
-    // セレクトボックスの表示を現在の年次に同期（これによりchange_pyramidが呼び出される）
-    this.syncSelectBoxToCurrentYear(currentYear);
-    
     // アニメーション開始前の人数表示状態に戻す
     if (this.initialShowNumbers !== null) {
-      const showCheckbox = document.getElementById("show");
-      if (showCheckbox) {
-        showCheckbox.checked = this.initialShowNumbers;
-        showNinzu_Setting(); // 人数表示設定を適用
+      if (this.initialShowNumbers) {
+        this.showNinzu_Setting('show');
       }
+    }
+  }
+
+  // 人数ラベルの表示を変更
+  showNinzu_Setting(mode) {
+    if (mode === "hidden") {
+      currentOptions.showNumbers = false;
+      window.pyramidRenderer.updateOptions({
+        showNumbers: false,
+      });
+    } else if (mode === "show") {
+      currentOptions.showNumbers = true;
+      window.pyramidRenderer.updateOptions({
+        showNumbers: true,
+      });
     }
   }
 
   // 現在表示されている年次を取得
   getCurrentDisplayYear() {
-    if (this.currentYearIndex > 0) {
+    if (this.currentYearIndex != null) {
       // アニメーション中または停止時は、最後に描画された年次
-      return this.allYears[this.currentYearIndex - 1];
+      return this.currentYearOfIndex(this.currentYearIndex-1);
     } else {
-      // アニメーション開始前は最初の年次
-      return this.allYears[0];
+      // nullのときは何もしない.
     }
   }
 
@@ -1357,21 +1362,29 @@ class StreamingAnimationManager {
     const targetYear = year || this.getCurrentDisplayYear();
     //console.log(`🔄 セレクトボックスを年次(${targetYear})に同期`);
     
-    const shikuYearSelect = document.getElementById("shiku_year");
-    if (!shikuYearSelect) {
-      console.warn("⚠️ shiku_yearセレクトボックスが見つかりません");
+    const pyramode = get_pyramid_mode();
+    
+    let yearSelect = null;
+    if (pyramode === "shiku") {
+      yearSelect = document.getElementById("shiku_year");
+    } else if (pyramode === "cho") {
+      yearSelect = document.getElementById("cho_year");
+    }
+    
+    if (!yearSelect) {
+      console.warn("⚠️ 年月セレクトボックスが見つかりません");
       return;
     }
     
     // オプションの存在確認
-    const optionExists = Array.from(shikuYearSelect.options).some(option => option.value === targetYear);
+    const optionExists = Array.from(yearSelect.options).some(option => option.value === targetYear);
     if (!optionExists) {
       console.warn(`⚠️ 年次${targetYear}のオプションが存在しません`);
       return;
     }
     
     // セレクトボックスの値を更新
-    shikuYearSelect.value = targetYear;
+    yearSelect.value = targetYear;
     $nengetsu = targetYear;
     console.log(`✅ shiku_yearセレクトボックスを${targetYear}に更新`);
     
@@ -1387,7 +1400,7 @@ class StreamingAnimationManager {
     
     // UISynchronizerを使ってスライドバーも同期
     if (typeof uiSynchronizer !== 'undefined' && uiSynchronizer) {
-      uiSynchronizer.syncSelectBoxWithSlider('shiku');
+      uiSynchronizer.syncSelectBoxWithSlider(pyramode);
     } else {
       console.warn("⚠️ uiSynchronizerが見つかりません");
     }
@@ -1402,11 +1415,15 @@ class StreamingAnimationManager {
 
   // アニメーション終了（改良版）
   stopAnimation() {
-    console.log('🛑 アニメーション終了');
-    this.stop();
+    console.log(`🌹アニメーション終了 @stopAnimation`);
             
-    // 終了時にもセレクトボックスを現在の年次に同期
+    // 現在の年次を取得
     const currentYear = this.getCurrentDisplayYear();
+
+    // stop()でinterPolationAnimationもstopする.
+    this.stop();
+
+    // セレクトボックスを現在の年次に同期
     this.syncSelectBoxToCurrentYear(currentYear);
     
     // 可変面積モードの場合は、基準スケールによるズームに戻す
@@ -1424,12 +1441,18 @@ class StreamingAnimationManager {
       const lastYear = this.allYears[this.allYears.length - 1];
       yearDisplay.innerHTML = `🛑 アニメーション終了<br><small>最終年次: ${this.formatYear(lastYear)} (${this.allYears.length}年分)</small>`;
     }
-    
+
+    // currentYearIndexを初期化
+    this.currentYearIndex = null;
+
     // アニメーションコントロールを非表示
     if (typeof hideAnimationControls === 'function') {
       hideAnimationControls();
     }
-    
+
+    // 人数ラベルの表示を元に戻す
+    this.showPopulationLabels();
+
     console.log('🛑 アニメーション終了完了');
   }
 
@@ -1489,13 +1512,8 @@ class StreamingAnimationManager {
       return;
     }
 
-    const allYearsSets = [];
-    if (this.useInterpolation) {
-      allYearsSets.push(...this.interPolationYears);
-    } else {
-      allYearsSets.push(...this.allYears);
-    }
     try {
+      const allYearsSets = this.allYearsSets();
       const targetIndex = Math.floor((progress / 100) * (allYearsSets.length - 1));
       const clampedIndex = Math.max(0, Math.min(targetIndex, allYearsSets.length - 1));
 
@@ -1639,7 +1657,32 @@ class StreamingAnimationManager {
 
   // 年数差に応じた動的間隔を計算
   calculateDynamicInterval(currentYearIndex) {
-    
+
+    const allYearsSets = this.allYearsSets();
+    const currentYear = allYearsSets[currentYearIndex];
+    const previousYear = allYearsSets[currentYearIndex - 1];
+    const twoYearsAGo = allYearsSets[currentYearIndex - 2];
+
+    // 最初の１枚は長く表示し、存在しない区の場合は早送りする。
+    if (this.dataCache && currentYear in this.dataCache) {
+      if (this.dataCache[currentYear].hasOwnProperty('not_exist')) {
+        // 区ができる前でデータが存在しないときは最小時間を返す
+        return 100;
+      } else if (currentYearIndex >= 2 &&
+                 previousYear in this.dataCache &&
+                 twoYearsAGo in this.dataCache &&
+                 this.dataCache[twoYearsAGo].hasOwnProperty('not_exist') &&
+                 !this.dataCache[previousYear].hasOwnProperty('not_exist')
+                ) {
+        // 区ができた最初の年は少し長く表示する。
+        return 1000;
+      } else if (currentYearIndex == 1) {
+        // 一般に最初の年は少し長く表示する。
+        return 1000;
+      }
+    }
+
+    // 速度調整スライダーと年間隔に対応したスピードの計算
     const x = this.animationSpeed;
     const actualSpeed = x ** 2 / 450 - x / 6 + 250 / 9 ; // 25msから500msまで２次関数的に推移
 
@@ -1647,15 +1690,7 @@ class StreamingAnimationManager {
     if (currentYearIndex <= 0) {
       return actualSpeed ; // 最初の年次は基本間隔
     }
-    const allYearsSets = [];
-    if (this.useInterpolation) {
-      allYearsSets.push(...this.interPolationYears);
-    } else {
-      allYearsSets.push(...this.allYears);
-    }
-    const currentYear = allYearsSets[currentYearIndex];
-    const previousYear = allYearsSets[currentYearIndex - 1];
-    
+
     const yearDifference = this.calculateYearDifference(previousYear, currentYear);
     
     // 年数差に応じて間隔を調整（最小100ms、最大2000ms）
@@ -1665,6 +1700,31 @@ class StreamingAnimationManager {
     console.log(`年次間隔調整: ${previousYear} → ${currentYear} (${yearDifference}年差) → ${clampedInterval}ms間隔`);
     
     return clampedInterval;
+  }
+  // インデックスから年次を取得
+  currentYearOfIndex(currentYearIndex) {
+    if (this.useInterpolation){
+      if (this.interPolationYears.length == 0 && this.dataCache != {}) {
+        this.interPolationYears = this.selectInterpolationYears();
+        console.dir(this.interPolationYears);
+      }
+      //alert(`currentYearOfIndex:${this.interPolationYears[currentYearIndex]}`);
+      return this.interPolationYears[currentYearIndex];
+    } else {
+      //alert(`currentYearOfIndex:${this.allYears[currentYearIndex]}`);
+      return this.allYears[currentYearIndex];
+    }
+  }
+  // 対象年次の集合
+  allYearsSets() {
+    if (this.useInterpolation) {
+      if (this.interPolationYears.length == 0 && this.dataCache != {}) {
+         this.interPolationYears = this.selectInterpolationYears();
+      }
+      return this.interPolationYears;
+    } else {
+      return this.allYears;
+    }
   }
 }
 

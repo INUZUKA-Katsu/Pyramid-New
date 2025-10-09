@@ -1939,7 +1939,7 @@
                   <div id="doga_button">
                     <!-- 動画ボタン -->
                     <button
-                      onClick="toggleAnimationPanel()"
+                      onClick="doga_button()"
                       name="animation"
                       type="button"
                       id="doga"
@@ -2576,6 +2576,7 @@
 
           // 進捗スライダーを初期化
           setupAnimationProgressSlider();
+
         }
 
         function hideAnimationControls() {
@@ -2823,7 +2824,7 @@
           }
         }
 
-        // アニメーション終了
+        // アニメーション終了(終了ボタン)
         function stopAnimationFromControls() {
           // 元の選択状態を保存
           //const originalNengetsu = get_selected_nengetsu();
@@ -2836,9 +2837,10 @@
           if (window.streamingAnimation) {
             window.streamingAnimation.stopAnimation();
           }
-          if (window.interpolationAnimation) {
-            window.interpolationAnimation.stopAnimation();
-          }
+          // 両方にストップを掛けるとstreamingAnimationのコードが最後まで実行されずに終わってしまう。
+          //if (window.interpolationAnimation) {
+          //  window.interpolationAnimation.stopAnimation();
+          //}
 
           // スライダーを無効化
           updateSliderState();
@@ -3108,7 +3110,7 @@
         }
 
         // 動画ボタンのクリック処理
-        function toggleAnimationPanel() {
+        function doga_button() {
           // 市区変更検知とキャッシュクリア
           checkAndClearCacheIfShikuChanged();
 
