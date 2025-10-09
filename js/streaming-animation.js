@@ -62,7 +62,8 @@ class StreamingAnimationManager {
           // データ形式を統一（配列形式の場合はオブジェクトに変換）
           const rawData = batchItem.data;
           const convertedData = this.getObjectPiramidData(rawData);
-          
+          console.log(`事前取得 年次 ${year} データ変換完了`);
+          console.dir(convertedData);
           // 変換結果を検証
           if (!convertedData) {
             console.error(`❌ 事前取得 年次 ${year} データ変換失敗: convertedData is null`);
@@ -73,10 +74,13 @@ class StreamingAnimationManager {
           // データ形式を検証（各歳別データまたは5歳階級別データのいずれかが存在することを確認）
           const hasKakusaiBetsu = convertedData.kakusai_betsu && Array.isArray(convertedData.kakusai_betsu);
           const hasFiveYearAgeGroup = convertedData.five_year_age_group && Array.isArray(convertedData.five_year_age_group);
-          const dataNotExist = convertedData.hasOwnProperty('not_exist');
+          let dataNotExist = false;
+          if (convertedData.hasOwnProperty('not_exist') && convertedData.not_exist != "") {
+            dataNotExist = true;
+          }
 
           // 補間アニメーションで使用できる年次を追加
-          if ( hasKakusaiBetsu && !dataNotExist) {
+          if (hasKakusaiBetsu && !dataNotExist) {
             this.interPolationYears.push(year);
           }
 
@@ -88,7 +92,7 @@ class StreamingAnimationManager {
           
           processedData[year] = convertedData;
           successYears.push(year);
-          //console.log(`✅ 事前取得 年次 ${year} データ変換完了`);
+          console.log(`✅ 事前取得 年次 ${year} データ変換完了`);
         } else {
           console.error(`❌ 事前取得 年次 ${year} データ取得失敗:`, batchItem);
           failedYears.push(year);
@@ -1262,7 +1266,10 @@ class StreamingAnimationManager {
       if (this.dataCache[year]) {
         // データ形式を検証（各歳別データが存在するか、区ができる前の年次かを確認）
         let hasKakusaiBetsu = this.dataCache[year].kakusai_betsu && Array.isArray(this.dataCache[year].kakusai_betsu);
-        let dataNotExist = this.dataCache[year].hasOwnProperty('not_exist');
+        let dataNotExist = false;
+        if (this.dataCache[year].hasOwnProperty('not_exist') && this.dataCache[year].not_exist != "") {
+          dataNotExist = true;
+        }
         
         // 補間アニメーションで使用できる年次を追加
         if ( hasKakusaiBetsu && !dataNotExist) {
@@ -1665,14 +1672,17 @@ class StreamingAnimationManager {
 
     // 最初の１枚は長く表示し、存在しない区の場合は早送りする。
     if (this.dataCache && currentYear in this.dataCache) {
-      if (this.dataCache[currentYear].hasOwnProperty('not_exist')) {
+      if (this.dataCache[currentYear].hasOwnProperty('not_exist') && 
+          this.dataCache[currentYear].not_exist != ""
+         ) 
+      {
         // 区ができる前でデータが存在しないときは最小時間を返す
         return 100;
       } else if (currentYearIndex >= 2 &&
                  previousYear in this.dataCache &&
                  twoYearsAGo in this.dataCache &&
-                 this.dataCache[twoYearsAGo].hasOwnProperty('not_exist') &&
-                 !this.dataCache[previousYear].hasOwnProperty('not_exist')
+                 (this.dataCache[twoYearsAGo].hasOwnProperty('not_exist') && this.dataCache[twoYearsAGo].not_exist != "") &&
+                 (!this.dataCache[previousYear].hasOwnProperty('not_exist') || this.dataCache[previousYear].not_exist == "")
                 ) {
         // 区ができた最初の年は少し長く表示する。
         return 1000;
