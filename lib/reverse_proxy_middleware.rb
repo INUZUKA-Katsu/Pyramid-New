@@ -19,8 +19,9 @@ class ReverseProxy
       
       elsif req.path.start_with?('/mcc')
         backend_url = @backend_uri + req.fullpath.sub("/mcc", "")
+        puts "リバースプロキシ: backend_url: #{backend_url}"
 
-      elsif req.path.match(/^\/img|choir\.css|get_mp3\.js|svgPiano\.js|howler\.core\.js/)
+      elsif req.path.match(/^\/img|choir\.css|get_mp3\.js|svgPiano\.js|howler\.core\.js/|get_information\.js)
         backend_url = @backend_uri + req.fullpath
       end
 
@@ -28,6 +29,7 @@ class ReverseProxy
       backend_req = Net::HTTP.const_get(req.request_method.capitalize).new(backend_url)
       copy_headers(req, backend_req)
       backend_req.body = req.body.read
+      puts "リバースプロキシ: backend_req.body: #{backend_req.body}"
 
       http = Net::HTTP.new(@backend_uri.host, @backend_uri.port)
       http.use_ssl = @backend_uri.scheme == 'https'
