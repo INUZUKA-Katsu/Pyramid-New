@@ -21,7 +21,7 @@ class ReverseProxy
         backend_url = @backend_uri + req.fullpath.sub("/mcc", "")
         puts "リバースプロキシ: backend_url: #{backend_url}"
 
-      elsif req.path.match(/^\/img|choir\.css|get_mp3\.js|svgPiano\.js|howler\.core\.js/|get_information\.js)
+      elsif req.path.match(/^\/img|choir\.css|get_mp3\.js|svgPiano\.js|howler\.core\.js|get_information\.js/)
         backend_url = @backend_uri + req.fullpath
       end
 
