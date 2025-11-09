@@ -18,9 +18,9 @@ require 'mechanize'
 require 'mail'
 
 require_relative '../services/s3_client'
-require_relative '../batchi/get_from_portal_site'
-require_relative '../batchi/make_shiku_option'
-require_relative '../batchi/make_cho_option'
+require_relative './get_from_portal_site'
+require_relative './make_shiku_option'
+require_relative './make_cho_option'
 
 Dir.chdir(__dir__)
 
