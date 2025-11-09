@@ -12,7 +12,6 @@ require 'openssl'
 require 'json'
 require 'logger'
 
-require 'bundler/setup'
 require 'roo'
 require 'mechanize'
 require 'mail'
@@ -60,15 +59,15 @@ AWS_txt_list   = 'Pyramid/nenreibetsu/txt_list.json'
 AWS_csv_list   = 'Pyramid/nenreibetsu/csv_list.json'
 
 #データが更新される1月と10月以外の月は直ちに終了する。
-#unless Time.now.month == 1 or Time.now.month == 10
-#  puts "1月と10月以外の月はここでプログラムを終了します。"
-#  exit
-#end
+unless Time.now.month == 1 or Time.now.month == 10
+  puts "1月と10月以外の月はここでプログラムを終了します。"
+  exit
+end
 ##奇数の日は直ちに終了する。
-#if Time.now.day % 2 == 1
-#  puts "奇数の日はここでプログラムを終了します。" 
-#  exit
-#end
+if Time.now.day % 2 == 1
+  puts "奇数の日はここでプログラムを終了します。" 
+  exit
+end
 $logger = Logger.new(STDOUT)
 
   #********************************
