@@ -10,3 +10,5 @@ gem 'dropbox_api'
 gem 'aws-sdk-s3'
 gem 'mail'
 gem 'mechanize'
+gem 'net-ftp'
+
