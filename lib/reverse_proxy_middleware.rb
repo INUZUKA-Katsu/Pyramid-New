@@ -42,8 +42,6 @@ class ReverseProxy
       # 他は元のRackアプリに処理を委譲
       @app.call(env)
     end
-  else
-    #p :not_match
   end
 
   private
