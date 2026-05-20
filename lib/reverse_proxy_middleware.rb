@@ -12,16 +12,14 @@ class ReverseProxy
     req = Rack::Request.new(env)
 
     # proxy対象パス
-if req.path.match(/christmas|easter|other|\/mcc|\/img|choir\.css|get_mp3\.js|svgPiano\.js|howler\.core\.js|get_information\.js|audio_durations\.json/)
+    #purs req.path
+    if req.path.match(/christmas|easter|other|\/mcc|\/img|choir\.css|get_mp3\.js|svgPiano\.js|howler\.core\.js|get_information\.js|audio_durations\.json/)
+      #p :match
       if req.path.match(/christmas|easter|other/)
-        # 転送先URLを組み立てる
         backend_url = @backend_uri + req.fullpath[/\/(christmas|easter|other)\/.*/]
-      
       elsif req.path.start_with?('/mcc')
         backend_url = @backend_uri + req.fullpath.sub("/mcc", "")
-        puts "リバースプロキシ: backend_url: #{backend_url}"
-
-      elsif req.path.match(/^\/img|choir\.css|get_mp3\.js|svgPiano\.js|howler\.core\.js|get_information\.js/)
+      else
         backend_url = @backend_uri + req.fullpath
       end
 
@@ -44,6 +42,8 @@ if req.path.match(/christmas|easter|other|\/mcc|\/img|choir\.css|get_mp3\.js|svg
       # 他は元のRackアプリに処理を委譲
       @app.call(env)
     end
+  else
+    #p :not_match
   end
 
   private
